@@ -1,0 +1,28 @@
+{
+  "name": "orm-curd",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@el-lowcode/crud": "^0.0.17",
+    "@prisma/client": "5.8.1",
+    "@vue/shared": "^3.4.15",
+    "@vueuse/core": "^10.7.2",
+    "el-form-render": "^0.0.17",
+    "element-plus": "^2.5.3",
+    "lodash-es": "^4.17.21",
+    "prisma": "^5.8.1",
+    "vue": "^3.3.11"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.5.2",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8",
+    "vue-tsc": "^1.8.25"
+  }
+}
