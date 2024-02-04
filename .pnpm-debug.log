@@ -1,0 +1,61 @@
+{
+  "0 debug pnpm:scope": {
+    "selected": 1
+  },
+  "1 debug pnpm:package-manifest": {
+    "initial": {
+      "name": "orm-curd",
+      "private": true,
+      "version": "0.0.0",
+      "type": "module",
+      "scripts": {
+        "dev": "vite",
+        "build": "vue-tsc && vite build",
+        "preview": "vite preview"
+      },
+      "dependencies": {
+        "vue": "^3.3.11"
+      },
+      "devDependencies": {
+        "@vitejs/plugin-vue": "^4.5.2",
+        "typescript": "^5.2.2",
+        "vite": "^5.0.8",
+        "vue-tsc": "^1.8.25"
+      }
+    },
+    "prefix": "D:\\npm-project\\orm-curd"
+  },
+  "2 debug pnpm:context": {
+    "currentLockfileExists": false,
+    "storeDir": "D:\\.pnpm-store\\v3",
+    "virtualStoreDir": "D:\\npm-project\\orm-curd\\node_modules\\.pnpm"
+  },
+  "3 debug pnpm:stage": {
+    "prefix": "D:\\npm-project\\orm-curd",
+    "stage": "resolution_started"
+  },
+  "4 error pnpm": {
+    "code": "ERR_PNPM_FETCH_404",
+    "hint": "@el-lowcode/curd is not in the npm registry, or you have no permission to fetch it.\n\nAn authorization header was used: Bearer npm_[hidden]",
+    "request": {
+      "authHeaderValue": "Bearer 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",
+      "url": "https://registry.npmjs.org/@el-lowcode%2Fcurd"
+    },
+    "response": {
+      "size": 0
+    },
+    "pkgName": "@el-lowcode/curd",
+    "spec": {
+      "fetchSpec": "latest",
+      "name": "@el-lowcode/curd",
+      "type": "tag"
+    },
+    "pkgsStack": [],
+    "err": {
+      "name": "pnpm",
+      "message": "GET https://registry.npmjs.org/@el-lowcode%2Fcurd: Not Found - 404",
+      "code": "ERR_PNPM_FETCH_404",
+      "stack": "pnpm: GET https://registry.npmjs.org/@el-lowcode%2Fcurd: Not Found - 404\n    at RetryOperation._fn (C:\\Users\\lzh\\AppData\\Roaming\\npm\\node_modules\\pnpm\\dist\\pnpm.cjs:84412:19)\n    at processTicksAndRejections (node:internal/process/task_queues:96:5)"
+    }
+  }
+}
