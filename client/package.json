@@ -10,15 +10,14 @@
   },
   "dependencies": {
     "@el-lowcode/crud": "^0.0.17",
-    "@prisma/client": "5.8.1",
     "@vue/shared": "^3.4.15",
     "@vueuse/core": "^10.7.2",
     "el-form-render": "^0.0.17",
     "element-plus": "^2.5.3",
     "lodash-es": "^4.17.21",
-    "prisma": "^5.8.1",
     "umi-request": "^1.4.0",
-    "vue": "^3.3.11"
+    "vue": "^3.3.11",
+    "vue-request": "^2.0.4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.2",

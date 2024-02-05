@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watchEffect, watchPostEffect } from 'vue';
+import { useRequest, usePagination } from 'vue-request'
 import { toReactive, objectPick } from '@vueuse/core'
 import { Field, NormalizedField, TableXXX } from './props'
 import { useConfig } from './context';
@@ -18,24 +19,41 @@ const cruds = createCruds(config.tables)
 const ctx = cruds[_props.table!]
 
 
-watchPostEffect(() => {
-  console.log(
-    JSON.parse(JSON.stringify(cruds[_props.table!].find(searchModel.value)?.argv || null))
-  );
-  console.log(
-    JSON.parse(JSON.stringify(cruds[_props.table!].finds(searchModel.value)?.argv || null))
-  );
-  console.log(
-    JSON.parse(JSON.stringify(cruds[_props.table!].create(formModel.value || {}).argv || null))
-  );
-  console.log(
-    JSON.parse(JSON.stringify(cruds[_props.table!].update(searchModel.value)?.argv || null))
-  );
-  
-})
+// watchPostEffect(() => {
+//   console.log(
+//     JSON.parse(JSON.stringify(cruds[_props.table!].find(searchModel.value)?.argv || null))
+//   );
+//   console.log(
+//     JSON.parse(JSON.stringify(cruds[_props.table!].finds(searchModel.value)?.argv || null))
+//   );
+//   console.log(
+//     JSON.parse(JSON.stringify(cruds[_props.table!].create(formModel.value || {}).argv || null))
+//   );
+//   console.log(
+//     JSON.parse(JSON.stringify(cruds[_props.table!].update(searchModel.value)?.argv || null))
+//   );
+// })
+
+// const { data } = useRequest((data) => cruds[_props.table!].finds(data))
+// const {} = usePagination()
 
 const searchModel = ref({})
 const formModel = ref()
+
+async function request(_, data, type) {
+  if (type == 'list') {
+    return {
+      data: {
+        total: await cruds[_props.table!].count(data),
+        list: await cruds[_props.table!].finds(data),
+      }
+    }
+  }
+  if (type == 'new') {
+    console.log(...arguments);
+    return await cruds[_props.table!].create(data)
+  }
+}
 
 const options = [
   { title: '1', id: '1' },
@@ -57,13 +75,10 @@ function setRelVal(field: NormalizedField, row, val) {
     :searchItems="ctx.searchs"
     :formItems="ctx.forms"
     :columns="ctx.columns"
-    :request="() => ({})"
+    url="xxx"
+    :request="request"
     v-model:search="searchModel"
     v-model:form="formModel"
-    :data="[
-      { aaa: 'xxx', bbb: '123', ccc: '331' },
-      { aaa: 'xxx', bbb: '123', ccc: '331' },
-    ]"
     :btns="() => [
       { children: 'xxx' }
     ]"

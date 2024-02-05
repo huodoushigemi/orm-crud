@@ -1,17 +1,20 @@
 import { TableXXX } from "../props"
 
+const required = true
+
 export const User: TableXXX = {
   fields: [
     { label: 'id', prop: 'id' },
-    { label: 'name', prop: 'name', filter: 'contains' },
-    { label: 'age', prop: 'age' },
+    { label: 'name', prop: 'name', filter: 'contains', required },
+    { label: 'age', prop: 'age', required },
+    { label: '邮箱', prop: 'email', required },
     { label: 'following', prop: 'following', relation: { table: 'User', rel: 'm-n' } },
     { label: 'followedBy', prop: 'followedBy', relation: { table: 'User', rel: 'm-n' } },
     { label: 'comments', prop: 'comments', relation: { table: 'Comment', rel: '1-n' } },
     { label: 'posts', prop: 'posts', relation: { table: 'Post', rel: '1-n' } }
   ],
-  columns: ['id', 'name', 'age'],
-  forms: ['name', 'age'],
+  columns: ['id', 'name', 'age', 'email'],
+  forms: ['name', { prop: 'age', type: 'input-number' }, 'email'],
   searchs: ['name'],
   btns: [],
   map: { label: 'name' }

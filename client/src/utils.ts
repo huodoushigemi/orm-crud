@@ -19,13 +19,13 @@ export function findFieldPath(ctx: TableCtx, prop: string) {
   })
 }
 
-export function normalizeField(field: Field | string, ctx: TableCtx): NormalizedField {
+export function normalizeField(field: Field | string, ctx: TableCtx, assign?: boolean): NormalizedField {
   if (typeof field == 'string') {
     const prop = field 
     return ctx.keybyed[prop] ||= { label: genLabel(prop), prop }
   } else {
     const cache = ctx.keybyed[field.prop]
-    return ctx.keybyed[field.prop] ||= {
+    const ret = {
       ...cache,
       ...field,
       label: field.label || cache?.label || genLabel(field.prop),
@@ -36,6 +36,7 @@ export function normalizeField(field: Field | string, ctx: TableCtx): Normalized
         })()
         : undefined
     }
+    return assign ? ret : (ctx.keybyed[field.prop] ||= ret)
   }
 
   function genLabel(prop: string) {

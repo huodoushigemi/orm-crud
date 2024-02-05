@@ -62,12 +62,17 @@ function createCrud(tables: Record<string, TableXXX>, table: string, ctxs: Recor
   }
 
   config.fields.forEach((e, i) => ctx.fields[i] = normalizeField(e, ctx))
-  config.columns.forEach((e, i) => ctx.columns[i] = normalizeField(e, ctx))
-  config.searchs.forEach((e, i) => ctx.searchs[i] = normalizeField(e, ctx))
-  config.forms.forEach((e, i) => ctx.forms[i] = normalizeField(e, ctx))
+  config.columns.forEach((e, i) => ctx.columns[i] = normalizeField(e, ctx, true))
+  config.searchs.forEach((e, i) => ctx.searchs[i] = normalizeField(e, ctx, true))
+  config.forms.forEach((e, i) => ctx.forms[i] = normalizeField(e, ctx, true))
 
-  const crud = { find, finds, create, update, remove, removes }
-  Object.setPrototypeOf(ctx, crud)
+  const crud = { find, finds, create, update, remove, removes, count }
+  const crudReq = Object.keys(crud).reduce((o, e) => {
+    o[e] = (data) => request.post('/crud', { data: crud[e].call(ctx, data) })
+    return o
+  }, {})
+
+  Object.setPrototypeOf(ctx, crudReq)
 
   return ctx as TableCtx & typeof crud
 }
@@ -77,20 +82,20 @@ function find(this: TableCtx, data) {
     table: this.table,
     action: 'find',
     argv: {
-      select: select(this.fields),
+      select: select(this.columns),
       where: data,
     }
   }
 }
 
-async function finds(this: TableCtx, data) {
+function finds(this: TableCtx, data) {
   const extraQueryKs = Object.keys(data).filter(k => !this.searchs.find(e => e.prop.split('.')[0] == k))
   const extraQs = objectPick(data, extraQueryKs as any)
-  const params = {
+  return {
     table: this.table,
     action: 'findMany',
     argv: {
-      select: select(this.fields),
+      select: select(this.columns),
       where: where(this, data),
       // todo
       // @ts-ignore
@@ -99,7 +104,16 @@ async function finds(this: TableCtx, data) {
       take: extraQs.page.pageSize
     }
   }
-  return await request.post('/crud', { data: params })
+}
+
+function count(this: TableCtx, data) {
+  return {
+    table: this.table,
+    action: 'count',
+    argv: {
+      where: where(this, data)
+    }
+  }
 }
 
 function create(this: TableCtx, data) {
@@ -177,7 +191,7 @@ function where(ctx: TableCtx, data: any) {
           path.push(field.relation.prop)
         }
         else if (field.filter) {
-          if (e.filter) path[ps.length - 1] = field.filter
+          if (e.filter) path[path.length - 1] = field.filter
           else path.push(field.filter)
         }
       }

@@ -11,6 +11,7 @@ export interface Field {
   label?: string
   prop: string
   filter?: XXX<'contains' | 'endsWith' | 'equals' | 'gt' | 'gte' | 'in' | 'lt' | 'lte' | 'not' | 'notIn' | 'startsWith', 'every' | 'some'>
+  required?: boolean
   relation?: {
     table: string
     name?: string
