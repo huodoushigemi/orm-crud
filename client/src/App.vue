@@ -7,6 +7,6 @@ import tables from './tables/index'
 
 <template>
   <ConfigProvider :tables="tables">
-    <Table table="comment" />
+    <Table table="Comment" />
   </ConfigProvider>
 </template>

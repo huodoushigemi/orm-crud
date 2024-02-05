@@ -17,6 +17,7 @@
     "element-plus": "^2.5.3",
     "lodash-es": "^4.17.21",
     "prisma": "^5.8.1",
+    "umi-request": "^1.4.0",
     "vue": "^3.3.11"
   },
   "devDependencies": {

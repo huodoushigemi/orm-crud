@@ -26,11 +26,11 @@ watchPostEffect(() => {
     JSON.parse(JSON.stringify(cruds[_props.table!].finds(searchModel.value)?.argv || null))
   );
   console.log(
-    JSON.parse(JSON.stringify(cruds[_props.table!].create(formModel.value)?.argv || null))
+    JSON.parse(JSON.stringify(cruds[_props.table!].create(formModel.value || {}).argv || null))
   );
-  // console.log(
-  //   JSON.parse(JSON.stringify(cruds[_props.table!].create(searchModel.value)?.argv || null))
-  // );
+  console.log(
+    JSON.parse(JSON.stringify(cruds[_props.table!].update(searchModel.value)?.argv || null))
+  );
   
 })
 

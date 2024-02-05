@@ -24,9 +24,11 @@ export function normalizeField(field: Field | string, ctx: TableCtx): Normalized
     const prop = field 
     return ctx.keybyed[prop] ||= { label: genLabel(prop), prop }
   } else {
+    const cache = ctx.keybyed[field.prop]
     return ctx.keybyed[field.prop] ||= {
+      ...cache,
       ...field,
-      label: field.label || genLabel(field.prop),
+      label: field.label || cache?.label || genLabel(field.prop),
       relation: field.relation
         ? (() => {
           const { table } = field.relation, { map } = ctx.tables[table]
@@ -40,5 +42,3 @@ export function normalizeField(field: Field | string, ctx: TableCtx): Normalized
     return prop.split('.').length > 1 ? findFieldPath(ctx, prop).map(e => e.label).join('.') : prop
   }
 }
-
-// tables keybyed

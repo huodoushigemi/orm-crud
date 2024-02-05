@@ -3,6 +3,11 @@ import { get, set, keyBy } from 'lodash-es'
 import { ConfigProviderContext, Field, NormalizedField, NormalizedTableXXX, TableXXX } from "./props";
 import { objectPick } from "@vueuse/core";
 import { findFieldPath, normalizeField } from "./utils";
+import { extend } from 'umi-request'
+
+const request = extend({
+  prefix: 'http://localhost:3000/prisma'
+})
 
 export function useCrud() {
 
@@ -78,10 +83,10 @@ function find(this: TableCtx, data) {
   }
 }
 
-function finds(this: TableCtx, data) {
+async function finds(this: TableCtx, data) {
   const extraQueryKs = Object.keys(data).filter(k => !this.searchs.find(e => e.prop.split('.')[0] == k))
   const extraQs = objectPick(data, extraQueryKs as any)
-  return {
+  const params = {
     table: this.table,
     action: 'findMany',
     argv: {
@@ -94,6 +99,7 @@ function finds(this: TableCtx, data) {
       take: extraQs.page.pageSize
     }
   }
+  return await request.post('/crud', { data: params })
 }
 
 function create(this: TableCtx, data) {
