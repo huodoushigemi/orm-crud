@@ -7,6 +7,10 @@ import tables from './tables/index'
 
 <template>
   <ConfigProvider :tables="tables">
-    <Table table="Comment" />
+    <Table table="User" />
+
+    <br />
+
+    <Table table="Post" />
   </ConfigProvider>
 </template>

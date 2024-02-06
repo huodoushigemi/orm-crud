@@ -7,10 +7,7 @@ settings:
 dependencies:
   '@el-lowcode/crud':
     specifier: ^0.0.17
-    version: 0.0.17(element-plus@2.5.3)(vue@3.4.15)
-  '@prisma/client':
-    specifier: 5.8.1
-    version: 5.8.1(prisma@5.8.1)
+    version: 0.0.17(element-plus@2.5.5)(vue@3.4.15)
   '@vue/shared':
     specifier: ^3.4.15
     version: 3.4.15
@@ -19,22 +16,22 @@ dependencies:
     version: 10.7.2(vue@3.4.15)
   el-form-render:
     specifier: ^0.0.17
-    version: 0.0.17(element-plus@2.5.3)(vue@3.4.15)
+    version: 0.0.17(element-plus@2.5.5)(vue@3.4.15)
   element-plus:
     specifier: ^2.5.3
-    version: 2.5.3(vue@3.4.15)
+    version: 2.5.5(vue@3.4.15)
   lodash-es:
     specifier: ^4.17.21
     version: 4.17.21
-  prisma:
-    specifier: ^5.8.1
-    version: 5.8.1
   umi-request:
     specifier: ^1.4.0
     version: 1.4.0
   vue:
-    specifier: ^3.3.11
+    specifier: ^3.4.15
     version: 3.4.15(typescript@5.3.3)
+  vue-request:
+    specifier: ^2.0.4
+    version: 2.0.4(vue@3.4.15)
 
 devDependencies:
   '@vitejs/plugin-vue':
@@ -80,27 +77,27 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /@el-lowcode/crud@0.0.17(element-plus@2.5.3)(vue@3.4.15):
+  /@el-lowcode/crud@0.0.17(element-plus@2.5.5)(vue@3.4.15):
     resolution: {integrity: sha512-andvz1dISoU2DzbcLZlYf/1vA0bXG11ejbM4IAkz1Kn8N4m2l9p0PtEi1xsQRSh1bcuF7CPuCgb6aLRUx3BtoQ==}
     peerDependencies:
       element-plus: ^2.3.8
       vue: ^3.2.0
     dependencies:
-      '@el-lowcode/render': 0.0.17(element-plus@2.5.3)(vue@3.4.15)
+      '@el-lowcode/render': 0.0.17(element-plus@2.5.5)(vue@3.4.15)
       '@vue/shared': 3.4.15
-      el-form-render: 0.0.17(element-plus@2.5.3)(vue@3.4.15)
-      element-plus: 2.5.3(vue@3.4.15)
+      el-form-render: 0.0.17(element-plus@2.5.5)(vue@3.4.15)
+      element-plus: 2.5.5(vue@3.4.15)
       vue: 3.4.15(typescript@5.3.3)
     dev: false
 
-  /@el-lowcode/render@0.0.17(element-plus@2.5.3)(vue@3.4.15):
+  /@el-lowcode/render@0.0.17(element-plus@2.5.5)(vue@3.4.15):
     resolution: {integrity: sha512-stRCBlfDdYs2f6AY+AzBZ0Od+ClVuyxVzIJXeMgUhtJy1EBDdfpbBHBq1CCkgzH5U0Dt2rayAea3/KIrVydY8w==}
     peerDependencies:
       element-plus: ^2.3.8
       vue: ^3.2.0
     dependencies:
       '@vue/shared': 3.4.15
-      element-plus: 2.5.3(vue@3.4.15)
+      element-plus: 2.5.5(vue@3.4.15)
       vue: 3.4.15(typescript@5.3.3)
     dev: false
 
@@ -325,8 +322,8 @@ packages:
       '@floating-ui/utils': 0.2.1
     dev: false
 
-  /@floating-ui/dom@1.6.0:
-    resolution: {integrity: sha512-SZ0BEXzsaaS6THZfZJUcAobbZTD+MvfGM42bxgeg0Tnkp4/an/avqwAXiVLsFtIBZtfsx3Ymvwx0+KnnhdA/9g==}
+  /@floating-ui/dom@1.6.1:
+    resolution: {integrity: sha512-iA8qE43/H5iGozC3W0YSnVSW42Vh522yyM1gj+BqRwVsTNOyr231PsXDaV04yT39PsO0QL2QpbI/M0ZaLUQgRQ==}
     dependencies:
       '@floating-ui/core': 1.6.0
       '@floating-ui/utils': 0.2.1
@@ -338,51 +335,6 @@ packages:
 
   /@jridgewell/sourcemap-codec@1.4.15:
     resolution: {integrity: sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==}
-
-  /@prisma/client@5.8.1(prisma@5.8.1):
-    resolution: {integrity: sha512-xQtMPfbIwLlbm0VVIVQY2yqQVOxPwRQhvIp7Z3m2900g1bu/zRHKhYZJQWELqmjl6d8YwBy0K2NvMqh47v1ubw==}
-    engines: {node: '>=16.13'}
-    requiresBuild: true
-    peerDependencies:
-      prisma: '*'
-    peerDependenciesMeta:
-      prisma:
-        optional: true
-    dependencies:
-      prisma: 5.8.1
-    dev: false
-
-  /@prisma/debug@5.8.1:
-    resolution: {integrity: sha512-tjuw7eA0Us3T42jx9AmAgL58rzwzpFGYc3R7Y4Ip75EBYrKMBA1YihuWMcBC92ILmjlQ/u3p8VxcIE0hr+fZfg==}
-    dev: false
-
-  /@prisma/engines-version@5.8.1-1.78caf6feeaed953168c64e15a249c3e9a033ebe2:
-    resolution: {integrity: sha512-f5C3JM3l9yhGr3cr4FMqWloFaSCpNpMi58Om22rjD2DOz3owci2mFdFXMgnAGazFPKrCbbEhcxdsRfspEYRoFQ==}
-    dev: false
-
-  /@prisma/engines@5.8.1:
-    resolution: {integrity: sha512-TJgYLRrZr56uhqcXO4GmP5be+zjCIHtLDK20Cnfg+o9d905hsN065QOL+3Z0zQAy6YD31Ol4u2kzSfRmbJv/uA==}
-    requiresBuild: true
-    dependencies:
-      '@prisma/debug': 5.8.1
-      '@prisma/engines-version': 5.8.1-1.78caf6feeaed953168c64e15a249c3e9a033ebe2
-      '@prisma/fetch-engine': 5.8.1
-      '@prisma/get-platform': 5.8.1
-    dev: false
-
-  /@prisma/fetch-engine@5.8.1:
-    resolution: {integrity: sha512-+bgjjoSFa6uYEbAPlklfoVSStOEfcpheOjoBoNsNNSQdSzcwE2nM4Q0prun0+P8/0sCHo18JZ9xqa8gObvgOUw==}
-    dependencies:
-      '@prisma/debug': 5.8.1
-      '@prisma/engines-version': 5.8.1-1.78caf6feeaed953168c64e15a249c3e9a033ebe2
-      '@prisma/get-platform': 5.8.1
-    dev: false
-
-  /@prisma/get-platform@5.8.1:
-    resolution: {integrity: sha512-wnA+6HTFcY+tkykMokix9GiAkaauPC5W/gg0O5JB0J8tCTNWrqpnQ7AsaGRfkYUbeOIioh6woDjQrGTTRf1Zag==}
-    dependencies:
-      '@prisma/debug': 5.8.1
-    dev: false
 
   /@rollup/rollup-android-arm-eabi@4.9.6:
     resolution: {integrity: sha512-MVNXSSYN6QXOulbHpLMKYi60ppyO13W9my1qogeiAqtjb2yR4LSmfU2+POvDkLzhjYLXz9Rf9+9a3zFHW1Lecg==}
@@ -573,7 +525,7 @@ packages:
       '@vue/compiler-ssr': 3.4.15
       '@vue/shared': 3.4.15
       estree-walker: 2.0.2
-      magic-string: 0.30.5
+      magic-string: 0.30.6
       postcss: 8.4.33
       source-map-js: 1.0.2
 
@@ -639,7 +591,7 @@ packages:
       '@types/web-bluetooth': 0.0.20
       '@vueuse/metadata': 10.7.2
       '@vueuse/shared': 10.7.2(vue@3.4.15)
-      vue-demi: 0.14.6(vue@3.4.15)
+      vue-demi: 0.14.7(vue@3.4.15)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -651,7 +603,7 @@ packages:
       '@types/web-bluetooth': 0.0.16
       '@vueuse/metadata': 9.13.0
       '@vueuse/shared': 9.13.0(vue@3.4.15)
-      vue-demi: 0.14.6(vue@3.4.15)
+      vue-demi: 0.14.7(vue@3.4.15)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -668,7 +620,7 @@ packages:
   /@vueuse/shared@10.7.2(vue@3.4.15):
     resolution: {integrity: sha512-qFbXoxS44pi2FkgFjPvF4h7c9oMDutpyBdcJdMYIMg9XyXli2meFMuaKn+UMgsClo//Th6+beeCgqweT/79BVA==}
     dependencies:
-      vue-demi: 0.14.6(vue@3.4.15)
+      vue-demi: 0.14.7(vue@3.4.15)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -677,7 +629,7 @@ packages:
   /@vueuse/shared@9.13.0(vue@3.4.15):
     resolution: {integrity: sha512-UrnhU+Cnufu4S6JLCPZnkWh0WwZGUp72ktOF2DFptMlOs3TOdVv8xJN53zhHGARmVOsz5KqOls09+J1NR6sBKw==}
     dependencies:
-      vue-demi: 0.14.6(vue@3.4.15)
+      vue-demi: 0.14.7(vue@3.4.15)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
@@ -729,25 +681,25 @@ packages:
       has-property-descriptors: 1.0.1
     dev: false
 
-  /el-form-render@0.0.17(element-plus@2.5.3)(vue@3.4.15):
+  /el-form-render@0.0.17(element-plus@2.5.5)(vue@3.4.15):
     resolution: {integrity: sha512-z7T+Rif6z/yeBB7C9K7nrA1jTqNGhswjKr/rdcWf4rPTmwkHpQod/tVoOGCfkFeAklfxuuDb/aBw7ENOkubzGg==}
     peerDependencies:
       element-plus: ^2.3.8
       vue: ^3.2.0
     dependencies:
       '@vue/shared': 3.4.15
-      element-plus: 2.5.3(vue@3.4.15)
+      element-plus: 2.5.5(vue@3.4.15)
       vue: 3.4.15(typescript@5.3.3)
     dev: false
 
-  /element-plus@2.5.3(vue@3.4.15):
-    resolution: {integrity: sha512-wmtstxaMkD6UinIgD+45CjrhbRh4u0vt+/GgxfPeMLt5pDpIVwZFjkUaVcWqqxcxd5a80HP3XlDF74fW7wim9A==}
+  /element-plus@2.5.5(vue@3.4.15):
+    resolution: {integrity: sha512-yGU/MruLOWI0ImQPFCyFM4cXtHtILJNAi0hhLImcxjRukjgQLYNkvcvbwqNgBUt808KSeKF9MyxENFyBQLTg+Q==}
     peerDependencies:
       vue: ^3.2.0
     dependencies:
       '@ctrl/tinycolor': 3.6.1
       '@element-plus/icons-vue': 2.3.1(vue@3.4.15)
-      '@floating-ui/dom': 1.6.0
+      '@floating-ui/dom': 1.6.1
       '@popperjs/core': /@sxzz/popperjs-es@2.11.7
       '@types/lodash': 4.14.202
       '@types/lodash-es': 4.17.12
@@ -921,8 +873,8 @@ packages:
       yallist: 4.0.0
     dev: true
 
-  /magic-string@0.30.5:
-    resolution: {integrity: sha512-7xlpfBaQaP/T6Vh8MO/EqXSW5En6INHEvEXQiuff7Gku0PWjU3uf6w/j9o7O+SpB5fOAkrI5HeoNgwjEO0pFsA==}
+  /magic-string@0.30.6:
+    resolution: {integrity: sha512-n62qCLbPjNjyo+owKtveQxZFZTBm+Ms6YoGD23Wew6Vw337PElFNifQpknPruVRQV57kVShPnLGo9vWxVhpPvA==}
     engines: {node: '>=12'}
     dependencies:
       '@jridgewell/sourcemap-codec': 1.4.15
@@ -976,15 +928,6 @@ packages:
       nanoid: 3.3.7
       picocolors: 1.0.0
       source-map-js: 1.0.2
-
-  /prisma@5.8.1:
-    resolution: {integrity: sha512-N6CpjzECnUHZ5beeYpDzkt2rYpEdAeqXX2dweu6BoQaeYkNZrC/WJHM+5MO/uidFHTak8QhkPKBWck1o/4MD4A==}
-    engines: {node: '>=16.13'}
-    hasBin: true
-    requiresBuild: true
-    dependencies:
-      '@prisma/engines': 5.8.1
-    dev: false
 
   /qs@6.11.2:
     resolution: {integrity: sha512-tDNIz22aBzCDxLtVH++VnTfzxlfeK5CbqohpSqpJgj1Wg/cQbStNAz3NuqCs5vV+pjBsK4x4pN9HlVh7rcYRiA==}
@@ -1102,8 +1045,8 @@ packages:
       fsevents: 2.3.3
     dev: true
 
-  /vue-demi@0.14.6(vue@3.4.15):
-    resolution: {integrity: sha512-8QA7wrYSHKaYgUxDA5ZC24w+eHm3sYCbp0EzcDwKqN3p6HqtTCGR/GVsPyZW92unff4UlcSh++lmqDWN3ZIq4w==}
+  /vue-demi@0.14.7(vue@3.4.15):
+    resolution: {integrity: sha512-EOG8KXDQNwkJILkx/gPcoL/7vH+hORoBaKgGe+6W7VFMvCYJfmF2dGbvgDroVnI8LU7/kTu8mbjRZGBU1z9NTA==}
     engines: {node: '>=12'}
     hasBin: true
     requiresBuild: true
@@ -1115,6 +1058,20 @@ packages:
         optional: true
     dependencies:
       vue: 3.4.15(typescript@5.3.3)
+    dev: false
+
+  /vue-request@2.0.4(vue@3.4.15):
+    resolution: {integrity: sha512-+Tu5rDy6ItF9UdD21Mmbjiq5Pq6NZSN9juH72hNQTMn1whHh4KZPTKWVLK2YS4nzbuEnPs+82G91AA2Fgd93mg==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      '@vue/composition-api': ^1.0.0-rc.1
+      vue: ^2.0.0 || >=3.0.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+    dependencies:
+      vue: 3.4.15(typescript@5.3.3)
+      vue-demi: 0.14.7(vue@3.4.15)
     dev: false
 
   /vue-template-compiler@2.7.16:

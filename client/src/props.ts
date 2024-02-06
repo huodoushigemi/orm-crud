@@ -1,3 +1,5 @@
+import { createCruds } from "./crud";
+
 type Permute<T extends string, U extends string> = 
   T extends infer A ? A extends string
     ? U extends infer B ? B extends string
@@ -11,6 +13,7 @@ export interface Field {
   label?: string
   prop: string
   filter?: XXX<'contains' | 'endsWith' | 'equals' | 'gt' | 'gte' | 'in' | 'lt' | 'lte' | 'not' | 'notIn' | 'startsWith', 'every' | 'some'>
+  required?: boolean
   relation?: {
     table: string
     name?: string
@@ -35,7 +38,7 @@ export interface TableXXX {
   map: Partial<{
     label: string
     /** @default 'id' */
-    prop: string
+    id: string
   }>
 }
 
@@ -54,4 +57,5 @@ export interface ConfigProviderProps {
 
 export interface ConfigProviderContext {
   tables: Record<string, TableXXX>
+  cruds: ReturnType<typeof createCruds>
 }

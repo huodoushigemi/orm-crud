@@ -10,9 +10,15 @@ const router = new Router({ prefix: '/prisma' })
 const prisma = new PrismaClient()
 
 router.post('/crud', async (ctx, next) => {
-  const params = ctx.request.body
-  const ret = await prisma[params.table.toLowerCase()][params.action](params.argv)
-  ctx.body = ret
+  const data = ctx.request.body
+  if (Array.isArray(data)) {
+    const ps = data.map(data => prisma[data.table.toLowerCase()][data.action](data.argv))
+    ctx.body = await prisma.$transaction(ps)
+    return 
+  } else {
+    const ret = await prisma[data.table.toLowerCase()][data.action](data.argv)
+    ctx.body = ret
+  }
 })
 
 async function handlerErr(ctx, next) {
