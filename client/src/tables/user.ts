@@ -13,7 +13,7 @@ export const User: TableXXX = {
     { label: 'comments', prop: 'comments', relation: { table: 'Comment', rel: '1-n' } },
     { label: 'posts', prop: 'posts', relation: { table: 'Post', rel: '1-n' } }
   ],
-  columns: ['name', 'age', 'email'],
+  columns: ['name', 'age', 'email', 'posts'],
   forms: ['name', { prop: 'age', type: 'input-number' }, 'email'],
   searchs: ['name'],
   btns: [],
@@ -23,13 +23,13 @@ export const User: TableXXX = {
 export const Post: TableXXX = {
   fields: [
     { label: 'id', prop: 'id' },
-    { label: 'title', prop: 'title' },
-    { label: 'content', prop: 'content' },
+    { label: 'title', prop: 'title', html: true },
+    { label: 'content', prop: 'content', html: true },
     { label: '作者', prop: 'author', relation: { table: 'User', rel: 'n-1' } },
     { label: 'tag', prop: 'tag', relation: { table: 'Tag', rel: 'm-n' } },
     { label: '评论', prop: 'comments', relation: { table: 'Comment', rel: 'm-n' } },
   ],
-  columns: ['title', 'content', 'author', 'author.age'],
+  columns: ['title', 'content', 'author', 'author.age', 'tag', 'tag.name'],
   forms: ['title', 'content', 'author'],
   searchs: ['title', 'content'],
   btns: [],
@@ -55,8 +55,8 @@ export const Comment: TableXXX = {
 export const Tag: TableXXX = {
   fields: [
     { label: 'id', prop: 'id' },
-    { label: 'name', prop: 'name', filter: 'contains' },
-    { label: 'post', prop: 'post', relation: { table: 'Post', rel: 'm-n' } },
+    { label: '标签名', prop: 'name', filter: 'contains' },
+    { label: '文章', prop: 'post', relation: { table: 'Post', rel: 'm-n' } },
   ],
   columns: ['name'],
   forms: ['name'],

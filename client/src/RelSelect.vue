@@ -45,7 +45,8 @@ function setRelVal(val) {
   const { field: { relation } } = props
   const { label, prop } = relation!
   if (!val) return value.value = undefined
-  const fn = v => ({ [label]: v[label], [prop]: v[prop] })
+  // const fn = v => ({ [label]: v[label], [prop]: v[prop] })
+  const fn = v => ({ ...v })
   value.value = isArray(val) ? val.map(fn) : fn(val)
 }
 </script>

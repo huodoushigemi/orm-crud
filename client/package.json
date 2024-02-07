@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@el-lowcode/crud": "^0.0.17",
+    "@vitejs/plugin-vue-jsx": "^3.1.0",
     "@vue/shared": "^3.4.15",
     "@vueuse/core": "^10.7.2",
     "el-form-render": "^0.0.17",

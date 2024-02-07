@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect, watchPostEffect } from 'vue'
-import { toReactive, objectPick } from '@vueuse/core'
+import { computed, ref } from 'vue'
+import { toReactive } from '@vueuse/core'
 import CRUD from '@el-lowcode/crud'
-import { Field, NormalizedField, TableXXX } from './props'
+import { TableXXX } from './props'
 import { useConfig } from './context'
-import { isArray, isObject, isPlainObject } from '@vue/shared'
-import Select from './Select.vue'
+import RelSelect from './RelSelect.vue'
+import RelTag from './RelTag.vue'
 
 const _props = defineProps<Partial<TableXXX> & {
   table?: string
@@ -59,19 +59,20 @@ async function request(_, data, type) {
     v-model:search="searchModel"
     v-model:form="formModel"
     :btns="() => [
-      { children: 'xxx' }
     ]"
   >
     <template v-for="col in ctx.columns.filter(e => e.relation)" #[col.prop]="{ row }">
-      <el-tag style="cursor: pointer;">{{ row[col.prop]?.[col.relation!.label] }}</el-tag>
+      <div>
+        <RelTag :field="col" :data="row" />
+      </div>
     </template>
 
     <template v-for="col in ctx.searchs.filter(e => e.relation)" #[`$search:${col.prop}`]="{ row }">
-      <Select v-model="row[col.prop]" :field="col" />
+      <RelSelect v-model="row[col.prop]" :field="col" />
     </template>
 
     <template v-for="col in ctx.forms.filter(e => e.relation)" #[`$form:${col.prop}`]="{ row }">
-      <Select v-model="row[col.prop]" :field="col" />
+      <RelSelect v-model="row[col.prop]" :field="col" />
     </template>
   </CRUD>
 </template>

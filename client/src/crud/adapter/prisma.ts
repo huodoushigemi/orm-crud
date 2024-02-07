@@ -1,5 +1,5 @@
 import { get, set } from 'lodash-es'
-import { objectPick } from '@vueuse/core'
+import { objectPick, useArrayFilter } from '@vueuse/core'
 import { isPlainObject } from '@vue/shared'
 import { extend } from 'umi-request'
 import { TableCtx, findFieldPath } from '../../utils'
@@ -13,9 +13,9 @@ const request = extend({
 function find(this: TableCtx, data) {
   return {
     table: this.table,
-    action: 'find',
+    action: 'findUnique',
     argv: {
-      select: { [this.map.id]: true, ...select(this, this.columns) },
+      select: { [this.map.id]: true, ...select(this, [...this.columns, ...this.forms]) },
       where: data,
     }
   }
@@ -36,16 +36,6 @@ function finds(this: TableCtx, data) {
   }
 }
 
-function count(this: TableCtx, data) {
-  return {
-    table: this.table,
-    action: 'count',
-    argv: {
-      where: where(this, data)
-    }
-  }
-}
-
 function create(this: TableCtx, data) {
   return {
     table: this.table,
@@ -53,7 +43,14 @@ function create(this: TableCtx, data) {
     argv: {
       data: {
         ...data,
-        ...this.forms.filter(e => e.relation).reduce((o, e) => (o[e.prop] = { connect: data[e.prop] || void 0 }, o), {})
+        ...this.forms.filter(e => e.relation).reduce((o, e) => {
+          const val = data[e.prop]
+          const fn = v => ({ [e.relation!.prop]: v[e.relation!.prop] })
+          o[e.prop] = {
+            connect: val ? Array.isArray(val) ? val.map(fn) : fn(val) : undefined
+          }
+          return o
+        }, {})
       }
     }
   }
@@ -66,7 +63,16 @@ function update(this: TableCtx, data) {
     argv: {
       data: {
         ...data,
-        ...this.forms.filter(e => e.relation).reduce((o, e) => (o[e.prop] = { set: [], connect: data[e.prop] || void 0 }, o), {})
+        ...this.forms.filter(e => e.relation).reduce((o, e) => {
+          const val = data[e.prop]
+          const fn = v => ({ [e.relation!.prop]: v[e.relation!.prop] })
+          o[e.prop] = {
+            set: e.relation!.rel == '1-n' || e.relation!.rel == 'm-n' ? [] : undefined,
+            connect: val ? Array.isArray(val) ? val.map(fn) : fn(val) : undefined
+          }
+          return o
+        }, {}),
+        [this.map.id]: undefined
       },
       where: { [this.map.id]: data[this.map.id] }
     }
@@ -95,15 +101,27 @@ function removes(this: TableCtx, data) {
   }
 }
 
+function count(this: TableCtx, data) {
+  return {
+    table: this.table,
+    action: 'count',
+    argv: {
+      where: where(this, data)
+    }
+  }
+}
+
 
 function select(ctx: TableCtx, fields: NormalizedField[]) {
   return fields.reduce((o, e) => {
     const ps = findFieldPath(ctx, e.prop)
     if (ps[ps.length - 1].relation) {
-      // e.g: post | post.author
-      set(o, e.prop.replace(/\./, '.select.') + '.select', { [e.relation!.label]: true, [e.relation!.prop]: true })
+      // e.g: post.author -> post.select.author.select
+      const prop = e.prop.replace(/\./, '.select.') + '.select'
+      const val = get(o, prop), newVal = { [e.relation!.label]: true, [e.relation!.prop]: true }
+      val ? Object.assign(val, newVal) : set(o, prop, newVal)
     } else if (ps.length > 1) {
-      // e.g: post.title | post.user.name
+      // e.g: post.author.name -> post.select.author.select.name
       set(o, e.prop.replace(/\./, '.select.'), true)
     } else {
       // e.g: content
