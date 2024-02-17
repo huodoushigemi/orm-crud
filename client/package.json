@@ -9,18 +9,22 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@el-lowcode/crud": "^0.0.17",
+    "@el-lowcode/crud": "^1.0.1",
     "@vitejs/plugin-vue-jsx": "^3.1.0",
     "@vue/shared": "^3.4.15",
     "@vueuse/core": "^10.7.2",
-    "el-form-render": "^0.0.17",
-    "element-plus": "^2.5.3",
+    "el-form-render": "^1.0.1",
+    "element-plus": "2.5.5",
     "lodash-es": "^4.17.21",
+    "sass": "^1.70.0",
     "umi-request": "^1.4.0",
-    "vue": "^3.4.15",
+    "unplugin-icons": "^0.18.5",
+    "unplugin-vue-components": "^0.26.0",
+    "vue": "^3.4.18",
     "vue-request": "^2.0.4"
   },
   "devDependencies": {
+    "@iconify-json/ep": "^1.1.14",
     "@vitejs/plugin-vue": "^4.5.2",
     "typescript": "^5.2.2",
     "vite": "^5.0.8",

@@ -10,7 +10,6 @@ const router = new Router({ prefix: '/prisma' })
 const prisma = new PrismaClient()
 
 router.post('/crud', async (ctx, next) => {
-  prisma.post.findUnique
   const data = ctx.request.body
   if (Array.isArray(data)) {
     const ps = data.map(data => prisma[data.table.toLowerCase()][data.action](data.argv))

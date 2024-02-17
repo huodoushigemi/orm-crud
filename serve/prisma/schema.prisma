@@ -35,7 +35,8 @@ model Post {
 model Comment {
   id        Int       @id @default(autoincrement())
   content   String
-  post      Post[]
+  post      Post      @relation(fields: [postId], references: [id])
+  postId    Int
   speaker   User      @relation(fields: [speakerId], references: [id])
   speakerId Int
   comments  Comment[] @relation("reply")

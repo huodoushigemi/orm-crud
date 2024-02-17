@@ -1,10 +1,11 @@
 import { get, set } from 'lodash-es'
-import { objectPick, useArrayFilter } from '@vueuse/core'
+import { isObject, objectPick, useArrayFilter } from '@vueuse/core'
 import { isPlainObject } from '@vue/shared'
 import { extend } from 'umi-request'
-import { TableCtx, findFieldPath } from '../../utils'
+import { findFieldPath } from '../../utils'
 import { NormalizedField } from '../../props'
 import { ApiAdapterInterface } from './interface'
+import { TableCtx } from '..'
 
 const request = extend({
   prefix: 'http://localhost:3000/prisma'
@@ -42,12 +43,15 @@ function create(this: TableCtx, data) {
     action: 'create',
     argv: {
       data: {
-        ...data,
-        ...this.forms.filter(e => e.relation).reduce((o, e) => {
-          const val = data[e.prop]
-          const fn = v => ({ [e.relation!.prop]: v[e.relation!.prop] })
-          o[e.prop] = {
-            connect: val ? Array.isArray(val) ? val.map(fn) : fn(val) : undefined
+        ...this.forms.reduce((o, e) => {
+          const rel = e.relation, val = data[e.prop]
+          if (rel) {
+            const fn = v => ({ [rel.prop]: v[rel.prop] })
+            o[e.prop] = {
+              connect: val ? Array.isArray(val) ? val.map(fn) : fn(val) : undefined
+            }
+          } else {
+            o[e.prop] = val
           }
           return o
         }, {})
@@ -62,13 +66,16 @@ function update(this: TableCtx, data) {
     action: 'update',
     argv: {
       data: {
-        ...data,
-        ...this.forms.filter(e => e.relation).reduce((o, e) => {
-          const val = data[e.prop]
-          const fn = v => ({ [e.relation!.prop]: v[e.relation!.prop] })
-          o[e.prop] = {
-            set: e.relation!.rel == '1-n' || e.relation!.rel == 'm-n' ? [] : undefined,
-            connect: val ? Array.isArray(val) ? val.map(fn) : fn(val) : undefined
+        ...this.forms.reduce((o, e) => {
+          const rel = e.relation, val = data[e.prop]
+          if (rel) {
+            const fn = v => ({ [rel.prop]: v[rel.prop] })
+            o[e.prop] = {
+              set: rel.rel == '1-n' || rel.rel == 'm-n' ? [] : undefined,
+              connect: val ? Array.isArray(val) ? val.map(fn) : fn(val) : undefined
+            }
+          } else {
+            o[e.prop] = val
           }
           return o
         }, {}),
@@ -117,8 +124,9 @@ function select(ctx: TableCtx, fields: NormalizedField[]) {
     const ps = findFieldPath(ctx, e.prop)
     if (ps[ps.length - 1].relation) {
       // e.g: post.author -> post.select.author.select
+      const rel = ps[ps.length - 1].relation!
       const prop = e.prop.replace(/\./, '.select.') + '.select'
-      const val = get(o, prop), newVal = { [e.relation!.label]: true, [e.relation!.prop]: true }
+      const val = get(o, prop), newVal = { [rel.label]: true, [rel.prop]: true }
       val ? Object.assign(val, newVal) : set(o, prop, newVal)
     } else if (ps.length > 1) {
       // e.g: post.author.name -> post.select.author.select.name
@@ -132,31 +140,45 @@ function select(ctx: TableCtx, fields: NormalizedField[]) {
 }
 
 function where(ctx: TableCtx, data: any) {
-  const { searchs } = ctx
-  const ret = {}
-  searchs.map(field => {
-    const ps = findFieldPath(ctx, field.prop)
-    const path = <string[]>[]
-    ps.forEach((e, i) => {
-      const [f1, f2] = e.filter?.split('.') || []
-      f2 && path.push(f2)
-      path.push(e.prop)
-      f1 && path.push(f1)
-      if (i == ps.length - 1) {
-        if (field.relation) {
-          path.push(field.relation.prop)
+  // 后序遍历
+  function rrr(obj, ps1 = <string[]>[]) {
+    const ret = {}
+    for (let k in obj) {
+      if (k[0] == '$') continue
+      ps1.push(k)
+      const field = findFieldPath(ctx, ps1).slice(-1)[0]
+      const rel = field.relation?.rel
+      
+      const ps2 = <string[]>[]
+      ps2.push(k)
+      if (rel == '1-n' || rel == 'm-n') ps2.push('some')
+      else if (field.filter) ps2.push(field.filter)
+
+      const val = obj[k]
+      if (rel) {
+        if (val == null) {
+          ret[k] = undefined
         }
-        else if (field.filter) {
-          if (e.filter) path[path.length - 1] = field.filter
-          else path.push(field.filter)
+        else if (!isObject(val)) {
+          throw new Error(`Invalid prop: type check failed for prop ${ps1.join('.')}. Expected Object, got ${val}`)
+        }
+        else  {
+          const xxx = rrr(val, ps1)
+          set(ret, ps2, xxx)
         }
       }
-    })
-    const val = get(data, field.prop)
-    if (val != null) set(ret, path.join('.'), val)
-  })
-
-  return ret
+      else if (val === '' || val === undefined) {
+        ret[k] = undefined
+      }
+      else {
+        set(ret, ps2, val)
+      }
+      
+      ps1.pop()
+    }
+    return ret
+  }
+  return rrr(data)
 }
 
 const api = { find, finds, create, update, remove, removes, count }

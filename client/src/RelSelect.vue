@@ -1,52 +1,65 @@
 <template>
   <el-select
-    v-bind="$props"
-    @update:modelValue="setRelVal"
-    :value-key="field.relation!.prop"
-    :multiple="field.relation!.rel == '1-n' || field.relation!.rel == 'm-n'"
+    style="width: 128px;"
+    v-bind="$attrs"
+    v-model="value"
+    clearable
     filterable
     remote
     reserve-keyword
     remote-show-suffix
     :remote-method="run"
     :loading="loading"
-    :placeholder="`选择${field.label}`"
+    placeholder="请选择"
   >
-    <el-option v-for="opt in list" :value="opt" :label="opt[field.relation!.label]" />
+    <el-option v-for="opt in _list" :value="opt[rel.prop]" :label="opt[rel.label]" />
   </el-select>
 </template>
 
 <script setup lang="ts">
-import { Arrayable, useVModel } from '@vueuse/core'
+import { computed } from 'vue'
 import { isArray } from '@vue/shared'
+import { Arrayable, toReactive } from '@vueuse/core'
 import { useRequest } from 'vue-request'
-import { SelectContext } from 'element-plus'
-import { NormalizedField } from './props'
+import { NormalizedField, RelField, Relation } from './props'
 import { useConfig } from './context'
 
 type Obj = Record<string, any>
 
-const props = defineProps<SelectContext['props'] & {
+const props = defineProps<{
   modelValue?: Arrayable<Obj>
-  field: NormalizedField
+  rel: Required<Relation>
 }>()
 
-const value = useVModel(props, 'modelValue')
+const emit = defineEmits(['update:modelValue'])
 
-
-const { cruds } = useConfig()!
-
-const { data: list, loading, run } = useRequest((str) => {
-  const { table, label } = props.field.relation!
-  return cruds[table].finds({ [label]: str })
+const value = computed({
+  get() {
+    const val = props.modelValue, { prop } = props.rel
+    return val == null ? val : isArray(val) ? val.map(e => e[prop]) : val[prop]
+  },
+  set(val) {
+    if (val === '') val = undefined
+    const { prop } = props.rel
+    emit('update:modelValue', val == null ? val : isArray(val) ? val.map(e => ({ [prop]: e })) : { [prop]: val })
+  }
 })
 
-function setRelVal(val) {
-  const { field: { relation } } = props
-  const { label, prop } = relation!
-  if (!val) return value.value = undefined
-  // const fn = v => ({ [label]: v[label], [prop]: v[prop] })
-  const fn = v => ({ ...v })
-  value.value = isArray(val) ? val.map(fn) : fn(val)
-}
+const config = useConfig()
+
+const { data: list, loading, run } = useRequest(
+  (str) => {
+    const { table, label } = props.rel
+    return config.cruds[table].finds({ [label]: str })
+  },
+  { initialData: [], manual: true }
+)
+
+const _list = computed(() => {
+  const val = props.modelValue
+  if (!val) return list.value
+  const { prop } = props.rel
+  const opt = list.value!.find(e => e[prop] == val[prop])
+  return opt ? list.value : [val, ...list.value!]
+})
 </script>
