@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed } from 'vue'
+import { reactive, computed, shallowReactive } from 'vue'
 import { RelField } from './props'
 import { useConfig } from './context'
 import { TableCtx } from './crud'
@@ -22,7 +22,7 @@ import Table from './Table.vue'
 
 const config = useConfig()
 
-const state = reactive({
+const state = shallowReactive({
   vis: false,
   ctx: null as unknown as TableCtx,
   field: null as unknown as RelField,
@@ -36,11 +36,11 @@ const rel = reactive({
   field: computed(() => rel.ctx.rels.find(e => e.relation.table == state.ctx.table && e.relation.name == state.field.relation.name && e.prop != state.field.prop)) as unknown as RelField
 })
 
-function open(row, field: RelField, ctx: TableCtx) {
+function open(row, ctx: TableCtx, field: RelField) {
   state.vis = true
   state.row = row
-  state.field = field
   state.ctx = ctx
+  state.field = field
 }
 
 defineExpose({

@@ -1,39 +1,40 @@
 <template>
-  <el-drawer v-if="curr" v-model="vis" append-to-body :size="w" :z-index="zIndex" @closed="curr = null">
-    <Info :ctx="ctx" :data="curr" />
+  <el-drawer v-if="state.data" v-model="state.vis" :title="state.ctx.label" append-to-body :size="w" :z-index="zIndex" @closed="state.data = null">
+    <Info :ctx="state.ctx" :data="state.data" />
   </el-drawer>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue'
+import { computed, shallowReactive, ref, watchEffect } from 'vue'
 import { toReactive, breakpointsTailwind, useBreakpoints } from '@vueuse/core'
 import { ElDrawer } from 'element-plus'
 import { useZIndex } from 'element-plus/es/hooks/index'
 import Info from './Info.vue'
 import { TableCtx } from './crud'
 
-const props = defineProps<{
-  ctx: TableCtx
-}>()
-
 // 响应式布局
 const breakpoints = useBreakpoints(breakpointsTailwind)
-const map = { sm: '90%', lg: '75%', '2xl': '50%' }
+const map = { sm: '90%', lg: '75%', '2xl': '60%' }
 const w = computed(() => Object.entries(map).find(([p]) => breakpoints.smaller(p).value)?.[1] || '40%')
 
-const vis = ref(false), curr = ref()
+const state = shallowReactive({
+  vis: false,
+  ctx: null as unknown as TableCtx,
+  data: null,
+})
 
 const { nextZIndex } = useZIndex()
 let zIndex = 0
-watchEffect(() => vis.value && (zIndex ||= nextZIndex()))
+watchEffect(() => state.vis && (zIndex ||= nextZIndex()))
 
 defineExpose({
-  open(data) {
-    vis.value = true
-    curr.value = data
+  open(data, ctx) {
+    state.vis = true
+    state.data = data
+    state.ctx = ctx
   },
   close() {
-    vis.value = false
+    state.vis = false
   }
 })
 </script>

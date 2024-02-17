@@ -164,7 +164,9 @@ function where(ctx: TableCtx, data: any) {
         }
         else  {
           const xxx = rrr(val, ps1)
-          set(ret, ps2, xxx)
+          Object.values(xxx).some(e => e === undefined)
+            ? ret[k] = undefined
+            : set(ret, ps2, xxx)
         }
       }
       else if (val === '' || val === undefined) {

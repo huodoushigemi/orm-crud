@@ -15,6 +15,8 @@
 <script setup lang="ts">
 import { isArray, isObject } from '@vue/shared'
 import { Arrayable } from '@vueuse/core'
+import { pick } from 'lodash-es'
+import { toArr } from './utils';
 
 type Obj = Record<string, any>
 
@@ -33,11 +35,11 @@ const emit = defineEmits(['update:modelValue', 'change'])
 
 function onClick(opt) {
   const { multiple, obj, replace: { label, value } } = props
-  const genObj = () => ({ [value]: opt[value], [label]: opt[label] })
+  const genObj = () => pick(opt, [value, label])
   let val
   if (multiple) {
-    val = (props.modelValue || []) as any[]
-    const i = val.findIndex(e => isSelect2(opt, e))
+    val = toArr(props.modelValue)
+    const i = val.findIndex(e => eqOpt(opt, e))
     ~i ? val.splice(i, 1) : val.push(obj ? genObj() : opt[value])
   }
   else if (props.clearable && isSelect(opt)) {
@@ -51,10 +53,10 @@ function onClick(opt) {
 
 function isSelect(opt) {
   const val = props.modelValue
-  return props.multiple ? ((val || []) as any[]).some(e => isSelect2(opt, e)) : isSelect2(opt, val)
+  return props.multiple ? toArr(val).some(e => eqOpt(opt, e)) : eqOpt(opt, val)
 }
 
-function isSelect2(opt, val) {
+function eqOpt(opt, val) {
   const { value } = props.replace
   return isObject(val) ? val[value] === opt[value] : val === opt[value]
 }
@@ -73,7 +75,7 @@ function isSelect2(opt, val) {
 }
 
 .orm-option {
-  padding: 0 22px;
+  padding: 0 18px;
   line-height: 34px;
   white-space: nowrap;
   overflow: hidden;

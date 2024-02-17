@@ -32,7 +32,6 @@ CRUD.setConfig({
 })
 
 const config = useConfig()
-// const ctx = toReactive(computed(() => config.cruds[props.table]))
 const ctx = () => config.cruds[props.table]
 
 const _searchs = computed(() => [
@@ -67,10 +66,10 @@ const crudRef = ref()
 
 const menu = reactive({ vis: false, row: null, x: 0, y: 0 })
 const menus = computed(() => [
-  { title: '详情', icon: IDocument, onClick: () => infoRef.value.open(menu.row) },
-  { title: '编辑', icon: IEdite, onClick: () => infoRef.value.open(menu.row) },
-  { title: '删除', icon: IDelete, disabled: true, divided: true, onClick: () => infoRef.value.open(menu.row) },
-  { title: '关联的表', children: ctx().rels.map(e => ({ title: e.label, onClick: () => relRef.value.open(menu.row, e, ctx()) })) }
+  { title: '详情', icon: IDocument, onClick: () => infoRef.value.open(menu.row, ctx()) },
+  { title: '编辑', icon: IEdite, onClick: () => infoRef.value.open(menu.row, ctx()) },
+  { title: '删除', icon: IDelete, disabled: true, divided: true, onClick: () => infoRef.value.open(menu.row, ctx()) },
+  { title: '关联的表', children: ctx().rels.map(e => ({ title: e.label, onClick: () => relRef.value.open(menu.row, ctx(), e) })) }
 ])
 watchEffect(() => menu.vis || (menu.row = null))
 async function openMenu(row, col, e: MouseEvent) {
@@ -86,16 +85,11 @@ async function openMenu(row, col, e: MouseEvent) {
 }
 
 const log = (...arg) => console.log(...arg)
-const c = ref(0)
-const c2 = ref(15)
 </script>
 
 <template>
+  <!-- {{ JSON.parse(JSON.stringify(searchModel)) }} -->
   <div class="orm-table">
-    <RelOptions class="orm-table_left" v-model="searchModel[ctx().rels[c].prop]" :rel="ctx().rels[c].relation" :header="ctx().rels[c].label" :pageSize="c2" defaultFirst @update:modelValue="crudRef.getData()" />
-
-    <el-button @click="c2++">{{ c2 }}</el-button>
-    
     <CRUD
       v-bind="{ ...$attrs, class: null, style: null }"
       ref="crudRef"
@@ -112,12 +106,13 @@ const c2 = ref(15)
       :tableAttrs="{
         rowKey: ctx().map.id,
         cellStyle: ({ row }) => row == menu.row ? { 'background-color': 'var(--el-table-current-row-bg-color)' } : undefined,
-        onRowContextmenu: openMenu
+        onRowContextmenu: openMenu,
+        ...$attrs.tableAttrs
       }"
     >
       <template v-for="col in ctx().columns.filter(e => e.relation)" #[`$${col.prop}`]="{ row }">
         <div>
-          <RelTag :data="getP(row, col.prop)" :field="col" />
+          <RelTag :data="getP(row, col.prop)" :rel="col.relation!" />
         </div>
       </template>
   
@@ -130,7 +125,7 @@ const c2 = ref(15)
       </template>
     </CRUD>
   
-    <InfoDialog ref="infoRef" :ctx="ctx()" />
+    <InfoDialog ref="infoRef" />
   
     <RelDialog ref="relRef" />
   
@@ -153,6 +148,24 @@ const c2 = ref(15)
   &_table {
     flex: 1;
     width: 0;
+  }
+
+}
+
+.crud > .el-table .cell > .el-checkbox {
+  --el-checkbox-input-height: 16px;
+  --el-checkbox-input-width: 16px;
+
+  .el-checkbox__inner {
+    &::after {
+      display: none;
+    }
+  }
+}
+
+.crud-search {
+  .el-input {
+    --el-input-width: 180px;
   }
 }
 </style>

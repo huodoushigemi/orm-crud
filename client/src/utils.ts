@@ -1,6 +1,7 @@
-import { TableCtx } from "./crud"
-import { Field, NormalizedField, NormalizedTableXXX, Relation, TableXXX } from "./props"
+import { Arrayable } from '@vueuse/core'
 import { merge } from 'lodash-es'
+import { TableCtx } from './crud'
+import { Field, NormalizedField, NormalizedTableXXX, Relation, TableXXX } from './props'
 
 export function findFieldPath(ctx: TableCtx, prop: string | string[]): NormalizedField[] {
   return (Array.isArray(prop) ? prop : prop.split('.')).map((e, i, arr) => {
@@ -19,7 +20,7 @@ export function normalizeField(field: Field | string, ctx: TableCtx, assign?: bo
     const leaf = findFieldPath(ctx, prop).slice(-1)[0]
     return ctx.keybyed[prop] ||= {
       ...leaf,
-      label: genLabel(prop),
+      label: genLabel(prop, ctx),
       prop,
     }
   } else {
@@ -27,12 +28,12 @@ export function normalizeField(field: Field | string, ctx: TableCtx, assign?: bo
     const ret = {
       ...cache,
       ...field,
-      label: field.label || cache?.label || genLabel(field.prop),
+      label: field.label || cache?.label || genLabel(field.prop, ctx),
       relation: field.relation
         ? (() => {
           const { table } = field.relation, { map } = ctx.ctxs[table]
           return merge(
-            { rel: '1-1', label: map.label, prop: map.id } as Partial<Relation>,
+            { rel: '1-1', label: map.label, prop: map.id } as Required<Relation>,
             field.relation
           )
         })()
@@ -41,9 +42,10 @@ export function normalizeField(field: Field | string, ctx: TableCtx, assign?: bo
     return assign ? ret : (ctx.keybyed[field.prop] ||= ret)
   }
 
-  function genLabel(prop: string) {
-    return prop.split('.').length > 1 ? findFieldPath(ctx, prop).map(e => e.label).join('.') : prop
-  }
+}
+
+export function genLabel(prop: string, ctx: TableCtx) {
+  return prop.split('.').length > 1 ? findFieldPath(ctx, prop).map(e => e.label).join('.') : prop
 }
 
 export function getP(obj, prop) {
@@ -58,3 +60,5 @@ export function getP(obj, prop) {
   }
   return obj
 }
+
+export const toArr = <T>(arr?: Arrayable<T>) => Array.isArray(arr) ? arr : (arr == null ? [] : [arr])

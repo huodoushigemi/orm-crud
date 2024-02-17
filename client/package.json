@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@iconify-json/ep": "^1.1.14",
+    "@types/lodash-es": "^4.17.12",
     "@vitejs/plugin-vue": "^4.5.2",
     "typescript": "^5.2.2",
     "vite": "^5.0.8",

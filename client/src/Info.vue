@@ -1,7 +1,7 @@
 <template>
   <ElDescriptions border :column="column">
     <ElDescriptionsItem v-for="(col, i) in cols" :label="col.label" :span="i == cols.length - 1 ? column - (i % column) : 1">
-      <RelTag v-if="col.relation" :field="col" :data="getP($data, col.prop)" />
+      <RelTag v-if="col.relation" :data="getP($data, col.prop)" :rel="col.relation" />
       <template v-else>{{ getP($data, col.prop) }}</template>
     </ElDescriptionsItem>
 

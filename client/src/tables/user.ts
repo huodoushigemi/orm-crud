@@ -14,9 +14,9 @@ export const User: TableXXX = {
     { label: '评论', prop: 'comments', relation: { table: 'Comment', rel: '1-n' } },
     { label: '文章', prop: 'posts', relation: { table: 'Post', rel: '1-n' } }
   ],
-  columns: ['name', 'age', 'email', 'posts', 'posts.content', 'posts.author'],
+  columns: ['name', 'age', 'email', 'posts'],
   forms: ['name', { prop: 'age', type: 'input-number' }, 'email'],
-  searchs: ['name', { prop: 'posts.title' }],
+  searchs: ['following', 'name', { prop: 'posts.title' }],
   btns: [],
   map: { label: 'name' }
 }
@@ -42,15 +42,15 @@ export const Comment: TableXXX = {
   label: '评论',
   fields: [
     { label: 'id', prop: 'id' },
-    { label: 'content', prop: 'content', filter: 'contains' },
+    { label: '内容', prop: 'content', filter: 'contains' },
     { label: '评论人', prop: 'speaker', relation: { table: 'User', rel: 'n-1' } },
     { label: '文章', prop: 'post', relation: { table: 'Post', rel: 'n-1' } },
-    { label: '@', prop: 'reply', relation: { table: 'Comment', rel: 'n-1' } },
+    { label: '回复', prop: 'reply', relation: { table: 'Comment', rel: 'n-1' } },
     { label: 'comments', prop: 'comments', relation: { table: 'Comment', rel: '1-n' } },
   ],
   columns: ['content', 'speaker', 'reply', 'post', 'post.author'],
   forms: ['content', 'post'],
-  searchs: ['content'],
+  searchs: ['content', 'reply'],
   btns: [],
   map: { label: 'content' }
 }
