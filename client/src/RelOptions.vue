@@ -11,7 +11,7 @@
       v-model="value"
       class="orm-rel-options_options"
       :options="options"
-      :replace="{ label: rel.label, value: rel.prop }"
+      :props="{ label: rel.label, value: rel.prop }"
       obj
       clearable
     >

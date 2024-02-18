@@ -6,7 +6,7 @@
       role="option"
       @click="onClick(opt)"
     >
-      {{ opt[replace.label] }}
+      {{ opt[props.props.label] }}
     </li>
     <slot />
   </el-scrollbar>
@@ -23,18 +23,18 @@ type Obj = Record<string, any>
 const props = withDefaults(defineProps<{
   modelValue: Arrayable<Obj | string | number>
   options: any[]
-  replace?: { label: string, value: string }
+  props?: { label: string, value: string }
   obj?: boolean
   clearable?: boolean
   multiple?: boolean
 }>(), {
-  replace: () => ({ label: 'label', value: 'value' })
+  props: () => ({ label: 'label', value: 'value' })
 })
 
 const emit = defineEmits(['update:modelValue', 'change'])
 
 function onClick(opt) {
-  const { multiple, obj, replace: { label, value } } = props
+  const { multiple, obj, props: { label, value } } = props
   const genObj = () => pick(opt, [value, label])
   let val
   if (multiple) {
@@ -57,7 +57,7 @@ function isSelect(opt) {
 }
 
 function eqOpt(opt, val) {
-  const { value } = props.replace
+  const { value } = props.props
   return isObject(val) ? val[value] === opt[value] : val === opt[value]
 }
 </script>

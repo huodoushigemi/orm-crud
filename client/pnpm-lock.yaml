@@ -1,14 +1,14 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@el-lowcode/crud': ^1.0.1
+  '@el-lowcode/crud': ^1.0.2
   '@iconify-json/ep': ^1.1.14
   '@types/lodash-es': ^4.17.12
   '@vitejs/plugin-vue': ^4.5.2
   '@vitejs/plugin-vue-jsx': ^3.1.0
   '@vue/shared': ^3.4.15
   '@vueuse/core': ^10.7.2
-  el-form-render: ^1.0.1
+  el-form-render: ^1.0.2
   element-plus: 2.5.5
   lodash-es: ^4.17.21
   sass: ^1.70.0
@@ -22,11 +22,11 @@ specifiers:
   vue-tsc: ^1.8.25
 
 dependencies:
-  '@el-lowcode/crud': 1.0.1_sqjaunqmyvevzvgrdwlfpq5geq
+  '@el-lowcode/crud': 1.0.2_sqjaunqmyvevzvgrdwlfpq5geq
   '@vitejs/plugin-vue-jsx': 3.1.0_vite@5.1.0+vue@3.4.18
   '@vue/shared': 3.4.16
   '@vueuse/core': 10.7.2_vue@3.4.18
-  el-form-render: 1.0.1_sqjaunqmyvevzvgrdwlfpq5geq
+  el-form-render: 1.0.2_sqjaunqmyvevzvgrdwlfpq5geq
   element-plus: 2.5.5_vue@3.4.18
   lodash-es: 4.17.21
   sass: 1.70.0
@@ -359,15 +359,15 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /@el-lowcode/crud/1.0.1_sqjaunqmyvevzvgrdwlfpq5geq:
-    resolution: {integrity: sha512-1RnzUajBLLCDAeKS1NOZGbr2EmxI67gNjZNEzMdQsdiwN2ivPLqiOy3eSrsnlt9EVcZhf4PzfcwVvWRcDxCXgw==}
+  /@el-lowcode/crud/1.0.2_sqjaunqmyvevzvgrdwlfpq5geq:
+    resolution: {integrity: sha512-Ei4CyeXRQiGSlzHxKKYRn77R1y88YlsielKWnvpGo2IBQWYGzAtGnVgas18Fic4T/3J55HbQ8NPb7REk6KZb3A==}
     peerDependencies:
       element-plus: ^2.3.8
       vue: ^3.2.0
     dependencies:
-      '@el-lowcode/render': 1.0.1_sqjaunqmyvevzvgrdwlfpq5geq
-      '@vue/shared': 3.4.16
-      el-form-render: 1.0.1_sqjaunqmyvevzvgrdwlfpq5geq
+      '@el-lowcode/render': 1.0.2_sqjaunqmyvevzvgrdwlfpq5geq
+      '@vue/shared': 3.4.19
+      el-form-render: 1.0.2_sqjaunqmyvevzvgrdwlfpq5geq
       element-plus: 2.5.5_vue@3.4.18
       vue: 3.4.18_typescript@5.3.3
     transitivePeerDependencies:
@@ -376,13 +376,13 @@ packages:
       - vant
     dev: false
 
-  /@el-lowcode/render/1.0.1_sqjaunqmyvevzvgrdwlfpq5geq:
-    resolution: {integrity: sha512-AVqW100Ap3UMWEzT8/KPR13FmDAujzPm7edT5gCgIdgweg/dY8wJGjo07vZSEI/lup2AKyleQTJMG+WmkIwgnQ==}
+  /@el-lowcode/render/1.0.2_sqjaunqmyvevzvgrdwlfpq5geq:
+    resolution: {integrity: sha512-epXGYWZpnljqs8Le2SAZOLj1NNdQ3mtcJXTb5vurPQwUXuWSJcChhFMtZHH8IZayRCH50SfoF/ShV3NMEO/tgw==}
     peerDependencies:
       element-plus: ^2.3.8
       vue: ^3.2.0
     dependencies:
-      '@vue/shared': 3.4.16
+      '@vue/shared': 3.4.19
       element-plus: 2.5.5_vue@3.4.18
       vue: 3.4.18_typescript@5.3.3
     dev: false
@@ -1253,8 +1253,8 @@ packages:
       has-property-descriptors: 1.0.1
     dev: false
 
-  /el-form-render/1.0.1_sqjaunqmyvevzvgrdwlfpq5geq:
-    resolution: {integrity: sha512-4bXzYRjnyfwigvdt/xI7/vG4g7Xgg3u4N+RlQnNGmTN+QsMg4AZWhcb+TkA2Nr1gLxuRQ1uVVohzooO+few+OA==}
+  /el-form-render/1.0.2_sqjaunqmyvevzvgrdwlfpq5geq:
+    resolution: {integrity: sha512-smgU+qWs00OGh7PWs+BrDIpblmOJNrxWaMqc5I/A/wyGCrGWDnPgVOIbF31PgKPc6bVqn5dzoOOGq1h/6yEiEQ==}
     peerDependencies:
       ant-design-vue: ^4.0.0
       element-plus: ^2.0.0

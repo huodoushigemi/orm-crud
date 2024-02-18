@@ -9,11 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@el-lowcode/crud": "^1.0.1",
+    "@el-lowcode/crud": "^1.0.2",
     "@vitejs/plugin-vue-jsx": "^3.1.0",
     "@vue/shared": "^3.4.15",
     "@vueuse/core": "^10.7.2",
-    "el-form-render": "^1.0.1",
+    "el-form-render": "^1.0.2",
     "element-plus": "2.5.5",
     "lodash-es": "^4.17.21",
     "sass": "^1.70.0",
