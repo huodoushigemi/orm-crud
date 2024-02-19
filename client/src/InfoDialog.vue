@@ -3,8 +3,12 @@
     <Info :ctx="state.ctx" :data="state.data" />
 
     <template #footer>
-      <el-cascader-panel v-model="xxx" :options="options" :props="{ value: 'prop', multiple: true, expandTrigger: 'hover' }" />
+      <el-button type="info" text bg @click="() => $refs.xxx.open(state.ctx.table)">
+        <i-ep:setting style="font-size: 1.4em;" />
+      </el-button>
     </template>
+    
+    <RelFieldsDialog ref="xxx" v-model="fields" @update:model-value="alert" />
   </el-drawer>
 </template>
 
@@ -14,13 +18,15 @@ import { toReactive, breakpointsTailwind, useBreakpoints } from '@vueuse/core'
 import { ElDrawer } from 'element-plus'
 import { useZIndex } from 'element-plus/es/hooks/index'
 import Info from './Info.vue'
+import RelFieldsDialog from './RelFieldsDialog.vue'
 import { TableCtx } from './crud'
-import { NormalizedField, RelField } from './props'
 
 // 响应式布局
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const map = { sm: '90%', lg: '75%', '2xl': '60%' }
 const w = computed(() => Object.entries(map).find(([p]) => breakpoints.smaller(p).value)?.[1] || '40%')
+
+const fields = ref([])
 
 const state = shallowReactive({
   vis: false,
@@ -32,6 +38,9 @@ const { nextZIndex } = useZIndex()
 let zIndex = 0
 watchEffect(() => state.vis && (zIndex ||= nextZIndex()))
 
+const alert = (...args) => console.log(...args);
+
+
 defineExpose({
   open(data, ctx) {
     state.vis = true
@@ -41,35 +50,5 @@ defineExpose({
   close() {
     state.vis = false
   }
-})
-
-const xxx = ref([])
-
-const options = computed(() => {
-  const { ctxs } = state.ctx || {}
-  if (!ctxs) return []
-  const map = {} as Record<string, NormalizedField[]>
-  const rels = <RelField[]>[]
-  function rrr(table: string) {
-    if (map[table]) map[table]
-    const fields = map[table] = <NormalizedField[]>[]
-    for (let e of ctxs[table].fields) {
-      e = { ...e }
-      if (e.relation) rels.push(e)
-      fields.push(e)
-    }
-    while (rels.length) {
-      const e = rels.shift()!
-      if (map[e.relation.table]) e.children = map[e.relation.table].filter(e => !e.relation)
-      else e.children = rrr(e.relation.table)
-    }
-    return fields
-  }
-  return rrr(state.ctx.table)
-})
-
-watchEffect(() => {
-  console.log(options.value);
-  // console.log(state.ctx?.table, state.vis);
 })
 </script>

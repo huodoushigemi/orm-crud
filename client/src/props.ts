@@ -37,9 +37,9 @@ export interface NormalizedField extends Omit<Field, 'relation'> {
 
 export type RelField = NormalizedField & { relation: Required<Relation> }
 
-export interface TableXXX {
+export interface TableXXX<T = string> {
   label: string
-  fields: Field[]
+  fields: (Field & { prop: T })[]
   columns: (Field | string)[]
   searchs: (Field | string)[]
   forms: (Field | string)[]

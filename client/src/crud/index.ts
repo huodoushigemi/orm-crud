@@ -60,6 +60,8 @@ function createCrud(tables: Record<string, TableXXX>, table: string, ctxs: Recor
   config.searchs.forEach((e, i) => ctx.searchs[i] = normalizeField(e, ctx, true))
   config.forms.forEach((e, i) => ctx.forms[i] = normalizeField(e, ctx, true))
 
+  Object.freeze(ctx)
+
   // Object.setPrototypeOf(ctx, prismaAdapter)
 
   return ctx as TableCtx & ApiAdapterInterface

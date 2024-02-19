@@ -67,7 +67,7 @@ const crudRef = ref()
 const menu = reactive({ vis: false, row: null, x: 0, y: 0 })
 const menus = computed(() => [
   { title: '详情', icon: IDocument, onClick: () => infoRef.value.open(menu.row, ctx()) },
-  { title: '编辑', icon: IEdite, onClick: () => infoRef.value.open(menu.row, ctx()) },
+  { title: '编辑', icon: IEdite, onClick: () => crudRef.value.openDialog(menu.row) },
   { title: '删除', icon: IDelete, disabled: true, divided: true, onClick: () => infoRef.value.open(menu.row, ctx()) },
   { title: '关联的表', children: ctx().rels.map(e => ({ title: e.label, onClick: () => relRef.value.open(menu.row, ctx(), e) })) }
 ])
