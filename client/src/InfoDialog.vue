@@ -8,7 +8,7 @@
       </el-button>
     </template>
     
-    <RelFieldsDialog ref="xxx" v-model="fields" @update:model-value="alert" />
+    <RelFieldsDialog ref="xxx" v-model="fields" />
   </el-drawer>
 </template>
 
@@ -37,9 +37,6 @@ const state = shallowReactive({
 const { nextZIndex } = useZIndex()
 let zIndex = 0
 watchEffect(() => state.vis && (zIndex ||= nextZIndex()))
-
-const alert = (...args) => console.log(...args);
-
 
 defineExpose({
   open(data, ctx) {

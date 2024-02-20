@@ -54,7 +54,7 @@ export function getP(obj, prop) {
   for (let i = 0; i < ps.length; i++) {
     const k = ps[i]
     isarr || (isarr = Array.isArray(obj))
-    obj = isarr ? obj.map(e => e[k]) : obj[k]
+    obj = isarr ? obj.map(e => e && e[k]).filter(e => e != null).flat() : obj[k]
     if (!obj) return obj
     if (isarr && !obj.length) return undefined
   }
@@ -62,3 +62,6 @@ export function getP(obj, prop) {
 }
 
 export const toArr = <T>(arr?: Arrayable<T>) => Array.isArray(arr) ? arr : (arr == null ? [] : [arr])
+
+export const isRelMany = (rel: RelField['relation']['rel']) => rel == '1-n' || rel == 'm-n'
+export const isRelOne = (rel: RelField['relation']['rel']) => rel == '1-1' || rel == 'n-1'

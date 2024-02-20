@@ -1,14 +1,13 @@
 <template>
-  <el-dialog v-if="state.vis || state.vis2" v-model="state.vis" title="展示字段" append-to-body :modal="false" width="850px" @open="state.vis2 = true" @close="state.vis2 = false">
+  <el-dialog v-if="state.vis || state.vis2" v-model="state.vis" title="展示字段" append-to-body :modal="false" width="550px" @open="state.vis2 = true" @close="state.vis2 = false">
     <div class="orm-fields">
       <div class="orm-fields_tags" style="margin-right: 8px;">
         <el-tag v-for="ks in value" :key="ks.join('.')" type="info" size="large" closable @close="remove(modelValue, ks.join('.'))">
           {{ findFieldPath(ctx, ks).map(e => e.label).join(' / ') }}
         </el-tag>
-        <el-empty v-if="!value.length" description="no select" />
+        <el-empty v-if="!value.length" description="no select" image-size="128" />
       </div>
-      <!-- <el-cascader ref="cascaderRef" v-model="value" :options="options" :props="{ value: 'prop', multiple: true, expandTrigger: 'hover', hoverThreshold: 0, checkStrictly: true }" clearable style="width: 100%;" class="orm-fields" popper-class="orm-fields-menu" /> -->
-      <el-cascader-panel v-model="value" :options="options" :props="{ value: 'prop', multiple: true, expandTrigger: 'hover', hoverThreshold: 0, checkStrictly: false }" clearable class="orm-fields_menu" />
+      <el-cascader-panel v-model="value" :options="options" :props="{ value: 'prop', multiple: true, expandTrigger: 'hover', hoverThreshold: 0, checkStrictly: true }" clearable class="orm-fields_menu" />
     </div>
   </el-dialog>
 </template>
@@ -17,7 +16,7 @@
 import { computed, ref, shallowReactive } from 'vue'
 import { remove } from '@vue/shared'
 import { TableCtx } from './crud'
-import { findFieldPath } from './utils'
+import { findFieldPath, isRelMany } from './utils'
 import { NormalizedField, RelField } from './props'
 import { useConfig } from './context'
 
@@ -59,8 +58,10 @@ const options = computed(() => {
     }
     while (rels.length) {
       const e = rels.shift()!
-      if (map[e.relation.table]) e.children = map[e.relation.table].filter(e => !e.relation)
-      else e.children = rrr(e.relation.table)
+      const rel = e.relation
+      if (isRelMany(rel.rel)) e.children = ctxs[rel.table].fields.map(e => ({ ...e }))
+      else if (map[rel.table]) e.children = map[rel.table].filter(e => !e.relation)
+      else e.children = rrr(rel.table)
     }
     return fields
   }
@@ -80,7 +81,6 @@ defineExpose({
   open(table) {
     state.vis = true
     state.table = table
-    // setTimeout(() => cascaderRef.value.togglePopperVisible(true), 200);
   }
 })
 </script>
@@ -95,7 +95,7 @@ defineExpose({
     flex-direction: column;
     margin-right: 8px;
     padding: 8px;
-    width: 200px;
+    width: 150px;
     overflow: auto;
     border: 1px solid var(--el-border-color-light);
 
@@ -115,6 +115,19 @@ defineExpose({
     flex: 1;
     width: 0;
     overflow: auto;
+
+    > .el-cascader-menu {
+      min-width: 150px;
+      flex-shrink: 0;
+    }
+
+    .el-cascader-menu:last-child .el-cascader-node {
+      padding-right: 30px;
+    }
+
+    .el-cascader-node {
+      font-weight: unset !important;
+    }
 
     .el-cascader-menu__wrap.el-scrollbar__wrap {
       height: 100%;

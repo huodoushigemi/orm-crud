@@ -12,11 +12,12 @@ const request = extend({
 })
 
 function find(this: TableCtx, data, paths) {
+  paths = paths?.length ? paths : [...this.columns, ...this.forms].map(e => e.prop)
   return {
     table: this.table,
     action: 'findUnique',
     argv: {
-      select: { [this.map.id]: true, ...select(this, (paths || [...this.columns, ...this.forms].map(e => e.prop))) },
+      select: { [this.map.id]: true, ...select(this, paths) },
       where: data,
     }
   }
@@ -25,11 +26,12 @@ function find(this: TableCtx, data, paths) {
 function finds(this: TableCtx, data, paths) {
   const extraQueryKs = Object.keys(data).filter(k => !this.searchs.find(e => e.prop.split('.')[0] == k))
   const extraQs = objectPick(data, extraQueryKs as any)
+  paths = paths?.length ? paths : this.columns.map(e => e.prop)
   return {
     table: this.table,
     action: 'findMany',
     argv: {
-      select: { [this.map.id]: true, ...select(this, (paths || this.columns.map(e => e.prop))) },
+      select: { [this.map.id]: true, ...select(this, paths) },
       where: where(this, data),
       skip: extraQs.$pageSize ? (extraQs.$page - 1) * extraQs.$pageSize : undefined,
       take: extraQs.$pageSize
@@ -125,12 +127,12 @@ function select(ctx: TableCtx, paths: string[]) {
     if (ps[ps.length - 1].relation) {
       // e.g: post.author -> post.select.author.select
       const rel = ps[ps.length - 1].relation!
-      const ks = path.replace(/\./, '.select.') + '.select'
+      const ks = path.replace(/\./g, '.select.') + '.select'
       const val = get(o, ks), newVal = { [rel.label]: true, [rel.prop]: true }
       val ? Object.assign(val, newVal) : set(o, ks, newVal)
     } else if (ps.length > 1) {
       // e.g: post.author.name -> post.select.author.select.name
-      set(o, path.replace(/\./, '.select.'), true)
+      set(o, path.replace(/\./g, '.select.'), true)
     } else {
       // e.g: content
       set(o, path, true)

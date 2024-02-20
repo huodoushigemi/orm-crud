@@ -60,7 +60,7 @@ export const Tag: TableXXX = {
   fields: [
     { label: 'id', prop: 'id' },
     { label: '标签名', prop: 'name', filter: 'contains' },
-    { label: '文章', prop: 'post', relation: { table: 'Post', rel: 'm-n' } },
+    { label: '文章', prop: 'posts', relation: { table: 'Post', rel: 'm-n' } },
   ],
   columns: ['name'],
   forms: ['name'],
