@@ -6,7 +6,6 @@
       <el-input v-if="searchable" class="orm-rel-options_search" v-model="searchTemp" placeholder="输入关键字" clearable @keydown.enter="search = searchTemp; refresh()" />
     </div>
 
-
     <Options
       v-model="value"
       class="orm-rel-options_options"

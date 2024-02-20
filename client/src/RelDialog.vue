@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-if="state.row" v-model="state.vis" :title="state.field.label" append-to-body width="75%" @closed="state.row = null">
+  <el-dialog v-if="state.row" v-model="state.vis" :title="state.field.label" append-to-body top="5vh" width="75%" @closed="state.row = null">
     <Table
       :table="rel.ctx.table"
       :searchs="[rel.field]"

@@ -1,6 +1,6 @@
 <template>
   <el-drawer v-if="state.data" v-model="state.vis" :title="state.ctx.label" append-to-body :size="w" :z-index="zIndex" @closed="state.data = null">
-    <Info :ctx="state.ctx" :data="state.data" />
+    <Info :ctx="state.ctx" :data="state.data" :fields="fields" />
 
     <template #footer>
       <el-button type="info" text bg @click="() => $refs.xxx.open(state.ctx.table)">

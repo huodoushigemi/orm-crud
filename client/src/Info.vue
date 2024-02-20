@@ -20,10 +20,12 @@ import { getP } from './utils'
 import RelTag from './RelTag.vue'
 import { useConfig } from './context'
 import { TableCtx } from './crud'
+import { pick } from 'lodash-es'
 
 const props = withDefaults(defineProps<{
   ctx: TableCtx
   data: Record<string, any>
+  fields: string[]
 }>(), {
   data: () => ({})
 })
@@ -34,12 +36,11 @@ const column = computed(() => breakpoints.smallerOrEqual('sm').value ? 2 : 3)
 const cols = computed(() => props.ctx.columns.filter(e => !e.html))
 const cols_html = computed(() => props.ctx.columns.filter(e => e.html))
 
-const req = useRequest((data) => props.ctx.find(data), { manual: true, initialData: {} })
-const $data = computed(() => req.data.value)
-
-watchEffect(async () => {
-  const prop = props.ctx.map.id, id = props.data[prop]
-  await Promise.resolve()
-  req.run({ [prop]: id })
-})
+const $data = computed(() => req.data.value || {})
+const req = useRequest(() => {
+  const { data, ctx, fields } = props
+  if (!data) return
+  const prop = ctx.map.id
+  return ctx.find({ [prop]: data[prop] }, fields)
+}, { refreshDeps: () => [props.fields, props.data] })
 </script>

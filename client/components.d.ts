@@ -8,12 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     'IEp:arrowRight': typeof import('~icons/ep/arrow-right')['default']
-    'IEp:grid': typeof import('~icons/ep/grid')['default']
-    'IEp:loading': typeof import('~icons/ep/loading')['default']
-    'IEp:menu': typeof import('~icons/ep/menu')['default']
-    'IEp:more': typeof import('~icons/ep/more')['default']
     'IEp:setting': typeof import('~icons/ep/setting')['default']
     'IEp:tools': typeof import('~icons/ep/tools')['default']
-    'IEp:view': typeof import('~icons/ep/view')['default']
   }
 }

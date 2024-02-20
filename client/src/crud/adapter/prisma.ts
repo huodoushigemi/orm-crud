@@ -11,25 +11,25 @@ const request = extend({
   prefix: 'http://localhost:3000/prisma'
 })
 
-function find(this: TableCtx, data) {
+function find(this: TableCtx, data, paths) {
   return {
     table: this.table,
     action: 'findUnique',
     argv: {
-      select: { [this.map.id]: true, ...select(this, [...this.columns, ...this.forms]) },
+      select: { [this.map.id]: true, ...select(this, (paths || [...this.columns, ...this.forms].map(e => e.prop))) },
       where: data,
     }
   }
 }
 
-function finds(this: TableCtx, data) {
+function finds(this: TableCtx, data, paths) {
   const extraQueryKs = Object.keys(data).filter(k => !this.searchs.find(e => e.prop.split('.')[0] == k))
   const extraQs = objectPick(data, extraQueryKs as any)
   return {
     table: this.table,
     action: 'findMany',
     argv: {
-      select: { [this.map.id]: true, ...select(this, this.columns) },
+      select: { [this.map.id]: true, ...select(this, (paths || this.columns.map(e => e.prop))) },
       where: where(this, data),
       skip: extraQs.$pageSize ? (extraQs.$page - 1) * extraQs.$pageSize : undefined,
       take: extraQs.$pageSize
@@ -119,21 +119,21 @@ function count(this: TableCtx, data) {
 }
 
 
-function select(ctx: TableCtx, fields: NormalizedField[]) {
-  return fields.reduce((o, e) => {
-    const ps = findFieldPath(ctx, e.prop)
+function select(ctx: TableCtx, paths: string[]) {
+  return paths.reduce((o, path) => {
+    const ps = findFieldPath(ctx, path)
     if (ps[ps.length - 1].relation) {
       // e.g: post.author -> post.select.author.select
       const rel = ps[ps.length - 1].relation!
-      const prop = e.prop.replace(/\./, '.select.') + '.select'
-      const val = get(o, prop), newVal = { [rel.label]: true, [rel.prop]: true }
-      val ? Object.assign(val, newVal) : set(o, prop, newVal)
+      const ks = path.replace(/\./, '.select.') + '.select'
+      const val = get(o, ks), newVal = { [rel.label]: true, [rel.prop]: true }
+      val ? Object.assign(val, newVal) : set(o, ks, newVal)
     } else if (ps.length > 1) {
       // e.g: post.author.name -> post.select.author.select.name
-      set(o, e.prop.replace(/\./, '.select.'), true)
+      set(o, path.replace(/\./, '.select.'), true)
     } else {
       // e.g: content
-      set(o, e.prop, true)
+      set(o, path, true)
     }
     return o
   }, {})
@@ -186,13 +186,13 @@ function where(ctx: TableCtx, data: any) {
 const api = { find, finds, create, update, remove, removes, count }
 
 export const prismaAdapter = Object.keys(api).reduce((o, e) => {
-  o[e] = function (data) {
-    return request.post('/crud', { data: api[e].call(this, data) })
+  o[e] = function (...args) {
+    return request.post('/crud', { data: api[e].apply(this, args) })
   }
   return o
 }, {}) as ApiAdapterInterface
 
-prismaAdapter.page = async function(data) {
-  const [list, total] = await request.post('/crud', { data: [finds.call(this, data), count.call(this, data)] })
+prismaAdapter.page = async function(...args) {
+  const [list, total] = await request.post('/crud', { data: [finds.apply(this, args), count.apply(this, args)] })
   return { list, total, a: 1 }
 }
