@@ -8,7 +8,7 @@ import RelTag from './RelTag.vue'
 import InfoDialog from './InfoDialog.vue'
 import RelDialog from './RelDialog.vue'
 import ContextMenu from './ContextMenu.vue'
-import { TableXXX } from './props'
+import { TableOpt } from './props'
 import { useConfig } from './context'
 import { getP, normalizeField } from './utils'
 
@@ -18,7 +18,7 @@ import IDocument from '~icons/ep/document'
 
 defineOptions({  })
 
-const props = defineProps<Partial<TableXXX> & {
+const props = defineProps<Partial<TableOpt> & {
   table: string
 }>()
 

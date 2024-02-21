@@ -1,4 +1,4 @@
-import { NormalizedField, NormalizedTableXXX, TableXXX } from '../props'
+import { NormalizedField, NormalizedTableXXX, TableOpt } from '../props'
 import { normalizeField } from '../utils'
 import { ApiAdapterInterface } from './adapter/interface'
 import { prismaAdapter } from './adapter/prisma'
@@ -6,11 +6,11 @@ import { prismaAdapter } from './adapter/prisma'
 export type TableCtx = NormalizedTableXXX & ApiAdapterInterface & {
   table: string
   keybyed: Record<string, NormalizedField>
-  tables: Record<string, TableXXX>
+  tables: Record<string, TableOpt>
   ctxs: Record<string, TableCtx>
 }
 
-export function createCruds(tables: Record<string, TableXXX>) {
+export function createCruds(tables: Record<string, TableOpt>) {
   const ctxs = new Proxy({}, {
     get(obj, table: string, receiver) {
       return obj[table] ||= createCrud(tables, table, ctxs)
@@ -33,7 +33,7 @@ export function createCruds(tables: Record<string, TableXXX>) {
   return ctxs as Record<string, ReturnType<typeof createCrud>>
 }
 
-function createCrud(tables: Record<string, TableXXX>, table: string, ctxs: Record<string, TableCtx>) {
+function createCrud(tables: Record<string, TableOpt>, table: string, ctxs: Record<string, TableCtx>) {
   const config = tables[table]
   
   if (!config) throw new Error(`找不到 Table: ${table}`)

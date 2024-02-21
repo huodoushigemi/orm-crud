@@ -9,23 +9,35 @@
       <div v-html="getP($data, col.prop)"></div>
     </ElDescriptionsItem> -->
 
-    <ElDescriptionsItem v-for="col in nFields" :label="col.label">
+    <!-- <ElDescriptionsItem v-for="col in nFields" :label="col.label">
+      <RelTag v-if="col.relation" :data="getP($data, col.prop)" :rel="col.relation" />
+      <template v-else>{{ getP($data, col.prop) }}</template>
+    </ElDescriptionsItem> -->
+
+    <ElDescriptionsItem v-for="col in nFields.filter(e => !e.relation && !e.prop.includes('.'))" :label="col.label">
       <RelTag v-if="col.relation" :data="getP($data, col.prop)" :rel="col.relation" />
       <template v-else>{{ getP($data, col.prop) }}</template>
     </ElDescriptionsItem>
   </ElDescriptions>
+
+  <div v-for="col in nFields.filter(e => e.relation)">
+    <div>{{ col.label }}</div>
+    <Table :table="col.relation!.table" :extraQuery="set({}, pathReverse(ctx, col.prop), pick(data, ctx.map.id))" :hasOperation="false" />
+  </div>
 </template>
 
-<script setup lang="ts">
-import { computed, withDefaults, watchEffect, watch } from 'vue'
+<script setup lang="tsx">
+import { computed, withDefaults, watchEffect, watch, defineComponent, PropType } from 'vue'
 import { toReactive, useBreakpoints, breakpointsTailwind } from '@vueuse/core'
 import { useRequest } from 'vue-request'
 import { ElDescriptions, ElDescriptionsItem } from 'element-plus'
-import { getP, normalizeField } from './utils'
+import { set, pick } from 'lodash-es'
+import { findFieldPath, getP, normalizeField, pathReverse } from './utils'
 import RelTag from './RelTag.vue'
+import Table from './Table.vue'
 import { useConfig } from './context'
 import { TableCtx } from './crud'
-import { pick } from 'lodash-es'
+import { NormalizedField } from './props'
 
 const props = withDefaults(defineProps<{
   ctx: TableCtx
@@ -55,4 +67,37 @@ watch(() => {
 }, {
   immediate: true
 })
+
+type A = {
+  prop: string
+  // parent: string
+  children?: A[]
+}
+// const aaa = computed(() => {
+//   const ret = {} as Record<string, A>
+//   let __ = ''
+//   const insert = (s: string) => (ret[s] = ret[__ = s.includes('.') ? s.replace(/\.[^\.]+$/, '') : ''] ||= { prop: __, children: [] }).children!.push({ prop: s,  children: [] })
+//   return props.fields.forEach(prop => insert(prop))
+// })
+
+// const xxx = defineComponent({
+//   props: {
+//     fields: Array as PropType<string[]>,
+//     data: null
+//   },
+//   setup(props, ctx) {
+//     return () => {
+//       const rels = []
+//       return (
+//         <ElDescriptions border :column={column}>
+//           { props.fields!.map(e => {
+
+//             const ps = findFieldPath(props.ctx, e)
+//             ps[ps.length - 1]
+//           })}
+//         </ElDescriptions>
+//       )
+//     }
+//   },
+// })
 </script>

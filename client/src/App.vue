@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Table from './Table.vue'
 import ConfigProvider from './ConfigProvider.vue'
-import { TableXXX } from './props';
+import { TableOpt } from './props';
 import tables from './tables/index'
 </script>
 

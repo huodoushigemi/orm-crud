@@ -11,6 +11,14 @@ export interface Field {
   required?: boolean
   html?: Boolean
   relation?: Omit<Relation, 'prop'>
+  // todo
+  enum?: string
+  // todo
+  type?: string
+  // todo
+  editor?: any
+  // todo
+  render?: any
 }
 
 export type Relation = RelationOne | RelationMany
@@ -37,7 +45,7 @@ export interface NormalizedField extends Omit<Field, 'relation'> {
 
 export type RelField = NormalizedField & { relation: Required<Relation> }
 
-export interface TableXXX<T = string> {
+export interface TableOpt<T = string> {
   label: string
   fields: (Field & { prop: T })[]
   columns: (Field | string)[]
@@ -61,11 +69,11 @@ export interface NormalizedTableXXX {
   readonly rels: RelField[];
   views: NormalizedField[]
   btns: any[]
-  map: Required<TableXXX['map']>
+  map: Required<TableOpt['map']>
 }
 
 export interface ConfigProviderProps {
-  tables: Record<string, TableXXX>
+  tables: Record<string, TableOpt>
 }
 
 export interface ConfigProviderContext extends ConfigProviderProps {

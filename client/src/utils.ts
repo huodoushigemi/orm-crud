@@ -1,7 +1,8 @@
 import { Arrayable } from '@vueuse/core'
+import { isArray } from '@vue/shared'
 import { merge } from 'lodash-es'
 import { TableCtx } from './crud'
-import { Field, NormalizedField, NormalizedTableXXX, Relation, TableXXX } from './props'
+import { Field, NormalizedField, NormalizedTableXXX, RelField, Relation, TableOpt } from './props'
 
 export function findFieldPath(ctx: TableCtx, prop: string | string[]): NormalizedField[] {
   return (Array.isArray(prop) ? prop : prop.split('.')).map((e, i, arr) => {
@@ -49,11 +50,11 @@ export function genLabel(prop: string, ctx: TableCtx) {
 }
 
 export function getP(obj, prop) {
-  const ps = Array.isArray(prop) ? prop : prop.split('.')
+  const ps = isArray(prop) ? prop : prop.split('.')
   let isarr
   for (let i = 0; i < ps.length; i++) {
     const k = ps[i]
-    isarr || (isarr = Array.isArray(obj))
+    isarr || (isarr = isArray(obj))
     obj = isarr ? obj.map(e => e && e[k]).filter(e => e != null).flat() : obj[k]
     if (!obj) return obj
     if (isarr && !obj.length) return undefined
@@ -61,7 +62,28 @@ export function getP(obj, prop) {
   return obj
 }
 
-export const toArr = <T>(arr?: Arrayable<T>) => Array.isArray(arr) ? arr : (arr == null ? [] : [arr])
+export const toArr = <T>(arr?: Arrayable<T>) => isArray(arr) ? arr : (arr == null ? [] : [arr])
 
 export const isRelMany = (rel: RelField['relation']['rel']) => rel == '1-n' || rel == 'm-n'
 export const isRelOne = (rel: RelField['relation']['rel']) => rel == '1-1' || rel == 'n-1'
+
+/**
+ * e.g: following.posts.tag -> posts.author.followedBy
+ */
+export function pathReverse(ctx: TableCtx, ps: string[] | string) {
+  const { ctxs } = ctx
+  const arr = isArray(ps) ? ps : ps.split('.')
+  let ret = <string[]>[]
+  arr.forEach(e => {
+    const col = ctx.keybyed[e], rel = col.relation!
+    const ctx2 = ctxs[rel.table]
+    const col2 = ctx2.fields.find(e => 
+      e.relation!.table == ctx.table
+      && e.relation!.name == rel.name
+      && (ctx2.table != ctx.table || e.prop != col.prop)
+    )!
+    ret.push(col2.prop)
+    ctx = ctx2
+  })
+  return ret.reverse().join('.')
+}
