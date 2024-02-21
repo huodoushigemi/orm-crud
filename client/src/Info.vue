@@ -1,5 +1,6 @@
 <template>
-  <ElDescriptions border :column="column">
+  <!-- <el-card class="el-card--small" :header="ctx.label"> -->
+    <ElDescriptions border :column="column" style="margin-bottom: 22px;">
     <!-- <ElDescriptionsItem v-for="(col, i) in cols" :label="col.label" :span="i == cols.length - 1 ? column - (i % column) : 1">
       <RelTag v-if="col.relation" :data="getP($data, col.prop)" :rel="col.relation" />
       <template v-else>{{ getP($data, col.prop) }}</template>
@@ -14,21 +15,30 @@
       <template v-else>{{ getP($data, col.prop) }}</template>
     </ElDescriptionsItem> -->
 
-    <ElDescriptionsItem v-for="col in nFields.filter(e => !e.relation && !e.prop.includes('.'))" :label="col.label">
+    <ElDescriptionsItem v-for="col in nFields.filter(e => e.relation || !e.prop.includes('.'))" :label="col.label">
       <RelTag v-if="col.relation" :data="getP($data, col.prop)" :rel="col.relation" />
       <template v-else>{{ getP($data, col.prop) }}</template>
     </ElDescriptionsItem>
   </ElDescriptions>
+  <!-- </el-card> -->
 
-  <div v-for="col in nFields.filter(e => e.relation)">
-    <div>{{ col.label }}</div>
-    <Table :table="col.relation!.table" :extraQuery="set({}, pathReverse(ctx, col.prop), pick(data, ctx.map.id))" :hasOperation="false" />
-  </div>
+  <el-card v-for="col in nFields.filter(e => e.relation)" class="el-card--small" :header="col.label" shadow="nerve" style="margin-bottom: 16px;">
+    <!-- <div class="el-descriptions__title" style="margin-bottom: 6px;">{{ col.label }}</div> -->
+    <Table
+      :table="col.relation!.table"
+      :extraQuery="set({}, pathReverse(ctx, col.prop), pick(data, ctx.map.id))"
+      :hasNew="false"
+      :searchAttrs="{ size: 'small' }"
+      :tableAttrs="{ size: 'small', border: true, tooltipEffect: true }"
+      :pagination="{ small: true, layout: 'total, prev, next', style: 'margin: 8px' }"
+      :hasOperation="false"
+    />
+  </el-card>
 </template>
 
 <script setup lang="tsx">
 import { computed, withDefaults, watchEffect, watch, defineComponent, PropType } from 'vue'
-import { toReactive, useBreakpoints, breakpointsTailwind } from '@vueuse/core'
+import { toReactive, useBreakpoints, breakpointsTailwind, reactify, reactifyObject } from '@vueuse/core'
 import { useRequest } from 'vue-request'
 import { ElDescriptions, ElDescriptionsItem } from 'element-plus'
 import { set, pick } from 'lodash-es'
@@ -56,6 +66,14 @@ const cols_html = computed(() => props.ctx.columns.filter(e => e.html))
 
 const $data = computed(() => req.data.value || {})
 const req = useRequest(({ data, fields }) => props.ctx.find(data, fields), { manual: true })
+
+const log = reactifyObject(console)
+
+log.log(nFields)
+
+watchEffect(() => {
+  console.log(nFields.value);
+})
 
 watch(() => {
   const { data, ctx, fields } = props
@@ -101,3 +119,29 @@ type A = {
 //   },
 // })
 </script>
+
+<style scoped lang="scss">
+.el-card--small {
+  & > :deep(.el-card__body) {
+    padding: 0;
+  }
+
+  &:deep(.crud-table) {
+    &::before { display: none; }
+    &::after { display: none; }
+
+    .el-table__inner-wrapper {
+      &::before { display: none; }
+      // &::after { display: none; }
+    }
+
+    .el-table__border-left-patch {
+      display: none;
+    }
+  }
+  
+  &:deep(.crud-search .el-input) {
+    --el-input-width: 100px;
+  }
+}
+</style>

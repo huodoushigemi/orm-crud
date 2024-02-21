@@ -77,7 +77,7 @@ export function pathReverse(ctx: TableCtx, ps: string[] | string) {
   arr.forEach(e => {
     const col = ctx.keybyed[e], rel = col.relation!
     const ctx2 = ctxs[rel.table]
-    const col2 = ctx2.fields.find(e => 
+    const col2 = ctx2.rels.find(e => 
       e.relation!.table == ctx.table
       && e.relation!.name == rel.name
       && (ctx2.table != ctx.table || e.prop != col.prop)

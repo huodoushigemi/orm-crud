@@ -1,5 +1,5 @@
 <template>
-  <el-drawer v-if="state.data" v-model="state.vis" :title="state.ctx.label" append-to-body :size="w" :z-index="zIndex" @closed="state.data = null">
+  <el-drawer v-if="state.data" v-model="state.vis" :title="state.ctx.label" append-to-body :size="w" :z-index="zIndex" body-style="--el-drawer-padding-primary: 10px" @closed="state.data = null">
     <Info :ctx="state.ctx" :data="state.data" :fields="fields" />
 
     <template #footer>

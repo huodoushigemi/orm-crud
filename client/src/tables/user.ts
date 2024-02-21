@@ -31,7 +31,7 @@ export const Post: TableXXX = {
     { label: '标签', prop: 'tag', relation: { table: 'Tag', rel: 'm-n' } },
     { label: '评论', prop: 'comments', relation: { table: 'Comment', rel: 'm-n' } },
   ],
-  columns: ['title', 'content', 'author', 'author.age', 'tag', 'tag.name'],
+  columns: ['title', 'content', 'author', 'tag'],
   forms: ['title', 'content', 'author', 'tag'],
   searchs: ['title', 'content'],
   btns: [],

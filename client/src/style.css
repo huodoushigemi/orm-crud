@@ -1,3 +1,7 @@
 .dark body {
   background: #1e1e20;
 }
+
+.el-card--small {
+  --el-card-padding: 10px;
+}
