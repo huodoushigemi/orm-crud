@@ -10,23 +10,17 @@
       <div v-html="getP($data, col.prop)"></div>
     </ElDescriptionsItem> -->
 
-    <!-- <ElDescriptionsItem v-for="col in nFields" :label="col.label">
-      <RelTag v-if="col.relation" :data="getP($data, col.prop)" :rel="col.relation" />
-      <template v-else>{{ getP($data, col.prop) }}</template>
-    </ElDescriptionsItem> -->
-
-    <ElDescriptionsItem v-for="col in nFields.filter(e => e.relation || !e.prop.includes('.'))" :label="col.label">
+    <ElDescriptionsItem v-for="col in parsed.fields" :label="col.label">
       <RelTag v-if="col.relation" :data="getP($data, col.prop)" :rel="col.relation" />
       <template v-else>{{ getP($data, col.prop) }}</template>
     </ElDescriptionsItem>
   </ElDescriptions>
-  <!-- </el-card> -->
 
-  <el-card v-for="col in nFields.filter(e => e.relation)" class="el-card--small" :header="col.label" shadow="nerve" style="margin-bottom: 16px;">
-    <!-- <div class="el-descriptions__title" style="margin-bottom: 6px;">{{ col.label }}</div> -->
+  <el-card v-for="table in parsed.tables" class="el-card--small" :header="table.label" shadow="nerve" style="margin-bottom: 16px;">
     <Table
-      :table="col.relation!.table"
-      :extraQuery="set({}, pathReverse(ctx, col.prop), pick(data, ctx.map.id))"
+      :table="table.table"
+      :columns="table.columns"
+      :extraQuery="set({ $pageSize: 5 }, pathReverse(ctx, table.prop), pick(data, ctx.map.id))"
       :hasNew="false"
       :searchAttrs="{ size: 'small' }"
       :tableAttrs="{ size: 'small', border: true, tooltipEffect: true }"
@@ -37,12 +31,12 @@
 </template>
 
 <script setup lang="tsx">
-import { computed, withDefaults, watchEffect, watch, defineComponent, PropType } from 'vue'
+import { ref, computed, withDefaults, watchEffect, watch, defineComponent, PropType } from 'vue'
 import { toReactive, useBreakpoints, breakpointsTailwind, reactify, reactifyObject } from '@vueuse/core'
 import { useRequest } from 'vue-request'
 import { ElDescriptions, ElDescriptionsItem } from 'element-plus'
-import { set, pick } from 'lodash-es'
-import { findFieldPath, getP, normalizeField, pathReverse } from './utils'
+import { set, pick, unionBy } from 'lodash-es'
+import { findFieldPath, getP, isRelMany, normalizeField, pathReverse } from './utils'
 import RelTag from './RelTag.vue'
 import Table from './Table.vue'
 import { useConfig } from './context'
@@ -61,19 +55,9 @@ const breakpoints = useBreakpoints(breakpointsTailwind)
 const column = computed(() => breakpoints.smallerOrEqual('sm').value ? 2 : 3)
 
 const nFields = computed(() => props.fields?.map(e => normalizeField(e, props.ctx)))
-const cols = computed(() =>  props.ctx.columns.filter(e => !e.html))
-const cols_html = computed(() => props.ctx.columns.filter(e => e.html))
 
 const $data = computed(() => req.data.value || {})
 const req = useRequest(({ data, fields }) => props.ctx.find(data, fields), { manual: true })
-
-const log = reactifyObject(console)
-
-log.log(nFields)
-
-watchEffect(() => {
-  console.log(nFields.value);
-})
 
 watch(() => {
   const { data, ctx, fields } = props
@@ -86,38 +70,28 @@ watch(() => {
   immediate: true
 })
 
-type A = {
-  prop: string
-  // parent: string
-  children?: A[]
+const parsed = computed(() => parseFields())
+
+type TableXXX = { table: string; label: string; prop: string; columns: string[] }
+
+function parseFields() {
+  const fields = [] as NormalizedField[]
+  const tables = {} as Record<string, TableXXX>
+  nFields.value.forEach(e => {
+    const fs = findFieldPath(props.ctx, e.prop)
+    if (!fs.length) return
+    const manyI = fs.findIndex(e => e.relation && isRelMany(e.relation.rel))
+    if (manyI == -1 || manyI == fs.length - 1) {
+      fields.push(e)
+    } else {
+      const col = fs[manyI], table = col.relation!.table, prop = e.prop.split('.').slice(0, manyI + 1).join('.')
+      const tableOpt = tables[prop] ||= { table, label: normalizeField(prop, props.ctx).label, prop, columns: [] }
+      tableOpt.columns.push(e.prop.replace(`${prop}.`, ''))
+    }
+  })
+  
+  return { fields, tables }
 }
-// const aaa = computed(() => {
-//   const ret = {} as Record<string, A>
-//   let __ = ''
-//   const insert = (s: string) => (ret[s] = ret[__ = s.includes('.') ? s.replace(/\.[^\.]+$/, '') : ''] ||= { prop: __, children: [] }).children!.push({ prop: s,  children: [] })
-//   return props.fields.forEach(prop => insert(prop))
-// })
-
-// const xxx = defineComponent({
-//   props: {
-//     fields: Array as PropType<string[]>,
-//     data: null
-//   },
-//   setup(props, ctx) {
-//     return () => {
-//       const rels = []
-//       return (
-//         <ElDescriptions border :column={column}>
-//           { props.fields!.map(e => {
-
-//             const ps = findFieldPath(props.ctx, e)
-//             ps[ps.length - 1]
-//           })}
-//         </ElDescriptions>
-//       )
-//     }
-//   },
-// })
 </script>
 
 <style scoped lang="scss">

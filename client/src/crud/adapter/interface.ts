@@ -9,7 +9,7 @@ export interface ApiAdapterInterface {
   create(this: TableCtx, data): Promise<any>
   update(this: TableCtx, data): Promise<any>
   count(this: TableCtx, data): Promise<any>
-  page(this: TableCtx, data: Pageable): Promise<{ total: number; list: any[] }>
+  page(this: TableCtx, data: Pageable, fields?: string[]): Promise<{ total: number; list: any[] }>
   remove(this: TableCtx, data): Promise<any>
   removes(this: TableCtx, data): Promise<any>
 }

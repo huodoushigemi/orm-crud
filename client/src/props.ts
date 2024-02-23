@@ -60,7 +60,7 @@ export interface TableOpt<T = string> {
   }>
 }
 
-export interface NormalizedTableXXX {
+export interface NormalizedTableOpt {
   label: string
   fields: NormalizedField[]
   columns: NormalizedField[]

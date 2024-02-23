@@ -15,6 +15,7 @@ import { getP, normalizeField } from './utils'
 import IEdite from '~icons/ep/edit'
 import IDelete from '~icons/ep/delete'
 import IDocument from '~icons/ep/document'
+import { linkEmits } from 'element-plus'
 
 defineOptions({  })
 
@@ -38,13 +39,15 @@ const _searchs = computed(() => [
   ...props.searchs?.map(e => normalizeField(e, ctx())).filter(e => ctx().searchs.every(ee => ee.prop != e.prop)) || [],
   ...ctx().searchs
 ])
+const _columns = computed(() => props.columns || ctx().columns)
+// row => getP(row, e.prop)
 
 const searchModel = ref({})
 const formModel = ref()
 
 async function request(_, data, type) {
   if (type == 'list') {
-    return ctx().page(data)
+    return ctx().page(data, props.columns?.map(e => normalizeField(e, ctx())).map(e => e.prop))
   }
   if (type == 'new') {
     return await ctx().create(data)
@@ -97,7 +100,7 @@ const log = (...arg) => console.log(...arg)
       :schema="ctx().fields"
       :searchItems="_searchs"
       :formItems="ctx().forms"
-      :columns="ctx().columns.map(e => ({ ...e, formatter: row => getP(row, e.prop) }))"
+      :columns="_columns"
       url="xxx"
       :request="request"
       v-model:search="searchModel"

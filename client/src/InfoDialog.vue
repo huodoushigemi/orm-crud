@@ -14,7 +14,8 @@
 
 <script setup lang="ts">
 import { computed, shallowReactive, ref, watchEffect, watch } from 'vue'
-import { toReactive, breakpointsTailwind, useBreakpoints } from '@vueuse/core'
+import { toReactive, breakpointsTailwind, useBreakpoints, useLocalStorage } from '@vueuse/core'
+import { useStorage } from './hooks'
 import { ElDrawer } from 'element-plus'
 import { useZIndex } from 'element-plus/es/hooks/index'
 import Info from './Info.vue'
@@ -26,13 +27,16 @@ const breakpoints = useBreakpoints(breakpointsTailwind)
 const map = { sm: '90%', lg: '75%', '2xl': '60%' }
 const w = computed(() => Object.entries(map).find(([p]) => breakpoints.smaller(p).value)?.[1] || '40%')
 
-const fields = ref([])
-
 const state = shallowReactive({
   vis: false,
   ctx: null as unknown as TableCtx,
   data: null,
 })
+
+const fields = useStorage(
+  () => `orm-views-fields_${state.ctx?.table}`,
+  { default: () => state.ctx?.views.map(e => e.prop) }
+)
 
 const { nextZIndex } = useZIndex()
 let zIndex = 0

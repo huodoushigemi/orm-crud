@@ -1,9 +1,10 @@
-import { NormalizedField, NormalizedTableXXX, TableOpt } from '../props'
+import { unionBy } from 'lodash-es'
+import { NormalizedField, NormalizedTableOpt, TableOpt } from '../props'
 import { normalizeField } from '../utils'
 import { ApiAdapterInterface } from './adapter/interface'
 import { prismaAdapter } from './adapter/prisma'
 
-export type TableCtx = NormalizedTableXXX & ApiAdapterInterface & {
+export type TableCtx = NormalizedTableOpt & ApiAdapterInterface & {
   table: string
   keybyed: Record<string, NormalizedField>
   tables: Record<string, TableOpt>
@@ -56,9 +57,10 @@ function createCrud(tables: Record<string, TableOpt>, table: string, ctxs: Recor
   }
 
   config.fields.forEach((e, i) => ctx.fields[i] = normalizeField(e, ctx))
-  config.columns.forEach((e, i) => ctx.columns[i] = normalizeField(e, ctx, true))
-  config.searchs.forEach((e, i) => ctx.searchs[i] = normalizeField(e, ctx, true))
-  config.forms.forEach((e, i) => ctx.forms[i] = normalizeField(e, ctx, true))
+  config.columns.forEach((e, i) => ctx.columns[i] = normalizeField(e, ctx))
+  config.searchs.forEach((e, i) => ctx.searchs[i] = normalizeField(e, ctx))
+  config.forms.forEach((e, i) => ctx.forms[i] = normalizeField(e, ctx))
+  ;(config.views?.length ? config.views : unionBy(ctx.columns, ctx.forms, e => e.prop)).forEach((e, i) => ctx.views[i] = normalizeField(e, ctx))
 
   Object.freeze(ctx)
 

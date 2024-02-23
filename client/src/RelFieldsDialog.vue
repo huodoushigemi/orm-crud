@@ -1,5 +1,9 @@
 <template>
   <el-dialog v-if="state.vis || state.vis2" v-model="state.vis" title="展示字段" append-to-body :modal="false" width="550px" @open="state.vis2 = true" @close="state.vis2 = false">
+    <template #header>
+      <span class="el-dialog__title">展示字段</span>
+      <el-button text bg size="small" style="margin-left: 12px; opacity: .75;" @click="emit('update:modelValue', ctx.views.map(e => e.prop))">还原</el-button>
+    </template>
     <div class="orm-fields">
       <div class="orm-fields_tags" style="margin-right: 8px;">
         <el-tag v-for="ks in value" :key="ks.join('.')" type="info" size="large" closable @close="remove(modelValue, ks.join('.'))">
@@ -7,7 +11,7 @@
         </el-tag>
         <el-empty v-if="!value.length" description="no select" image-size="128" />
       </div>
-      <el-cascader-panel v-model="value" :options="options" :props="{ value: 'prop', multiple: true, expandTrigger: 'hover', hoverThreshold: 0, checkStrictly: true }" clearable class="orm-fields_menu" />
+      <el-cascader-panel v-model="value" :options="options" :props="{ value: 'prop', multiple: true, hoverThreshold: 0, checkStrictly: true }" clearable class="orm-fields_menu" />
     </div>
   </el-dialog>
 </template>

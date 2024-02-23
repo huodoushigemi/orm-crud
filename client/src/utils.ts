@@ -1,8 +1,8 @@
 import { Arrayable } from '@vueuse/core'
 import { isArray } from '@vue/shared'
-import { merge } from 'lodash-es'
+import { merge, unionBy } from 'lodash-es'
 import { TableCtx } from './crud'
-import { Field, NormalizedField, NormalizedTableXXX, RelField, Relation, TableOpt } from './props'
+import { Field, NormalizedField, NormalizedTableOpt, RelField, Relation, TableOpt } from './props'
 
 export function findFieldPath(ctx: TableCtx, prop: string | string[]): NormalizedField[] {
   return (Array.isArray(prop) ? prop : prop.split('.')).map((e, i, arr) => {
@@ -15,13 +15,13 @@ export function findFieldPath(ctx: TableCtx, prop: string | string[]): Normalize
   })
 }
 
-export function normalizeField(field: Field | string, ctx: TableCtx, assign?: boolean): NormalizedField {
+export function normalizeField(field: Field | string, ctx: TableCtx): NormalizedField {
   if (typeof field == 'string') {
     const prop = field
     const leaf = findFieldPath(ctx, prop).slice(-1)[0]
     return ctx.keybyed[prop] ||= {
       ...leaf,
-      label: genLabel(prop, ctx),
+      label: genLabel(ctx, prop),
       prop,
     }
   } else {
@@ -29,7 +29,7 @@ export function normalizeField(field: Field | string, ctx: TableCtx, assign?: bo
     const ret = {
       ...cache,
       ...field,
-      label: field.label || cache?.label || genLabel(field.prop, ctx),
+      label: field.label || cache?.label || genLabel(ctx, field.prop),
       relation: field.relation
         ? (() => {
           const { table } = field.relation, { map } = ctx.ctxs[table]
@@ -40,12 +40,12 @@ export function normalizeField(field: Field | string, ctx: TableCtx, assign?: bo
         })()
         : undefined
     }
-    return assign ? ret : (ctx.keybyed[field.prop] ||= ret)
+    return ctx.keybyed[field.prop] ||= ret
   }
 
 }
 
-export function genLabel(prop: string, ctx: TableCtx) {
+export function genLabel(ctx: TableCtx, prop: string) {
   return prop.split('.').length > 1 ? findFieldPath(ctx, prop).map(e => e.label).join('.') : prop
 }
 
