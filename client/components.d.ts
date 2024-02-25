@@ -8,6 +8,8 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     'IEp:arrowRight': typeof import('~icons/ep/arrow-right')['default']
+    'IEp:expand': typeof import('~icons/ep/expand')['default']
+    'IEp:fullScreen': typeof import('~icons/ep/full-screen')['default']
     'IEp:setting': typeof import('~icons/ep/setting')['default']
     'IEp:tools': typeof import('~icons/ep/tools')['default']
   }

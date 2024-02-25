@@ -5,27 +5,31 @@ interface UseDialogOpt {
   shallow: boolean
 }
 
-export function useDialog<T extends any>(data: T, opt: UseDialogOpt) {
+export function useDialog<T extends any>(data: T, opt?: UseDialogOpt) {
+  opt ||= { shallow: false }
+  const ins = ref(), vis = ref(false)
   const state = (opt.shallow ? shallowReactive : reactive)({
-    modelValue: false,
+    modelValue: vis,
+    vis,
     data: undefined as T | undefined,
-    ref: ref(),
-    ins: computed(() => state.ref.values),
+    ref: el => ins.value = el,
+    ins,
     onClosed: () => state.data = undefined,
-    'onUpdate:modelValue': v => state.modelValue = v,
+    'onUpdate:modelValue': v => vis.value = v,
+    'onUpdate:vis': v => vis.value = v,
     'onUpdate:data': v => state.data = v,
   })
 
   watch(() => state.data, v => {
-    if (v != null) return
-    state.modelValue = true
+    if (v == null) return
+    vis.value = true
   })
 
   return state
 }
 
-export function useStorage(key: () => string, opt: { default: () => any }) {
-  const val = ref(calcVal())
+export function useStorage<T>(key: () => string, opt: { default: () => T }) {
+  const val = ref<T>(calcVal())
   watch(calcVal, v => val.value = v)
   watchEffect(() => {
     const eq = isEqual(val.value, opt.default())

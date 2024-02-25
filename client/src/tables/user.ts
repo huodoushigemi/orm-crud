@@ -1,8 +1,8 @@
-import { TableXXX } from "../props"
+import { TableOpt } from "../props"
 
 const required = true
 
-export const User: TableXXX = {
+export const User: TableOpt = {
   label: '用户',
   fields: [
     { label: 'id', prop: 'id' },
@@ -15,13 +15,13 @@ export const User: TableXXX = {
     { label: '文章', prop: 'posts', relation: { table: 'Post', rel: '1-n' } }
   ],
   columns: ['name', 'age', 'email', 'posts'],
-  forms: ['name', { prop: 'age', type: 'input-number' }, 'email'],
+  forms: ['name', { prop: 'age', editor: 'input-number' }, 'email', 'following'],
   searchs: ['following', 'name', { prop: 'posts.title' }],
   btns: [],
   map: { label: 'name' }
 }
 
-export const Post: TableXXX = {
+export const Post: TableOpt = {
   label: '文章',
   fields: [
     { label: 'id', prop: 'id' },
@@ -38,7 +38,7 @@ export const Post: TableXXX = {
   map: { label: 'title' }
 }
 
-export const Comment: TableXXX = {
+export const Comment: TableOpt = {
   label: '评论',
   fields: [
     { label: 'id', prop: 'id' },
@@ -55,7 +55,7 @@ export const Comment: TableXXX = {
   map: { label: 'content' }
 }
 
-export const Tag: TableXXX = {
+export const Tag: TableOpt = {
   label: '标签',
   fields: [
     { label: 'id', prop: 'id' },

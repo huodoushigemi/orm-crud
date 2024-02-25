@@ -12,7 +12,7 @@ export interface Field {
   html?: Boolean
   relation?: Omit<Relation, 'prop'>
   // todo
-  enum?: string
+  options?: string
   // todo
   type?: string
   // todo
@@ -20,6 +20,10 @@ export interface Field {
   // todo
   render?: any
 }
+
+export type FieldColumn = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'render'>
+export type FieldForm = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'editor'>
+export type FieldView = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'render' | 'html'>
 
 export type Relation = RelationOne | RelationMany
 
@@ -48,10 +52,10 @@ export type RelField = NormalizedField & { relation: Required<Relation> }
 export interface TableOpt<T = string> {
   label: string
   fields: (Field & { prop: T })[]
-  columns: (Field | string)[]
-  searchs: (Field | string)[]
-  forms: (Field | string)[]
-  views?: (Field | string)[]
+  columns: (FieldColumn | string)[]
+  searchs: (FieldForm | string)[]
+  forms: (FieldForm | string)[]
+  views?: (FieldView | string)[]
   btns: any[]
   map: Partial<{
     label: string

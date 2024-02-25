@@ -8,7 +8,7 @@
       </el-button>
     </template>
     
-    <RelFieldsDialog ref="xxx" v-model="fields" />
+    <RelFieldsDialog ref="xxx" v-model="fields" :default="defaults" />
   </el-drawer>
 </template>
 
@@ -16,7 +16,6 @@
 import { computed, shallowReactive, ref, watchEffect, watch } from 'vue'
 import { toReactive, breakpointsTailwind, useBreakpoints, useLocalStorage } from '@vueuse/core'
 import { useStorage } from './hooks'
-import { ElDrawer } from 'element-plus'
 import { useZIndex } from 'element-plus/es/hooks/index'
 import Info from './Info.vue'
 import RelFieldsDialog from './RelFieldsDialog.vue'
@@ -33,9 +32,11 @@ const state = shallowReactive({
   data: null,
 })
 
+const defaults = () => state.ctx?.views.map(e => e.prop)
+
 const fields = useStorage(
   () => `orm-views-fields_${state.ctx?.table}`,
-  { default: () => state.ctx?.views.map(e => e.prop) }
+  { default: defaults }
 )
 
 const { nextZIndex } = useZIndex()

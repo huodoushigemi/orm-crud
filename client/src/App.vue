@@ -11,6 +11,6 @@ import tables from './tables/index'
 
     <br />
 
-    <!-- <Table table="Post" /> -->
+    <Table table="Post" />
   </ConfigProvider>
 </template>

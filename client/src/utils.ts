@@ -1,6 +1,6 @@
 import { Arrayable } from '@vueuse/core'
-import { isArray } from '@vue/shared'
-import { merge, unionBy } from 'lodash-es'
+import { isObject, isArray } from '@vue/shared'
+import { get, set, merge, unionBy } from 'lodash-es'
 import { TableCtx } from './crud'
 import { Field, NormalizedField, NormalizedTableOpt, RelField, Relation, TableOpt } from './props'
 
@@ -15,7 +15,7 @@ export function findFieldPath(ctx: TableCtx, prop: string | string[]): Normalize
   })
 }
 
-export function normalizeField(field: Field | string, ctx: TableCtx): NormalizedField {
+export function normalizeField(ctx: TableCtx, field: Field | string): NormalizedField {
   if (typeof field == 'string') {
     const prop = field
     const leaf = findFieldPath(ctx, prop).slice(-1)[0]
@@ -39,7 +39,9 @@ export function normalizeField(field: Field | string, ctx: TableCtx): Normalized
           )
         })()
         : undefined
-    }
+    } as NormalizedField
+    if (cache && ret.editor) cache.editor ||= ret.editor
+    if (cache && ret.render) cache.render ||= ret.render
     return ctx.keybyed[field.prop] ||= ret
   }
 
@@ -62,10 +64,30 @@ export function getP(obj, prop) {
   return obj
 }
 
+export const pickP = <T>(obj: T, arr: string[]) => arr.reduce((o, k) => set(o, k, get(obj, k)), {})
+
 export const toArr = <T>(arr?: Arrayable<T>) => isArray(arr) ? arr : (arr == null ? [] : [arr])
 
-export const isRelMany = (rel: RelField['relation']['rel']) => rel == '1-n' || rel == 'm-n'
-export const isRelOne = (rel: RelField['relation']['rel']) => rel == '1-1' || rel == 'n-1'
+export const isRelMany = (rel?: RelField['relation']['rel']) => rel == '1-n' || rel == 'm-n'
+export const isRelOne = (rel?: RelField['relation']['rel']) => rel == '1-1' || rel == 'n-1'
+
+/**
+ * todo
+ * e.g: { 'a.e': 1, a: { 'b.c': 1 } } -> { a: { e: 1, b: { c: 1 } } }
+ */
+export function normalObj(obj: Record<string, any>) {
+  const ret = {}
+  function rrr(obj, ps = <string>[]) {
+    for (let k in obj) {
+      ps.push(k)
+      const v = obj[k]
+      if (isObject(v)) set(ret, k, rrr(v, ps))
+      else set(ret, k, v)
+      ps.pop()
+    }
+  }
+  return ret
+}
 
 /**
  * e.g: following.posts.tag -> posts.author.followedBy
@@ -86,4 +108,19 @@ export function pathReverse(ctx: TableCtx, ps: string[] | string) {
     ctx = ctx2
   })
   return ret.reverse().join('.')
+}
+
+export function inMany(ctx: TableCtx, path: string | string[]) {
+  return findFieldPath(ctx, path).slice(0, -1).some(e => isRelMany(e.relation!.rel))
+}
+
+export function fieldEditor(ctx: TableCtx, field: NormalizedField) {
+  let type: string | undefined
+  type = ctx.forms.find(e => field.prop == e.prop)?.type
+  type ||= ctx.keybyed[field.prop].type
+  if (!field.prop.includes('.')) return type || 'input'
+  // type ||= 
+  const paths = findFieldPath(ctx, field.prop)
+  const leaf = paths[paths.length - 1]
+  if (leaf.editor) leaf.editor
 }

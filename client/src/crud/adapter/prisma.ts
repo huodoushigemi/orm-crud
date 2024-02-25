@@ -1,6 +1,6 @@
+import { isObject, isArray } from '@vue/shared'
 import { get, set } from 'lodash-es'
-import { isObject, objectPick } from '@vueuse/core'
-import { isPlainObject } from '@vue/shared'
+import { objectPick } from '@vueuse/core'
 import { extend } from 'umi-request'
 import { findFieldPath } from '../../utils'
 import { NormalizedField } from '../../props'
@@ -44,20 +44,7 @@ function create(this: TableCtx, data) {
     table: this.table,
     action: 'create',
     argv: {
-      data: {
-        ...this.forms.reduce((o, e) => {
-          const rel = e.relation, val = data[e.prop]
-          if (rel) {
-            const fn = v => ({ [rel.prop]: v[rel.prop] })
-            o[e.prop] = {
-              connect: val ? Array.isArray(val) ? val.map(fn) : fn(val) : undefined
-            }
-          } else {
-            o[e.prop] = val
-          }
-          return o
-        }, {})
-      }
+      data: buildData(this, data, true),
     }
   }
 }
@@ -68,19 +55,7 @@ function update(this: TableCtx, data) {
     action: 'update',
     argv: {
       data: {
-        ...this.forms.reduce((o, e) => {
-          const rel = e.relation, val = data[e.prop]
-          if (rel) {
-            const fn = v => ({ [rel.prop]: v[rel.prop] })
-            o[e.prop] = {
-              set: rel.rel == '1-n' || rel.rel == 'm-n' ? [] : undefined,
-              connect: val ? Array.isArray(val) ? val.map(fn) : fn(val) : undefined
-            }
-          } else {
-            o[e.prop] = val
-          }
-          return o
-        }, {}),
+        ...buildData(this, data, false),
         [this.map.id]: undefined
       },
       where: { [this.map.id]: data[this.map.id] }
@@ -120,6 +95,33 @@ function count(this: TableCtx, data) {
   }
 }
 
+function buildData(ctx: TableCtx, data, create: boolean) {
+  const ret = {}
+  for (let k in  data) {
+    const field = findFieldPath(ctx, k).slice(-1)[0]
+    const rel = field.relation
+
+    const val = data[k]
+    if (rel) {
+      if (val == null) {
+        ret[k] = create ? undefined : { disconnect: true }
+      }
+      else if (!isObject(val)) {
+        throw new Error(`Invalid prop: type check failed for prop ${k}. Expected Object, got ${val}`)
+      }
+      else {
+        const fn = v => ({ [rel.prop]: v[rel.prop] })
+        ret[k] = {
+          set: rel.rel == '1-n' || rel.rel == 'm-n' ? [] : undefined,
+          connect: isArray(val) ? val.map(fn) : fn(val)
+        }
+      }
+    } else {
+      ret[k] = val
+    }
+  }
+  return ret
+}
 
 function select(ctx: TableCtx, paths: string[]) {
   return paths.reduce((o, path) => {

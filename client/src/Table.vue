@@ -16,6 +16,8 @@ import IEdite from '~icons/ep/edit'
 import IDelete from '~icons/ep/delete'
 import IDocument from '~icons/ep/document'
 import { linkEmits } from 'element-plus'
+import EditDialog from './EditDialog.vue'
+import { useDialog } from './hooks'
 
 defineOptions({  })
 
@@ -36,7 +38,7 @@ const config = useConfig()
 const ctx = () => config.cruds[props.table]
 
 const _searchs = computed(() => [
-  ...props.searchs?.map(e => normalizeField(e, ctx())).filter(e => ctx().searchs.every(ee => ee.prop != e.prop)) || [],
+  ...props.searchs?.map(e => normalizeField(ctx(), e)).filter(e => ctx().searchs.every(ee => ee.prop != e.prop)) || [],
   ...ctx().searchs
 ])
 const _columns = computed(() => props.columns || ctx().columns)
@@ -47,7 +49,7 @@ const formModel = ref()
 
 async function request(_, data, type) {
   if (type == 'list') {
-    return ctx().page(data, props.columns?.map(e => normalizeField(e, ctx())).map(e => e.prop))
+    return ctx().page(data, props.columns?.map(e => normalizeField(ctx(), e)).map(e => e.prop))
   }
   if (type == 'new') {
     return await ctx().create(data)
@@ -66,11 +68,12 @@ async function request(_, data, type) {
 const infoRef = ref()
 const relRef = ref()
 const crudRef = ref()
+const edit = useDialog(formModel)
 
 const menu = reactive({ vis: false, row: null, x: 0, y: 0 })
 const menus = computed(() => [
   { title: '详情', icon: IDocument, onClick: () => infoRef.value.open(menu.row, ctx()) },
-  { title: '编辑', icon: IEdite, onClick: () => crudRef.value.openDialog(menu.row) },
+  { title: '编辑', icon: IEdite, onClick: () => edit.data = menu.row },
   { title: '删除', icon: IDelete, disabled: true, divided: true, onClick: () => infoRef.value.open(menu.row, ctx()) },
   { title: '关联的表', children: ctx().rels.map(e => ({ title: e.label, onClick: () => relRef.value.open(menu.row, ctx(), e) })) }
 ])
@@ -105,7 +108,7 @@ const log = (...arg) => console.log(...arg)
       :request="request"
       v-model:search="searchModel"
       v-model:form="formModel"
-      :btns="() => []"
+      :hasOperation="false"
       :tableAttrs="{
         rowKey: ctx().map.id,
         cellStyle: ({ row }) => row == menu.row ? { 'background-color': 'var(--el-table-current-row-bg-color)' } : undefined,
@@ -129,6 +132,8 @@ const log = (...arg) => console.log(...arg)
     </CRUD>
   
     <InfoDialog ref="infoRef" />
+
+    <EditDialog v-bind="edit" :table="table" @finish="crudRef.getData()" />
   
     <RelDialog ref="relRef" />
   
@@ -139,7 +144,6 @@ const log = (...arg) => console.log(...arg)
 <style lang="scss">
 .orm-table {
   display: flex;
-  // height: 300px;
 
   &_left {
     flex-shrink: 0;

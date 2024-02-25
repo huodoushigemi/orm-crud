@@ -54,7 +54,7 @@ const props = withDefaults(defineProps<{
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const column = computed(() => breakpoints.smallerOrEqual('sm').value ? 2 : 3)
 
-const nFields = computed(() => props.fields?.map(e => normalizeField(e, props.ctx)))
+const nFields = computed(() => props.fields?.map(e => normalizeField(props.ctx, e)))
 
 const $data = computed(() => req.data.value || {})
 const req = useRequest(({ data, fields }) => props.ctx.find(data, fields), { manual: true })
@@ -85,7 +85,7 @@ function parseFields() {
       fields.push(e)
     } else {
       const col = fs[manyI], table = col.relation!.table, prop = e.prop.split('.').slice(0, manyI + 1).join('.')
-      const tableOpt = tables[prop] ||= { table, label: normalizeField(prop, props.ctx).label, prop, columns: [] }
+      const tableOpt = tables[prop] ||= { table, label: normalizeField(props.ctx, prop).label, prop, columns: [] }
       tableOpt.columns.push(e.prop.replace(`${prop}.`, ''))
     }
   })
