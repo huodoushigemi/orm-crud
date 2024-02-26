@@ -5,7 +5,7 @@
     style="width: 128px;"
     v-bind="$attrs"
     :modelValue="props.modelValue"
-    @update:modelValue="emit('update:modelValue', pickLP($event))"
+    @update:modelValue="emit('update:modelValue', normal($event))"
     :value-key="rel.prop"
     clearable
     filterable
@@ -47,15 +47,15 @@
 </template>
 
 <script setup lang="tsx">
-import { computed, h, reactive, ref, watchEffect } from 'vue'
+import { reactive, ref } from 'vue'
 import { isArray } from '@vue/shared'
-import { Arrayable, toReactive } from '@vueuse/core'
+import { Arrayable } from '@vueuse/core'
 import { useRequest } from 'vue-request'
 import { get, set } from 'lodash-es'
 import Table from './Table.vue'
-import { NormalizedField, RelField, Relation } from './props'
+import { Relation } from './props'
 import { useConfig } from './context'
-import { toArr, pickP } from './utils'
+import { toArr, pickLP } from './utils'
 
 type Obj = Record<string, any>
 
@@ -100,15 +100,14 @@ function closed() {
 function ok() {
   const { selected } = dialog
   dialog.vis = false
-  const val = pickLP(props.multiple ? selected : selected[0])
+  const val = normal(props.multiple ? selected : selected[0])
   emit('update:modelValue', val)
 }
 
-function pickLP(e) {
+function normal(e) {
   if (e === '') e = null
-  const { label, prop } = props.rel
-  const _pick = e => e && pickP(e, [prop, label])
-  return isArray(e) ? e.map(_pick) : _pick(e)
+  const { rel } = props
+  return isArray(e) ? e.map(e => pickLP(e, rel)) : pickLP(e, rel)
 }
 </script>
 

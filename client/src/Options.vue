@@ -6,24 +6,24 @@
       role="option"
       @click="onClick(opt)"
     >
-      {{ opt[props.props.label] }}
+      {{ get(opt, props.props.label) }}
     </li>
     <slot />
   </el-scrollbar>
 </template>
 
 <script setup lang="ts">
-import { isArray, isObject } from '@vue/shared'
+import { isObject } from '@vue/shared'
 import { Arrayable } from '@vueuse/core'
-import { pick } from 'lodash-es'
-import { toArr } from './utils';
+import { get } from 'lodash-es'
+import { toArr, pickLP } from './utils'
 
 type Obj = Record<string, any>
 
 const props = withDefaults(defineProps<{
   modelValue: Arrayable<Obj | string | number>
   options: any[]
-  props?: { label: string, value: string }
+  props: { label: string, value: string }
   obj?: boolean
   clearable?: boolean
   multiple?: boolean
@@ -34,18 +34,17 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits(['update:modelValue', 'change'])
 
 function onClick(opt) {
-  const { multiple, obj, props: { label, value } } = props
-  const genObj = () => pick(opt, [value, label])
+  const { multiple, obj, props: _props } = props
   let val
   if (multiple) {
     val = toArr(props.modelValue)
     const i = val.findIndex(e => eqOpt(opt, e))
-    ~i ? val.splice(i, 1) : val.push(obj ? genObj() : opt[value])
+    ~i ? val.splice(i, 1) : val.push(obj ? pickLP(opt, _props) : get(opt, _props.value))
   }
   else if (props.clearable && isSelect(opt)) {
     val = undefined
   } else {
-    val = obj ? genObj() : opt[value]
+    val = obj ? pickLP(opt, _props) : get(opt, _props.value)
   }
   emit('update:modelValue', val)
   emit('change', val)
@@ -58,7 +57,7 @@ function isSelect(opt) {
 
 function eqOpt(opt, val) {
   const { value } = props.props
-  return isObject(val) ? val[value] === opt[value] : val === opt[value]
+  return isObject(val) ? get(val, value) === get(opt, value) : val === get(opt, value)
 }
 </script>
 

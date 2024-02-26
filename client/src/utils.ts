@@ -64,7 +64,8 @@ export function getP(obj, prop) {
   return obj
 }
 
-export const pickP = <T>(obj: T, arr: string[]) => arr.reduce((o, k) => set(o, k, get(obj, k)), {})
+export const pickPath = (obj, paths: string[]) => paths.reduce((o, k) => set(o, k, get(obj, k)), {})
+export const pickLP = (obj, props: { label: string; prop?: string; value?: string }) => obj && pickPath(obj, [props.prop || props.value!, props.label])
 
 export const toArr = <T>(arr?: Arrayable<T>) => isArray(arr) ? arr : (arr == null ? [] : [arr])
 
