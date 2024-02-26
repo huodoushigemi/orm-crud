@@ -5,7 +5,7 @@ interface UseDialogOpt {
   shallow: boolean
 }
 
-export function useDialog<T extends any>(data: T, opt?: UseDialogOpt) {
+export function useDialogBind<T extends any>(opt?: UseDialogOpt) {
   opt ||= { shallow: false }
   const ins = ref(), vis = ref(false)
   const state = (opt.shallow ? shallowReactive : reactive)({

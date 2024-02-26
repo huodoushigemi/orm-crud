@@ -57,9 +57,9 @@ function createCrud(tables: Record<string, TableOpt>, table: string, ctxs: Recor
   }
 
   config.fields.forEach((e, i) => ctx.fields[i] = normalizeField(ctx, e))
-  config.columns.forEach((e, i) => ctx.columns[i] = normalizeField(ctx, e))
-  config.searchs.forEach((e, i) => ctx.searchs[i] = normalizeField(ctx, e))
-  config.forms.forEach((e, i) => ctx.forms[i] = normalizeField(ctx, e))
+  config.columns?.forEach((e, i) => ctx.columns[i] = normalizeField(ctx, e))
+  config.searchs?.forEach((e, i) => ctx.searchs[i] = normalizeField(ctx, e))
+  config.forms?.forEach((e, i) => ctx.forms[i] = normalizeField(ctx, e))
   ;(config.views?.length ? config.views : unionBy(ctx.columns, ctx.forms, e => e.prop)).forEach((e, i) => ctx.views[i] = normalizeField(ctx, e))
 
   Object.freeze(ctx)

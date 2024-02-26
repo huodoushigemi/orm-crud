@@ -12,10 +12,11 @@ export const User: TableOpt = {
     { label: 'following', prop: 'following', relation: { table: 'User', rel: 'm-n' } },
     { label: 'followedBy', prop: 'followedBy', relation: { table: 'User', rel: 'm-n' } },
     { label: '评论', prop: 'comments', relation: { table: 'Comment', rel: '1-n' } },
-    { label: '文章', prop: 'posts', relation: { table: 'Post', rel: '1-n' } }
+    { label: '文章', prop: 'posts', relation: { table: 'Post', rel: '1-n' } },
+    { prop: 'videos', relation: { table: 'User_Video', rel: '1-n', label: 'video.filename' } },
   ],
   columns: ['name', 'age', 'email', 'posts'],
-  forms: ['name', { prop: 'age', editor: 'input-number' }, 'email', 'following'],
+  forms: ['name', { prop: 'age', editor: 'el-input-number' }, 'email', 'following'],
   searchs: ['following', 'name', { prop: 'posts.title' }],
   btns: [],
   map: { label: 'name' }
@@ -67,4 +68,30 @@ export const Tag: TableOpt = {
   searchs: ['name'],
   btns: [],
   map: { label: 'name' }
+}
+
+export const Video: TableOpt = {
+  label: '视频',
+  fields: [
+    { prop: 'id' },
+    { prop: 'filename' },
+    { prop: 'size', editor: 'el-input-number' },
+    { prop: 'type' },
+    { prop: 'duration', editor: 'el-slider' },
+    { prop: 'users', relation: { table: 'User_Video', rel: '1-n', label: 'user.name' } },
+  ],
+  forms: ['filename', 'size', 'type', 'duration', 'users.user'],
+  map: { label: 'filename' }
+}
+
+export const User_Video: TableOpt = {
+  label: '',
+  fields: [
+    { prop: 'id' },
+    { prop: 'user', relation: { table: 'User', rel: 'n-1' } },
+    // { prop: 'userId' },
+    { prop: 'video', relation: { table: 'Video', rel: 'n-1' } },
+    // { prop: 'videoId' },
+  ],
+  map: { label: 'id' }
 }

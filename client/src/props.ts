@@ -52,11 +52,11 @@ export type RelField = NormalizedField & { relation: Required<Relation> }
 export interface TableOpt<T = string> {
   label: string
   fields: (Field & { prop: T })[]
-  columns: (FieldColumn | string)[]
-  searchs: (FieldForm | string)[]
-  forms: (FieldForm | string)[]
+  columns?: (FieldColumn | string)[]
+  searchs?: (FieldForm | string)[]
+  forms?: (FieldForm | string)[]
   views?: (FieldView | string)[]
-  btns: any[]
+  btns?: any[]
   map: Partial<{
     label: string
     /** @default 'id' */

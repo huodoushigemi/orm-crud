@@ -2,6 +2,7 @@
 import { reactive, computed, ref, watchEffect } from 'vue'
 import { toReactive } from '@vueuse/core'
 import CRUD from '@el-lowcode/crud'
+import { ElFormItemRender } from 'el-form-render/index'
 import RelSelect from './RelSelect.vue'
 import RelOptions from './RelOptions.vue'
 import RelTag from './RelTag.vue'
@@ -17,7 +18,7 @@ import IDelete from '~icons/ep/delete'
 import IDocument from '~icons/ep/document'
 import { linkEmits } from 'element-plus'
 import EditDialog from './EditDialog.vue'
-import { useDialog } from './hooks'
+import { useDialogBind } from './hooks'
 
 defineOptions({  })
 
@@ -45,7 +46,6 @@ const _columns = computed(() => props.columns || ctx().columns)
 // row => getP(row, e.prop)
 
 const searchModel = ref({})
-const formModel = ref()
 
 async function request(_, data, type) {
   if (type == 'list') {
@@ -68,7 +68,7 @@ async function request(_, data, type) {
 const infoRef = ref()
 const relRef = ref()
 const crudRef = ref()
-const edit = useDialog(formModel)
+const edit = useDialogBind()
 
 const menu = reactive({ vis: false, row: null, x: 0, y: 0 })
 const menus = computed(() => [
@@ -102,12 +102,11 @@ const log = (...arg) => console.log(...arg)
       class="orm-table_table"
       :schema="ctx().fields"
       :searchItems="_searchs"
-      :formItems="ctx().forms"
       :columns="_columns"
       url="xxx"
       :request="request"
       v-model:search="searchModel"
-      v-model:form="formModel"
+      :hasNew="false"
       :hasOperation="false"
       :tableAttrs="{
         rowKey: ctx().map.id,
@@ -126,8 +125,12 @@ const log = (...arg) => console.log(...arg)
         <RelSelect v-model="row[col.prop]" :rel="col.relation!" />
       </template>
   
-      <template v-for="col in ctx().forms.filter(e => e.relation)" #[`form:${col.prop}`]="{ row }">
+      <!-- <template v-for="col in ctx().forms.filter(e => e.relation)" #[`form:${col.prop}`]="{ row }">
         <RelSelect v-model="row[col.prop]" :rel="col.relation!" />
+      </template> -->
+
+      <template #header>
+        <el-button type="primary" @click="edit.data = {}">新增</el-button>
       </template>
     </CRUD>
   

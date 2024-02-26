@@ -9,10 +9,10 @@
 
     <ElFormRender ref="formRef" :model="$data" label-Width="100px">
       <template v-for="col in nFields">
-        <ElFormItemRender v-if="col.relation" v-bind="col" :type="col.editor">
+        <ElFormItemRender v-if="col.relation" v-bind="col" :el="{ is: col.editor }">
           <RelSelect :modelValue="get($data, col.prop)" @update:modelValue="set($data, col.prop, $event)" :rel="col.relation!" :multiple="isRelMany(col.relation!.rel)" />
         </ElFormItemRender>
-        <ElFormItemRender v-else v-bind="col" :type="col.editor" />
+        <ElFormItemRender v-else v-bind="col" :el="{ is: col.editor }" />
       </template>
     </ElFormRender>
 
@@ -70,6 +70,8 @@ watch(
 
 watchEffect(() => $data.value = { ...props.data, ...req.data.value })
 
+watchEffect(() => console.log(fields.value))
+
 const formRef = ref()
 const okLoading = ref(false)
 
@@ -82,13 +84,11 @@ async function ok() {
       await ctx().create(model)
     } else {
       // 只更新修改的字段
-      // const data = differenceWith(model, req.data.value, (a, b) => isObject(a) ? isEqual(a, b) : a === b)
       const _eq = (a, b) => isObject(a) ? isEqual(a, b) : a === b
-      // const data = differenceWith(model, req.data.value, isEqual)
       const data = {}
       const rData = req.data.value
       for (let k in model) if (!_eq(model[k], rData[k])) data[k] = model[k]
-      console.log(data);
+      console.log('update', data);
       await ctx().update({ [idKey()]: model[idKey()], ...data })
     }
     ElMessage({ message: '操作成功', type: 'success' })
