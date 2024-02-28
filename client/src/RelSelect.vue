@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="tsx">
-import { reactive, ref } from 'vue'
+import { reactive, ref, watchEffect } from 'vue'
 import { isArray } from '@vue/shared'
 import { Arrayable } from '@vueuse/core'
 import { useRequest } from 'vue-request'
@@ -55,7 +55,7 @@ import { get, set } from 'lodash-es'
 import Table from './Table.vue'
 import { Relation } from './props'
 import { useConfig } from './context'
-import { toArr, pickLP } from './utils'
+import { toArr, pickLP, findFieldPath } from './utils'
 
 type Obj = Record<string, any>
 
@@ -73,8 +73,11 @@ const ctx = () => config.cruds[props.rel.table]
 
 const { data: list, loading, run } = useRequest(
   (str) => {
-    const { label } = props.rel
-    return ctx().finds(set({}, label, str))
+    const { label, prop } = props.rel
+    console.log({...props.rel});
+    
+    // const _ = findFieldPath(ctx(), prop)
+    return ctx().finds(set({}, label, str), [prop, label])
   },
   { initialData: [], manual: true }
 )

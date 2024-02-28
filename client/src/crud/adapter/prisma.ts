@@ -2,7 +2,7 @@ import { isObject, isArray } from '@vue/shared'
 import { get, set } from 'lodash-es'
 import { objectPick } from '@vueuse/core'
 import { extend } from 'umi-request'
-import { findFieldPath } from '../../utils'
+import { findFieldPath, isRelMany } from '../../utils'
 import { NormalizedField } from '../../props'
 import { ApiAdapterInterface } from './interface'
 import { TableCtx } from '..'
@@ -112,7 +112,7 @@ function buildData(ctx: TableCtx, data, create: boolean) {
       else {
         const fn = v => ({ [rel.prop]: v[rel.prop] })
         ret[k] = {
-          set: rel.rel == '1-n' || rel.rel == 'm-n' ? [] : undefined,
+          set: !create && isRelMany(rel.rel) ? [] : undefined,
           connect: isArray(val) ? val.map(fn) : fn(val)
         }
       }
