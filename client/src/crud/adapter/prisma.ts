@@ -95,6 +95,46 @@ function count(this: TableCtx, data) {
   }
 }
 
+function updateInput(ctx: TableCtx, data) {
+  const $data = {}
+  for (const k in data) {
+    if (k.endsWith('-') || k.endsWith('+')) continue
+    const rel = ctx.keybyed[k].relation
+    const val = data[k]
+    if (rel) {
+      const _ctx = ctx.ctxs[rel.table]
+      if (isRelMany(rel.rel)) {
+        $data[k] = {
+          update: val.map(e => updateInput(_ctx, e)),
+          connect: data[`${k}+`]?.map(e => ({ [_ctx.map.id]: e[_ctx.map.id] })),
+          disconnect: data[`${k}-`]?.map(e => ({ [_ctx.map.id]: e[_ctx.map.id] })),
+        }
+      } else {
+        $data[k] = {
+          update: val ? updateInput(_ctx, val) : undefined,
+          connect: val ? { [_ctx.map.id]: val[_ctx.map.id] } : undefined,
+          disconnect: val ? undefined : true
+        }
+      }
+    } else {
+      $data[k] = data[k]
+    }
+  }
+  $data[ctx.map.id] = undefined
+  return {
+    data: $data,
+    where: {
+      [ctx.map.id]: data[ctx.map.id]
+    }
+  }
+}
+
+function createInput(ctx: TableCtx, data) {
+  const input = updateInput(ctx, data)
+  input.where = undefined
+  return input
+}
+
 function buildData(ctx: TableCtx, data, create: boolean) {
   const ret = {}
   for (let k in  data) {
