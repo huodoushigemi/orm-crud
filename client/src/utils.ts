@@ -1,6 +1,6 @@
 import { Arrayable } from '@vueuse/core'
 import { isObject, isArray } from '@vue/shared'
-import { get, set, merge, unionBy } from 'lodash-es'
+import { get, set, merge, unionBy, isEqual, keyBy } from 'lodash-es'
 import { TableCtx } from './crud'
 import { Field, NormalizedField, NormalizedTableOpt, RelField, Relation, TableOpt } from './props'
 
@@ -124,4 +124,59 @@ export function fieldEditor(ctx: TableCtx, field: NormalizedField) {
   const paths = findFieldPath(ctx, field.prop)
   const leaf = paths[paths.length - 1]
   if (leaf.editor) leaf.editor
+}
+
+/**
+ * 对比数据，返回最小化的改变
+ */
+export function diff(ctx: TableCtx, d1, d2) {
+  const ret = {}
+  for (let k in d1) {
+    const v1 = d1[k], v2 = d2[k]
+    if (isEqual(v1, v2)) continue
+    if (isObject(v1) || isObject(v2)) {
+      const _ctx = ctx.ctxs[ctx.keybyed[k].relation!.table]
+      // 取消关联
+      if (v1 == null && v2 != null) {
+        ret[k] = null
+        ret[`${k}-`] = v2
+      }
+      // 建立关联
+      else if (v1 != null && v2 == null) {
+        ret[k] = v1
+        ret[`${k}+`] = v1
+      }
+      else {
+        if (isArray(v1)) {
+          const { id } = _ctx.map
+          const keybyed1 = keyBy(v1, id), keybyed2 = keyBy(v2, id)
+          const list: any[] = ret[k] = []
+          const adds: any[] = ret[`${k}+`] = []
+          const dels: any[] = ret[`${k}-`] = []
+          v1.forEach(e => {
+            const e2 = keybyed2[e[id]]
+            if (e2 == null) {
+              list.push(e)
+              adds.push(e)
+            }
+            else if (!isEqual(e, e2)) {
+              list.push(diff(_ctx, e, e2))
+            }
+          })
+          v2.forEach(e => {
+            if (keybyed1[e[id]] == null) {
+              dels.push(e)
+            }
+          })
+        }
+        else {
+          ret[k] = diff(_ctx, v1, v2)
+        }
+      }
+    }
+    else {
+      ret[k] = v1
+    }
+  }
+  return ret
 }

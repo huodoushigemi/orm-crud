@@ -28,7 +28,7 @@ import { pick } from 'lodash-es'
 const props = defineProps<{
   modelValue: string[]
   defaults: () => string[]
-  filter?: (ctx: TableCtx, field: NormalizedField, deep: number) => boolean
+  filter?: (ctx: TableCtx, field: NormalizedField, queue: NormalizedField[]) => boolean
   maxDeep?: number
 }>()
 
@@ -52,20 +52,24 @@ const value = computed({
 type Opt = Pick<Field, 'label' | 'prop' | 'relation'> & { children?: Opt[] }
 
 const options = computed(() => {
-  const { filter, maxDeep = 3 } = props
+  const { filter = () => true, maxDeep = 3 } = props
   const { ctxs } = ctx.value || {}
   const _pick = (v: Field) => pick(v, 'label', 'prop', 'relation') as Opt
   if (!ctxs) return []
   // 递归
-  return (function rrr(table: string, deep = 1) {
+  return (function rrr(table: string, queue = <NormalizedField[]>[]) {
+    const ret = <Opt[]>[]
     const ctx = ctxs[table]
-    let fields = ctx.fields
-    if (filter) fields = fields.filter(e => filter(ctx, e, deep))
-    return fields.map(e => {
+    ctx.fields.forEach(e => {
       const item = _pick(e)
-      if (deep < maxDeep && item.relation) item.children = rrr(item.relation.table, deep + 1)
-      return item
+      queue.push(e)
+      if (filter(ctx, e, queue)) {
+        ret.push(item)
+        if (queue.length < maxDeep && item.relation) item.children = rrr(item.relation.table, queue)
+      }
+      queue.pop()
     })
+    return ret
   })(state.table)
 })
 

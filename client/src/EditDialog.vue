@@ -9,10 +9,11 @@
       <!-- {{ nFields }} -->
     </template>
 
-    <ElFormRender ref="formRef" :model="$data" label-Width="100px">
+    <ElFormRender v-if="$data" ref="formRef" :model="$data" label-Width="100px">
       <template v-for="col in nFields">
         <ElFormItemRender v-if="col.relation" v-bind="col" :el="{ is: col.editor }">
-          <RelSelect :modelValue="get($data, col.prop)" @update:modelValue="set($data, col.prop, $event)" :rel="col.relation!" :multiple="isRelMany(col.relation!.rel)" />
+          <!-- <RelSelect :modelValue="get($data, col.prop)" @update:modelValue="set($data, col.prop, $event)" :rel="col.relation!" :multiple="isRelMany(col.relation!.rel)" /> -->
+          <RelSelect2 :model="$data" :table="table" :field="col" />
         </ElFormItemRender>
         <ElFormItemRender v-else v-bind="col" :el="{ is: col.editor }" />
       </template>
@@ -23,7 +24,7 @@
       <el-button type="primary" :disabled="okLoading" :loading="okLoading" @click="ok">确认</el-button>
     </template>
 
-    <RelFieldsDialog ref="xxx" v-model="fields" :defaults="defaults" :filter="(ctx, fields, deep) => deep <= 2" />
+    <RelFieldsDialog ref="xxx" v-model="fields" :defaults="defaults" :filter="(ctx, field, queue) => queue.filter(e => isRelMany(e.relation?.rel)).length == 1" />
   </el-dialog>
 </template>
 
@@ -33,12 +34,14 @@ import { isObject } from '@vue/shared'
 import { ElMessage } from 'element-plus'
 import { ElFormRender, ElFormItemRender } from 'el-form-render'
 import { useRequest } from 'vue-request'
-import { get, isEqual, pick, set } from 'lodash-es'
+import { get, isArray, isEqual, keyBy, pick, set } from 'lodash-es'
 import RelSelect from './RelSelect.vue'
 import { useConfig } from './context'
 import { useStorage } from './hooks'
 import RelFieldsDialog from './RelFieldsDialog.vue'
-import { isRelMany, normalizeField, inMany } from './utils'
+import { isRelMany, normalizeField, inMany, diff } from './utils'
+import { TableCtx } from './crud'
+import RelSelect2 from './RelSelect2.vue'
 
 const props = defineProps<{
   table: string
@@ -79,17 +82,20 @@ const okLoading = ref(false)
 
 async function ok() {
   await formRef.value.validate()
-  okLoading.value = true
+  // okLoading.value = true
   const model = $data.value
+  const rData = req.data.value
+
+  return console.log(diff(ctx(), model, rData));
+
   try {
     if (isNew()) {
       await ctx().create(model)
     } else {
       // 只更新修改的字段
       const data = {}
-      const rData = req.data.value
       for (let k in model) if (!isEqual(model[k], rData[k])) data[k] = model[k]
-      console.log('update', JSON.parse(JSON.stringify(data)), JSON.parse(JSON.stringify(model)), JSON.parse(JSON.stringify(rData)));
+      // console.log('update', JSON.parse(JSON.stringify(data)), JSON.parse(JSON.stringify(model)), JSON.parse(JSON.stringify(rData)));
       await ctx().update({ [idKey()]: model[idKey()], ...data })
     }
     ElMessage({ message: '操作成功', type: 'success' })
