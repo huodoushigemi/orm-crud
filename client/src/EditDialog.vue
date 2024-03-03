@@ -24,7 +24,7 @@
       <el-button type="primary" :disabled="okLoading" :loading="okLoading" @click="ok">确认</el-button>
     </template>
 
-    <RelFieldsDialog ref="xxx" v-model="fields" :defaults="defaults" :filter="(ctx, field, queue) => queue.filter(e => isRelMany(e.relation?.rel)).length == 1" />
+    <RelFieldsDialog ref="xxx" v-model="fields" :defaults="defaults" :filter="fieldFilter" />
   </el-dialog>
 </template>
 
@@ -42,6 +42,7 @@ import RelFieldsDialog from './RelFieldsDialog.vue'
 import { isRelMany, normalizeField, inMany, diff } from './utils'
 import { TableCtx } from './crud'
 import RelSelect2 from './RelSelect2.vue'
+import { NormalizedField } from './props'
 
 const props = defineProps<{
   table: string
@@ -62,6 +63,11 @@ const fields = useStorage(
   { default: defaults }
 )
 
+function fieldFilter(ctx, field: NormalizedField, queue: NormalizedField[]) {
+  const fs = queue.filter(e => isRelMany(e.relation?.rel))
+  return fs.length == 0 || (fs.length == 1 && field.relation)
+}
+
 const nFields = computed(() => fields.value.map(e => normalizeField(ctx(), e)))
 
 const $data = ref()
@@ -73,6 +79,7 @@ watch(
   { immediate: true }
 )
 
+watchEffect(() => $data.value = props.data ? {} : undefined)
 watchEffect(() => $data.value = JSON.parse(JSON.stringify(req.data.value || {})))
 
 // watchEffect(() => console.log(nFields.value))
@@ -86,16 +93,15 @@ async function ok() {
   const model = $data.value
   const rData = req.data.value
 
-  return console.log(diff(ctx(), model, rData));
+  return console.log(diff(ctx(), model, rData || {}), model);
+  // 只更新修改的字段
+  const data = diff(ctx(), model, rData || {})
 
   try {
     if (isNew()) {
-      await ctx().create(model)
+      await ctx().create(data)
     } else {
-      // 只更新修改的字段
       const data = {}
-      for (let k in model) if (!isEqual(model[k], rData[k])) data[k] = model[k]
-      // console.log('update', JSON.parse(JSON.stringify(data)), JSON.parse(JSON.stringify(model)), JSON.parse(JSON.stringify(rData)));
       await ctx().update({ [idKey()]: model[idKey()], ...data })
     }
     ElMessage({ message: '操作成功', type: 'success' })

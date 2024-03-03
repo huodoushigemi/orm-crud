@@ -1,5 +1,7 @@
 import { isEqual } from 'lodash-es'
-import { computed, reactive, ref, shallowReactive, watch, watchEffect } from 'vue'
+import { MaybeRefOrGetter, Ref, computed, isRef, reactive, ref, shallowReactive, watch, watchEffect, unref } from 'vue'
+import { RefSymbol } from '@vue/reactivity'
+import { isFunction } from '@vue/shared'
 
 interface UseDialogOpt {
   shallow: boolean
@@ -44,4 +46,19 @@ export function useStorage<T>(key: () => string, opt: { default: () => T }) {
     return stored ?? opt.default()
   }
   return val
+}
+
+type FnRef<T> = {
+  (t?: T): T
+  value: T
+}
+
+export function $<T>(v: MaybeRefOrGetter<T>): FnRef<T> {
+  const _ = isRef(v)
+    ? v : isFunction(v)
+    ? computed(v) as Ref<T>
+    : ref(v)
+  const xxx = (...arg) => arg.length ? (_.value = arg[0]) : _.value
+  Object.defineProperty(xxx, 'value', { get: () => _.value, set: v => _.value = v  })
+  return xxx as any
 }

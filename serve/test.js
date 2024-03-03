@@ -16,10 +16,29 @@ async function main() {
   //   }
   // })
 
-  await prisma.user_Video.update({
+  await prisma.user.create({
     data: {
-      video: {
-        
+      posts: {
+        create: []
+      },
+      videos: {
+        connectOrCreate: {
+
+        }
+      }
+    }
+  })
+
+  await prisma.user.update({
+    data: {
+      videos: {
+        // connect: {}
+        create: {
+          
+        },
+        update: {
+
+        }
       }
     }
   })

@@ -151,13 +151,13 @@ export function diff(ctx: TableCtx, d1, d2) {
           const { id } = _ctx.map
           const keybyed1 = keyBy(v1, id), keybyed2 = keyBy(v2, id)
           const list: any[] = ret[k] = []
-          const adds: any[] = ret[`${k}+`] = []
-          const dels: any[] = ret[`${k}-`] = []
+          const cons: any[] = ret[`${k}*+`] = []
+          const diss: any[] = ret[`${k}*-`] = []
           v1.forEach(e => {
             const e2 = keybyed2[e[id]]
             if (e2 == null) {
               list.push(e)
-              adds.push(e)
+              cons.push(e)
             }
             else if (!isEqual(e, e2)) {
               list.push(diff(_ctx, e, e2))
@@ -165,7 +165,7 @@ export function diff(ctx: TableCtx, d1, d2) {
           })
           v2.forEach(e => {
             if (keybyed1[e[id]] == null) {
-              dels.push(e)
+              diss.push(e)
             }
           })
         }

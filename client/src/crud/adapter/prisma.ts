@@ -1,11 +1,13 @@
 import { isObject, isArray } from '@vue/shared'
-import { get, set } from 'lodash-es'
+import { add, get, set } from 'lodash-es'
 import { objectPick } from '@vueuse/core'
 import { extend } from 'umi-request'
 import { findFieldPath, isRelMany } from '../../utils'
 import { NormalizedField } from '../../props'
 import { ApiAdapterInterface } from './interface'
 import { TableCtx } from '..'
+import { ElCascaderPanel } from 'element-plus'
+import RelSelect2 from '../../RelSelect2.vue'
 
 const request = extend({
   prefix: 'http://localhost:3000/prisma'
@@ -43,9 +45,7 @@ function create(this: TableCtx, data) {
   return {
     table: this.table,
     action: 'create',
-    argv: {
-      data: buildData(this, data, true),
-    }
+    argv: { data: createInput(this, data) }
   }
 }
 
@@ -53,13 +53,7 @@ function update(this: TableCtx, data) {
   return {
     table: this.table,
     action: 'update',
-    argv: {
-      data: {
-        ...buildData(this, data, false),
-        [this.map.id]: undefined
-      },
-      where: { [this.map.id]: data[this.map.id] }
-    }
+    argv: updateInput(this, data)
   }
 }
 
@@ -130,30 +124,27 @@ function updateInput(ctx: TableCtx, data) {
 }
 
 function createInput(ctx: TableCtx, data) {
-  const input = updateInput(ctx, data)
-  input.where = undefined
-  return input
-}
-
-function buildData(ctx: TableCtx, data, create: boolean) {
   const ret = {}
   for (let k in  data) {
-    const field = findFieldPath(ctx, k).slice(-1)[0]
-    const rel = field.relation
-
+    if (k.endsWith('-') || k.endsWith('+')) continue
+    const rel = ctx.keybyed[k].relation
     const val = data[k]
     if (rel) {
+      const { table, prop } = rel
+      const _ctx = ctx.ctxs[table]
       if (val == null) {
-        ret[k] = create ? undefined : { disconnect: true }
+        ret[k] = undefined
       }
       else if (!isObject(val)) {
         throw new Error(`Invalid prop: type check failed for prop ${k}. Expected Object, got ${val}`)
       }
       else {
-        const fn = v => ({ [rel.prop]: v[rel.prop] })
+        const _create = e => createInput(_ctx, e)
+        const _connect = e => ({ [prop]: e[prop] })
+        const adds = data[`${k}+`] || data[k]
         ret[k] = {
-          set: !create && isRelMany(rel.rel) ? [] : undefined,
-          connect: isArray(val) ? val.map(fn) : fn(val)
+          create: isArray(adds) ? adds.filter(e => e[prop] == null).map(_create) : adds[prop] == null ? _create(adds) : undefined,
+          connect: isArray(adds) ? adds.filter(e => e[prop] != null).map(_connect) : adds[prop] != null ? _connect(adds) : undefined
         }
       }
     } else {
