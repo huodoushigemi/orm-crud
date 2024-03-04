@@ -19,7 +19,7 @@ function find(this: TableCtx, data, paths) {
     table: this.table,
     action: 'findUnique',
     argv: {
-      select: { [this.map.id]: true, ...select(this, paths) },
+      select: { [this.map.id]: true, ...selectInput(this, paths) },
       where: data,
     }
   }
@@ -33,8 +33,8 @@ function finds(this: TableCtx, data, paths) {
     table: this.table,
     action: 'findMany',
     argv: {
-      select: { [this.map.id]: true, ...select(this, paths) },
-      where: where(this, data),
+      select: { [this.map.id]: true, ...selectInput(this, paths) },
+      where: whereInput(this, data),
       skip: extraQs.$pageSize ? (extraQs.$page - 1) * extraQs.$pageSize : undefined,
       take: extraQs.$pageSize
     }
@@ -84,7 +84,7 @@ function count(this: TableCtx, data) {
     table: this.table,
     action: 'count',
     argv: {
-      where: where(this, data)
+      where: whereInput(this, data)
     }
   }
 }
@@ -98,9 +98,15 @@ function updateInput(ctx: TableCtx, data) {
     if (rel) {
       const _ctx = ctx.ctxs[rel.table]
       if (isRelMany(rel.rel)) {
+        const update = [], create = [], connect = []
+        data[`${k}+`].forEach(e => {
+          if (e[rel.prop] == null) create.push(createInput(_ctx, e))
+          else connect.push({ [_ctx.map.id]: e[_ctx.map.id] })
+        })
         $data[k] = {
-          update: val.map(e => updateInput(_ctx, e)),
-          connect: data[`${k}+`]?.map(e => ({ [_ctx.map.id]: e[_ctx.map.id] })),
+          create,
+          update,
+          connect,
           disconnect: !_ctx.middle ? data[`${k}-`]?.map(e => ({ [_ctx.map.id]: e[_ctx.map.id] })) : undefined,
           delete: _ctx.middle ? data[`${k}-`]?.map(e => ({ [_ctx.map.id]: e[_ctx.map.id] })) : undefined
         }
@@ -156,30 +162,30 @@ function createInput(ctx: TableCtx, data) {
   return ret
 }
 
-function select(ctx: TableCtx, paths: string[]) {
+function selectInput(ctx: TableCtx, paths: string[]) {
   return paths.reduce((o, path) => {
     const ps = findFieldPath(ctx, path)
-    if (ps[ps.length - 1].relation) {
-      // e.g: post.author -> post.select.author.select
-      const rel = ps[ps.length - 1].relation!
-      const ks = path.replace(/\./g, '.select.') + '.select'
-      const val = get(o, ks), newVal = { [rel.label]: true, [rel.prop]: true }
-      val ? Object.assign(val, newVal) : set(o, ks, newVal)
-    } else if (ps.length > 1) {
-      // e.g: post.author.name -> post.select.author.select.name
-      set(o, path.replace(/\./g, '.select.'), true)
-    } else {
-      // e.g: content
-      set(o, path, true)
-    }
+    let ret = o
+    ps.forEach((e, i) => {
+      if (e.relation) {
+        const { label, prop } = e.relation
+        ret[e.prop] = { select: { [prop]: true } }
+        ret = ret[e.prop].select
+        Object.assign(ret, selectInput(ctx.ctxs[e.relation.table], [label]))
+      }
+      else {
+        ret[e.prop] = true
+      }
+    })
     return o
   }, {})
 }
 
-function where(ctx: TableCtx, data: any) {
+function whereInput(ctx: TableCtx, data: any) {
   // 后序遍历
   function rrr(obj, ps1 = <string[]>[]) {
     const ret = {}
+    // todo arr
     for (let k in obj) {
       if (k[0] == '$') continue
       ps1.push(k)

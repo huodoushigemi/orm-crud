@@ -16,7 +16,7 @@ export const User: TableOpt = {
     { prop: 'videos', relation: { table: 'User_Video', rel: '1-n' } },
   ],
   columns: ['id', 'name', 'age', 'email', 'posts', 'videos.video'],
-  forms: ['name', { prop: 'age', editor: 'el-input-number' }, 'email', 'following', 'videos.video'],
+  forms: ['name', { prop: 'age', editor: 'el-input-number' }, 'email', 'following', { prop: 'videos.video' }],
   searchs: ['following', 'name', { prop: 'posts.title' }],
   btns: [],
   map: { label: 'name' }
@@ -89,11 +89,10 @@ export const User_Video: TableOpt = {
   label: '',
   fields: [
     { prop: 'id' },
-    { prop: 'user', relation: { table: 'User', rel: 'n-1' } },
-    // { prop: 'userId' },
-    { prop: 'video', relation: { table: 'Video', rel: 'n-1' } },
-    // { prop: 'videoId' },
+    { label: '用户', prop: 'user', relation: { table: 'User', rel: 'n-1' } },
+    { label: '视频', prop: 'video', relation: { table: 'Video', rel: 'n-1' } },
   ],
+  columns: ['id', 'user', 'video'],
   middle: true,
   map: { label: 'id' }
 }

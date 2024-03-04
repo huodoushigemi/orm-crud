@@ -16,41 +16,38 @@ async function main() {
   //   }
   // })
 
-  await prisma.user.create({
-    data: {
-      posts: {
-        create: []
-      },
-      videos: {
-        connectOrCreate: {
+  // await prisma.user.create({
+  //   data: {
+  //     posts: {
+  //       create: []
+  //     },
+  //     videos: {
+  //       connectOrCreate: {
+  //         where: {
 
-        }
-      }
-    }
-  })
+  //         }
+  //       }
+  //     }
+  //   }
+  // })
 
-  await prisma.post.update({
-    data: {
-      author: {
-        // delete
-        disconnect
-      },
+  // await prisma.post.update({
+  //   data: {
+  //     author: {
+  //       // delete
+  //       disconnect
+  //     },
+  //     comments: {
+  //       delete: []
+  //     }
+  //   }
+  // })
+
+  await prisma.user.findMany({
+    select: {
       comments: {
-        delete: []
-      }
-    }
-  })
-
-  await prisma.user.update({
-    data: {
-      posts: {
-      }
-      videos: {
-        create: {
-          
-        },
-        update: {
-
+        select: {
+          content: true
         }
       }
     }

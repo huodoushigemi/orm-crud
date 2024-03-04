@@ -2,7 +2,7 @@
   <el-select
     ref="selectRef"
     class="orm-rel-select"
-    style="width: 128px;"
+    style="min-width: 128px;"
     v-bind="$attrs"
     :modelValue="props.modelValue"
     @update:modelValue="emit('update:modelValue', normal($event))"

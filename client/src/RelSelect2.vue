@@ -60,7 +60,7 @@ const val = computed({
       keybyed = keyBy(arr, p2.concat(rel().prop).join('.'))
       v = v.filter(e => !keybyed[e[rel().prop]])
       v.forEach(e => arr.push(set({}, p2, e)))
-
+      
       set(props.model, p1, arr)
     } else {
       set({}, props.field.prop, v)
@@ -71,7 +71,7 @@ const val = computed({
 function getVal(data) {
   if (multiple()) {
     const p1 = xx()[0], p2 = xx()[1]
-    let ret = get(data, p1) || []
+    let ret = toArr(get(data, p1))
     if (p2.length) ret = ret.map(e => get(e, p2))
     return ret
   } else {

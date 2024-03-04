@@ -18,6 +18,7 @@
 
 <script setup lang="ts">
 import { computed, ref, shallowReactive } from 'vue'
+import { CascaderProps } from 'element-plus'
 import { remove } from '@vue/shared'
 import { TableCtx } from './crud'
 import { findFieldPath, isRelMany } from './utils'
@@ -29,6 +30,7 @@ const props = defineProps<{
   modelValue: string[]
   defaults: () => string[]
   filter?: (ctx: TableCtx, field: NormalizedField, queue: NormalizedField[]) => boolean
+  processOpt?: (ctx: TableCtx, field: NormalizedField, queue: NormalizedField[]) => Partial<CascaderProps> | undefined
   maxDeep?: number
 }>()
 
@@ -49,10 +51,10 @@ const value = computed({
   set: (v) => emit('update:modelValue', sort(v).map(e => e.join('.'))),
 })
 
-type Opt = Pick<Field, 'label' | 'prop' | 'relation'> & { children?: Opt[] }
+type Opt = Pick<Field, 'label' | 'prop' | 'relation'> & { children?: Opt[]; disabled: any }
 
 const options = computed(() => {
-  const { filter = () => true, maxDeep = 3 } = props
+  const { filter = () => true, processOpt, maxDeep = 3 } = props
   const { ctxs } = ctx.value || {}
   const _pick = (v: Field) => pick(v, 'label', 'prop', 'relation') as Opt
   if (!ctxs) return []
@@ -63,6 +65,9 @@ const options = computed(() => {
     ctx.fields.forEach(e => {
       const item = _pick(e)
       queue.push(e)
+      if (processOpt) {
+        Object.assign(item, processOpt(ctx, e, queue))
+      }
       if (filter(ctx, e, queue)) {
         ret.push(item)
         if (queue.length < maxDeep && item.relation) item.children = rrr(item.relation.table, queue)
