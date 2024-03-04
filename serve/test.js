@@ -29,10 +29,23 @@ async function main() {
     }
   })
 
+  await prisma.post.update({
+    data: {
+      author: {
+        // delete
+        disconnect
+      },
+      comments: {
+        delete: []
+      }
+    }
+  })
+
   await prisma.user.update({
     data: {
+      posts: {
+      }
       videos: {
-        // connect: {}
         create: {
           
         },

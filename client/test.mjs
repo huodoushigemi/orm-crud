@@ -1,6 +1,4 @@
-import { RefSymbol } from '@vue/reactivity'
-import { isRef } from 'vue'
-import { pick, isEqual, get } from 'lodash-es'
+import { keyBy, pick, isEqual, get } from 'lodash-es'
 
+console.log(keyBy([{ a: { b: 1 } }], ['a.b']));
 // console.log(isRef({ value: 1, [RefSymbol]: true }));
-console.log(RefSymbol)

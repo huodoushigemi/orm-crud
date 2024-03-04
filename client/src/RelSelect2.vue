@@ -11,7 +11,7 @@ import { computed, reactive, ref, watchEffect } from 'vue'
 import { isArray } from '@vue/shared'
 import { Arrayable } from '@vueuse/core'
 import { useRequest } from 'vue-request'
-import { get, set } from 'lodash-es'
+import { get, keyBy, set } from 'lodash-es'
 import { RelField, Relation } from './props'
 import { useConfig } from './context'
 import { toArr, pickLP, findFieldPath, isRelMany } from './utils'
@@ -22,6 +22,7 @@ type Obj = Record<string, any>
 
 const props = defineProps<{
   model: Arrayable<Obj>
+  raw: Arrayable<Obj>
   table: string
   field: RelField
 }>()
@@ -43,27 +44,38 @@ const xx = () => {
 
 const multiple = () => paths().some(e => isRelMany(e.relation?.rel))
 
+const rawKeybyed = computed(() => keyBy(toArr(getVal(props.raw)), rel().prop))
+
 const val = computed({
   get: () => {
-    if (multiple()) {
-      const p1 = xx()[0], p2 = xx()[1]
-      let ret = get(props.model, p1) || []
-      if (p2.length) ret = ret.map(e => get(e, p2))
-      return ret
-    } else {
-      return get(props.model, props.field.prop)
-    }
+    return getVal(props.model)
   },
   set: v => {
     if (multiple()) {
-      const arr = []
       const p1 = xx()[0], p2 = xx()[1]
-      let ret = p1.length > 1 ? set({}, p1.slice(1), arr) : arr
-      v?.map((e, i) => set(arr, i + (p2.length ? '.' + p2.join('.') : ''), e))
-      props.model[p1[0]] = ret
+      const _get = (e, p) => p.length ? get(e, p) : e
+      
+      let keybyed = keyBy(v, rel().prop)
+      const arr = get(props.raw, p1)?.filter(e => keybyed[_get(e, p2)[rel().prop]]) || []
+      keybyed = keyBy(arr, p2.concat(rel().prop).join('.'))
+      v = v.filter(e => !keybyed[e[rel().prop]])
+      v.forEach(e => arr.push(set({}, p2, e)))
+
+      set(props.model, p1, arr)
     } else {
       set({}, props.field.prop, v)
     }
   }
 })
+
+function getVal(data) {
+  if (multiple()) {
+    const p1 = xx()[0], p2 = xx()[1]
+    let ret = get(data, p1) || []
+    if (p2.length) ret = ret.map(e => get(e, p2))
+    return ret
+  } else {
+    return get(data, props.field.prop)
+  }
+}
 </script>

@@ -57,6 +57,7 @@ export interface TableOpt<T = string> {
   forms?: (FieldForm | string)[]
   views?: (FieldView | string)[]
   btns?: any[]
+  middle?: boolean
   map: Partial<{
     label: string
     /** @default 'id' */
@@ -73,6 +74,7 @@ export interface NormalizedTableOpt {
   readonly rels: RelField[];
   views: NormalizedField[]
   btns: any[]
+  middle: boolean
   map: Required<TableOpt['map']>
 }
 

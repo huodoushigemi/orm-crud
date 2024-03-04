@@ -94,5 +94,6 @@ export const User_Video: TableOpt = {
     { prop: 'video', relation: { table: 'Video', rel: 'n-1' } },
     // { prop: 'videoId' },
   ],
+  middle: true,
   map: { label: 'id' }
 }

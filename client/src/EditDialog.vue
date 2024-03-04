@@ -13,7 +13,7 @@
       <template v-for="col in nFields">
         <ElFormItemRender v-if="col.relation" v-bind="col" :el="{ is: col.editor }">
           <!-- <RelSelect :modelValue="get($data, col.prop)" @update:modelValue="set($data, col.prop, $event)" :rel="col.relation!" :multiple="isRelMany(col.relation!.rel)" /> -->
-          <RelSelect2 :model="$data" :table="table" :field="col" />
+          <RelSelect2 :model="$data" :raw="req.data.value" :table="table" :field="col" />
         </ElFormItemRender>
         <ElFormItemRender v-else v-bind="col" :el="{ is: col.editor }" />
       </template>

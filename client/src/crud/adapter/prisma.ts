@@ -101,13 +101,15 @@ function updateInput(ctx: TableCtx, data) {
         $data[k] = {
           update: val.map(e => updateInput(_ctx, e)),
           connect: data[`${k}+`]?.map(e => ({ [_ctx.map.id]: e[_ctx.map.id] })),
-          disconnect: data[`${k}-`]?.map(e => ({ [_ctx.map.id]: e[_ctx.map.id] })),
+          disconnect: !_ctx.middle ? data[`${k}-`]?.map(e => ({ [_ctx.map.id]: e[_ctx.map.id] })) : undefined,
+          delete: _ctx.middle ? data[`${k}-`]?.map(e => ({ [_ctx.map.id]: e[_ctx.map.id] })) : undefined
         }
       } else {
         $data[k] = {
           update: val ? updateInput(_ctx, val) : undefined,
           connect: val ? { [_ctx.map.id]: val[_ctx.map.id] } : undefined,
-          disconnect: val ? undefined : true
+          disconnect: !_ctx.middle && !val ? true: undefined,
+          delete: _ctx.middle && !val ? true : undefined
         }
       }
     } else {

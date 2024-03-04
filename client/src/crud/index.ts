@@ -52,6 +52,7 @@ function createCrud(tables: Record<string, TableOpt>, table: string, ctxs: Recor
     tables,
     ctxs,
     btns: [],
+    middle: config.middle || false,
     map: { label: config.map?.label || '', id: config.map?.id || 'id' },
     ...prismaAdapter
   }
