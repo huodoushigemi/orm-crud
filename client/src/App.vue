@@ -3,6 +3,7 @@ import Table from './Table.vue'
 import ConfigProvider from './ConfigProvider.vue'
 import { TableOpt } from './props';
 import tables from './tables/index'
+import RelGraph from './RelGraph.vue';
 </script>
 
 <template>
@@ -13,5 +14,7 @@ import tables from './tables/index'
 
     <!-- <Table table="Post" /> -->
     <Table table="Video" />
+
+    <RelGraph />
   </ConfigProvider>
 </template>
