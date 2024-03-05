@@ -67,6 +67,6 @@ model User_Video {
   video   Video? @relation(fields: [videoId], references: [id])
   videoId Int?
 
-  @@index([userId, videoId])
   @@unique([userId, videoId])
+  @@index([userId, videoId])
 }
