@@ -48,18 +48,21 @@ const rawKeybyed = computed(() => keyBy(toArr(getVal(props.raw)), rel().prop))
 
 const val = computed({
   get: () => {
+    console.log(getVal(props.model));
+    
     return getVal(props.model)
   },
   set: v => {
     if (multiple()) {
       const p1 = xx()[0], p2 = xx()[1]
       const _get = (e, p) => p.length ? get(e, p) : e
-      
+      const _set = (p, e) => p.length ? set({}, p, e) : e
+
       let keybyed = keyBy(v, rel().prop)
       const arr = get(props.raw, p1)?.filter(e => keybyed[_get(e, p2)[rel().prop]]) || []
       keybyed = keyBy(arr, p2.concat(rel().prop).join('.'))
       v = v.filter(e => !keybyed[e[rel().prop]])
-      v.forEach(e => arr.push(set({}, p2, e)))
+      v.forEach(e => arr.push(_set(p2, e)))
 
       set(props.model, p1, arr)
     } else {
@@ -71,7 +74,7 @@ const val = computed({
 function getVal(data) {
   if (multiple()) {
     const p1 = xx()[0], p2 = xx()[1]
-    let ret = get(data, p1) || []
+    let ret = toArr(get(data, p1))
     if (p2.length) ret = ret.map(e => get(e, p2))
     return ret
   } else {

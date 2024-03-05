@@ -2,7 +2,7 @@
   <el-select
     ref="selectRef"
     class="orm-rel-select"
-    style="width: 128px;"
+    style="min-width: 128px;"
     v-bind="$attrs"
     :modelValue="props.modelValue"
     @update:modelValue="emit('update:modelValue', normal($event))"
@@ -23,7 +23,7 @@
     
     <el-option v-for="opt in list" :value="opt" :label="get(opt, rel.label)" />
 
-    <el-option v-for="(opt, i) in toArr(modelValue)" :value="opt" :label="get(opt, rel.label)" :key="`_${i}`" hidden aria-hidden />
+    <el-option v-for="(opt, i) in toArr(modelValue)" :value="opt" :label="get(opt, rel.label)" :key="`_${get(opt, rel.prop)}`" hidden aria-hidden />
 
     <!-- <template #footer>
       <div style="text-align: right;">
@@ -74,9 +74,6 @@ const ctx = () => config.cruds[props.rel.table]
 const { data: list, loading, run } = useRequest(
   (str) => {
     const { label, prop } = props.rel
-    console.log({...props.rel});
-    
-    // const _ = findFieldPath(ctx(), prop)
     return ctx().finds(set({}, label, str), [prop, label])
   },
   { initialData: [], manual: true }

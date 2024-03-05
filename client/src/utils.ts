@@ -72,23 +72,6 @@ export const toArr = <T>(arr?: Arrayable<T>) => isArray(arr) ? arr : (arr == nul
 export const isRelMany = (rel?: RelField['relation']['rel']) => rel == '1-n' || rel == 'm-n'
 export const isRelOne = (rel?: RelField['relation']['rel']) => rel == '1-1' || rel == 'n-1'
 
-/**
- * todo
- * e.g: { 'a.e': 1, a: { 'b.c': 1 } } -> { a: { e: 1, b: { c: 1 } } }
- */
-export function normalObj(obj: Record<string, any>) {
-  const ret = {}
-  function rrr(obj, ps = <string>[]) {
-    for (let k in obj) {
-      ps.push(k)
-      const v = obj[k]
-      if (isObject(v)) set(ret, k, rrr(v, ps))
-      else set(ret, k, v)
-      ps.pop()
-    }
-  }
-  return ret
-}
 
 /**
  * e.g: following.posts.tag -> posts.author.followedBy
@@ -151,11 +134,14 @@ export function diff(ctx: TableCtx, d1, d2) {
           const { id } = _ctx.map
           const keybyed1 = keyBy(v1, id), keybyed2 = keyBy(v2, id)
           const list: any[] = ret[k] = []
-          const cons: any[] = ret[`${k}*+`] = []
-          const diss: any[] = ret[`${k}*-`] = []
+          const cons: any[] = ret[`${k}+`] = []
+          const diss: any[] = ret[`${k}-`] = []
           v1.forEach(e => {
             const e2 = keybyed2[e[id]]
-            if (e2 == null) {
+            if (e[id] == null) {
+              cons.push(e)
+            }
+            else if (e[id] == null || e2 == null) {
               list.push(e)
               cons.push(e)
             }

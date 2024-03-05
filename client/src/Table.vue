@@ -19,6 +19,7 @@ import IDocument from '~icons/ep/document'
 import { linkEmits } from 'element-plus'
 import EditDialog from './EditDialog.vue'
 import { useDialogBind } from './hooks'
+import RelSelect2 from './RelSelect2.vue'
 
 defineOptions({  })
 
@@ -66,16 +67,16 @@ async function request(_, data, type) {
 }
 
 const infoRef = ref()
-const relRef = ref()
 const crudRef = ref()
-const edit = useDialogBind()
+const editBind = useDialogBind()
+const relBind = useDialogBind({ table: '', prop: '' })
 
 const menu = reactive({ vis: false, row: null, x: 0, y: 0 })
 const menus = computed(() => [
   { title: '详情', icon: IDocument, onClick: () => infoRef.value.open(menu.row, ctx()) },
-  { title: '编辑', icon: IEdite, onClick: () => edit.data = menu.row },
+  { title: '编辑', icon: IEdite, onClick: () => editBind.data = menu.row },
   { title: '删除', icon: IDelete, disabled: true, divided: true, onClick: () => infoRef.value.open(menu.row, ctx()) },
-  { title: '关联的表', children: ctx().rels.map(e => ({ title: e.label, onClick: () => relRef.value.open(menu.row, ctx(), e) })) }
+  { title: '关联的表', children: ctx().rels.map(e => ({ title: e.label, onClick: () => Object.assign(relBind, { data: menu.row, table: ctx().table, prop: e.prop }) })) }
 ])
 watchEffect(() => menu.vis || (menu.row = null))
 async function openMenu(row, col, e: MouseEvent) {
@@ -122,7 +123,8 @@ const log = (...arg) => console.log(...arg)
       </template>
   
       <template v-for="col in _searchs.filter(e => e.relation)" #[`search:${col.prop}`]="{ row }">
-        <RelSelect v-model="row[col.prop]" :rel="col.relation!" />
+        <!-- <RelSelect v-model="row[col.prop]" :rel="col.relation!" /> -->
+        <RelSelect2 :table="table" :model="row" :raw="{}" :field="col" />
       </template>
   
       <!-- <template v-for="col in ctx().forms.filter(e => e.relation)" #[`form:${col.prop}`]="{ row }">
@@ -130,15 +132,15 @@ const log = (...arg) => console.log(...arg)
       </template> -->
 
       <template #header>
-        <el-button type="primary" @click="edit.data = {}">新增</el-button>
+        <el-button type="primary" @click="editBind.data = {}">新增</el-button>
       </template>
     </CRUD>
   
     <InfoDialog ref="infoRef" />
 
-    <EditDialog v-bind="edit" :table="table" @finish="crudRef.getData()" />
+    <EditDialog v-bind="editBind" :table="table" @finish="crudRef.getData()" />
   
-    <RelDialog ref="relRef" />
+    <RelDialog v-bind="relBind" />
   
     <ContextMenu v-model="menu.vis" :menus="menus" :x="menu.x" :y="menu.y" />
   </div>

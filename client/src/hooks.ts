@@ -4,13 +4,14 @@ import { RefSymbol } from '@vue/reactivity'
 import { isFunction } from '@vue/shared'
 
 interface UseDialogOpt {
-  shallow: boolean
+  shallow?: boolean
 }
 
-export function useDialogBind<T extends any>(opt?: UseDialogOpt) {
+export function useDialogBind<T extends any, E extends Record<string, any>>(extra?: E, opt?: UseDialogOpt) {
   opt ||= { shallow: false }
   const ins = ref(), vis = ref(false)
   const state = (opt.shallow ? shallowReactive : reactive)({
+    ...extra!,
     modelValue: vis,
     vis,
     data: undefined as T | undefined,

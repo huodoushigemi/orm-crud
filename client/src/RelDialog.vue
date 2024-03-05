@@ -1,49 +1,46 @@
 <template>
-  <el-dialog v-if="state.row" v-model="state.vis" :title="state.field.label" append-to-body top="5vh" width="75%" @closed="state.row = null">
+  <el-dialog v-if="data" v-bind="$attrs" :title="relCtx().label" append-to-body top="5vh" width="75%">
     <Table
-      :table="rel.ctx.table"
-      :searchs="[rel.field]"
-      :extraQuery="{
-        [rel.field.prop]: {
-          [map.id]: state.row[map.id],
-          [map.label]: state.row[rel.field.relation.label] ?? state.row[map.label]
-        }
-      }"
+      :table="relCtx().table"
+      :searchs="[reversedProp()]"
+      :extraQuery="set({}, reversedProp(), pick(data, [reversedRel().prop, reversedRel().label]))"
     />
   </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { reactive, computed, shallowReactive } from 'vue'
-import { RelField } from './props'
+import { NormalizedField, RelField } from './props'
 import { useConfig } from './context'
 import { TableCtx } from './crud'
+import { findFieldPath, normalizeField, pathReverse } from './utils'
 import Table from './Table.vue'
+import { pick, set } from 'lodash-es'
+import { $ } from './hooks'
+
+const props = defineProps<{
+  table: string
+  data: any
+  prop: string
+}>()
 
 const config = useConfig()
+const ctx = () => config.cruds[props.table]
 
-const state = shallowReactive({
-  vis: false,
-  ctx: null as unknown as TableCtx,
-  field: null as unknown as RelField,
-  row: null,
+const _prop = $(() => {
+  let table = normalizeField(ctx(), props.prop).relation!.table
+  const _ctx = config.cruds[table]
+  if (_ctx.middle) {
+    return props.prop + '.' + _ctx.rels.find(e => e.relation.table != props.table)!.prop
+  } else {
+    return props.prop
+  }
 })
 
-const map = computed(() => state.ctx.map)
+const relCtx = $(() => config.cruds[normalizeField(ctx(), _prop()).relation!.table])
 
-const rel = reactive({
-  ctx: computed(() => config.cruds[state.field.relation.table]) as unknown as TableCtx,
-  field: computed(() => rel.ctx.rels.find(e => e.relation.table == state.ctx.table && e.relation.name == state.field.relation.name && e.prop != state.field.prop)) as unknown as RelField
-})
+const reversedProp = $(() => pathReverse(ctx(), _prop()))
+const reversedField = $(() => normalizeField(relCtx(), reversedProp()))
+const reversedRel = $(() => reversedField().relation!)
 
-function open(row, ctx: TableCtx, field: RelField) {
-  state.vis = true
-  state.row = row
-  state.ctx = ctx
-  state.field = field
-}
-
-defineExpose({
-  open
-})
 </script>

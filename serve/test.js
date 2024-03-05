@@ -3,58 +3,19 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-  // await prisma.user.create({
-  //   data: {
-  //     name: 'asd',
-  //     age: 1,
-  //     email: 'asdsvfv',
-  //     posts: {
-  //       create: {
-          
-  //       }
-  //     }
-  //   }
-  // })
+  const aaa = await prisma.user.findMany({
+    where: {
+      AND: [{
+        videos: { some: { video: { id: 1 } } },
+      }, {
+        videos: { some: { video: { id: 2 } } },
+      }, {
 
-  await prisma.user.create({
-    data: {
-      posts: {
-        create: []
-      },
-      videos: {
-        connectOrCreate: {
-
-        }
-      }
+      }]
     }
   })
 
-  await prisma.post.update({
-    data: {
-      author: {
-        // delete
-        disconnect
-      },
-      comments: {
-        delete: []
-      }
-    }
-  })
-
-  await prisma.user.update({
-    data: {
-      posts: {
-      }
-      videos: {
-        create: {
-          
-        },
-        update: {
-
-        }
-      }
-    }
-  })
+  console.log(aaa);
 }
 
 main()
