@@ -212,8 +212,7 @@ function whereInput(ctx: TableCtx, data: any) {
             })
           } else {
             const xxx = rrr(val, ps1)
-            const vs = Object.values(xxx)
-            vs.some(e => e !== undefined) && set(ret, ps2, xxx)
+            Object.values(xxx).some(e => e !== undefined) && set(ret, ps2, xxx)
           }
         }
       }

@@ -4,6 +4,11 @@ import ConfigProvider from './ConfigProvider.vue'
 import { TableOpt } from './props';
 import tables from './tables/index'
 import RelGraph from './RelGraph.vue';
+import RelGraphDialog from './RelGraphDialog.vue';
+
+import { useDialogBind } from './hooks'
+
+const relgraphBind = useDialogBind()
 </script>
 
 <template>
@@ -15,6 +20,8 @@ import RelGraph from './RelGraph.vue';
     <!-- <Table table="Post" /> -->
     <Table table="Video" />
 
-    <RelGraph />
+    <RelGraphDialog v-if="relgraphBind.vis" v-bind="relgraphBind" table="User" />
+
+    <el-button @click="relgraphBind.vis = true">open</el-button>
   </ConfigProvider>
 </template>
