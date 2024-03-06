@@ -166,3 +166,71 @@ export function diff(ctx: TableCtx, d1, d2) {
   }
   return ret
 }
+
+/**
+ * 返回无权限的标识
+ */
+export function checkPermis(ctx: TableCtx, data: any, permis: Set<string>) {
+  return dataWalker(ctx, data, (ctx, field) => {
+    if (!permis.has(ctx.table)) return ctx.table
+    if (ctx.map.id == field.prop) return
+
+    if (field.relation) return
+    
+    const flag = `${ctx.table}.${field.prop}`
+    if (!permis.has(p)) return flag
+  })
+}
+
+
+/**
+ * 过滤无权限的字段
+ */
+export function fieldFilter(ctx: TableCtx, fields: string[], permis: Set<string>) {
+  return fields.filter(prop => {
+    const nFields = findFieldPath(ctx, prop)
+    let table = ctx.table
+    for (let i = 0; i < nFields.length; i++) {
+      if (table && !permis.has(table)) {
+        return false
+      }
+      else if (nFields[i].relation) {
+        table = nFields[i].relation?.table
+      }
+      else if (ctx.ctxs[table].map.id != nFields[i].prop) {
+        const flag = `${table}.${nFields[i].prop}`
+        if (!permis.has(flag)) return false
+      }
+    }
+    return true
+  })
+}
+
+/**
+ * 遍历数据，cb 返回值时会停止遍历并将其返回
+ */
+export function dataWalker(ctx: TableCtx, data: any, cb: (ctx: TableCtx, field: NormalizedField) => any) {
+  for (let k in data) {
+    const field = ctx.keybyed[k]
+    if (field.relation) {
+      if (isArray(data[k])) {
+        const arr = data[k]
+        let ret: string
+        for (let i = 0; i < arr.length; i++) {
+          ret = cb(ctx, arr[i], permis)
+          if (ret !== undefined) return ret
+
+          const relCtx = ctx.ctxs[field.relation.table]
+          dataWalker(relCtx, arrp[i], cb)
+        }
+      }
+      else {
+        return checkPermis(ctx.ctxs[field.relation.table], data[k])
+      }
+    }
+    else {
+      const ret = cb()
+      if (ret !== undefined) return ret
+    }
+  }
+}
