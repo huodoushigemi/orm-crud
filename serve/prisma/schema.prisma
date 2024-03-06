@@ -20,6 +20,7 @@ model User {
   followedBy User[]       @relation("follow")
   following  User[]       @relation("follow")
   videos     User_Video[]
+  fieldRW    FieldRW?
 }
 
 model Post {
@@ -69,4 +70,12 @@ model User_Video {
 
   @@unique([userId, videoId])
   @@index([userId, videoId])
+}
+
+model FieldRW {
+  id     Int    @id @default(autoincrement())
+  user   User   @relation(fields: [userId], references: [id])
+  userId Int    @unique
+  r      String
+  w      String
 }
