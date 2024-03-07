@@ -50,7 +50,7 @@ const props = defineProps<{
 const emit = defineEmits(['update:vis', 'finish'])
 
 const config = useConfig()
-const ctx = () => config.cruds[props.table]
+const ctx = () => config.ctxs[props.table]
 const idKey = () => ctx().map.id
 const isNew = () => props.data?.[idKey()] == null
 

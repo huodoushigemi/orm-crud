@@ -1,5 +1,5 @@
-import { unionBy } from 'lodash-es'
-import { NormalizedField, NormalizedTableOpt, TableOpt } from '../props'
+import { isString, unionBy } from 'lodash-es'
+import { Field, NormalizedField, NormalizedTableOpt, TableOpt } from '../props'
 import { normalizeField } from '../utils'
 import { ApiAdapterInterface } from './adapter/interface'
 import { prismaAdapter } from './adapter/prisma'
@@ -11,10 +11,12 @@ export type TableCtx = NormalizedTableOpt & ApiAdapterInterface & {
   ctxs: Record<string, TableCtx>
 }
 
-export function createCruds(tables: Record<string, TableOpt>) {
+type FieldFilter = (ctx: TableCtx, prop: string) => boolean
+
+export function createCtxs(tables: Record<string, TableOpt>, fieldFilter?: FieldFilter) {
   const ctxs = new Proxy({}, {
     get(obj, table: string, receiver) {
-      return obj[table] ||= createCrud(tables, table, ctxs)
+      return obj[table] ||= createCtx(tables, table, ctxs, fieldFilter)
     },
     set(obj, table: string, val) {
       obj[table] = val
@@ -31,10 +33,10 @@ export function createCruds(tables: Record<string, TableOpt>) {
     }
   })
 
-  return ctxs as Record<string, ReturnType<typeof createCrud>>
+  return ctxs as Record<string, ReturnType<typeof createCtx>>
 }
 
-function createCrud(tables: Record<string, TableOpt>, table: string, ctxs: Record<string, TableCtx>) {
+function createCtx(tables: Record<string, TableOpt>, table: string, ctxs: Record<string, TableCtx>, fieldFilter?: FieldFilter) {
   const config = tables[table]
   
   if (!config) throw new Error(`找不到 Table: ${table}`)
@@ -57,11 +59,15 @@ function createCrud(tables: Record<string, TableOpt>, table: string, ctxs: Recor
     ...prismaAdapter
   }
 
-  config.fields.forEach((e, i) => ctx.fields[i] = normalizeField(ctx, e))
-  config.columns?.forEach((e, i) => ctx.columns[i] = normalizeField(ctx, e))
-  config.searchs?.forEach((e, i) => ctx.searchs[i] = normalizeField(ctx, e))
-  config.forms?.forEach((e, i) => ctx.forms[i] = normalizeField(ctx, e))
-  ;(config.views?.length ? config.views : unionBy(ctx.columns, ctx.forms, e => e.prop)).forEach((e, i) => ctx.views[i] = normalizeField(ctx, e))
+  const _ff = (e: Field | string) => fieldFilter ? fieldFilter(ctx, isString(e) ? e : e.prop) : true
+  const views = config.views?.length ? config.views : unionBy(config.columns, config.forms, e => isString(e) ? e : e.prop)
+  
+  config.fields.filter(_ff).forEach((e, i) => ctx.fields[i] = normalizeField(ctx, e))
+  config.columns?.filter(_ff).forEach((e, i) => ctx.columns[i] = normalizeField(ctx, e))
+  config.searchs?.filter(_ff).forEach((e, i) => ctx.searchs[i] = normalizeField(ctx, e))
+  config.forms?.filter(_ff).forEach((e, i) => ctx.forms[i] = normalizeField(ctx, e))
+  views.filter(_ff).forEach((e, i) => ctx.views[i] = normalizeField(ctx, e))
+
 
   Object.freeze(ctx)
 

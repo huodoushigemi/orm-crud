@@ -37,7 +37,7 @@ CRUD.setConfig({
 })
 
 const config = useConfig()
-const ctx = () => config.cruds[props.table]
+const ctx = () => config.ctxs[props.table]
 
 const _searchs = computed(() => [
   ...props.searchs?.map(e => normalizeField(ctx(), e)).filter(e => ctx().searchs.every(ee => ee.prop != e.prop)) || [],

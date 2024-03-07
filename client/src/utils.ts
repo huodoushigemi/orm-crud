@@ -1,8 +1,8 @@
 import { Arrayable } from '@vueuse/core'
 import { isObject, isArray } from '@vue/shared'
-import { get, set, merge, unionBy, isEqual, keyBy } from 'lodash-es'
+import { get, set, merge, isEqual, keyBy } from 'lodash-es'
 import { TableCtx } from './crud'
-import { Field, NormalizedField, NormalizedTableOpt, RelField, Relation, TableOpt } from './props'
+import { Field, NormalizedField, RelField, Relation } from './props'
 
 export function findFieldPath(ctx: TableCtx, prop: string | string[]): NormalizedField[] {
   return (Array.isArray(prop) ? prop : prop.split('.')).map((e, i, arr) => {
@@ -170,40 +170,45 @@ export function diff(ctx: TableCtx, d1, d2) {
 /**
  * 返回无权限的标识
  */
-export function checkPermis(ctx: TableCtx, data: any, permis: Set<string>) {
+export function checkPermis(ctx: TableCtx, data: any, cb: (flag: string) => boolean) {
   return dataWalker(ctx, data, (ctx, field) => {
-    if (!permis.has(ctx.table)) return ctx.table
+    if (!cb(ctx.table)) return ctx.table
     if (ctx.map.id == field.prop) return
 
     if (field.relation) return
     
     const flag = `${ctx.table}.${field.prop}`
-    if (!permis.has(p)) return flag
+    if (!cb(p)) return flag
   })
 }
-
 
 /**
  * 过滤无权限的字段
  */
-export function fieldFilter(ctx: TableCtx, fields: string[], permis: Set<string>) {
-  return fields.filter(prop => {
-    const nFields = findFieldPath(ctx, prop)
-    let table = ctx.table
-    for (let i = 0; i < nFields.length; i++) {
-      if (table && !permis.has(table)) {
-        return false
-      }
-      else if (nFields[i].relation) {
-        table = nFields[i].relation?.table
-      }
-      else if (ctx.ctxs[table].map.id != nFields[i].prop) {
-        const flag = `${table}.${nFields[i].prop}`
-        if (!permis.has(flag)) return false
-      }
+export function fieldsFilter(ctx: TableCtx, fields: string[], cb: (flag: string) => boolean) {
+  return fields.filter(prop => fieldFilter(ctx, prop, cb))
+}
+
+/**
+ * 字段是否有权限
+ */
+export function fieldFilter(ctx: TableCtx, prop: string, cb: (flag: string) => boolean) {
+  let table = ctx.table
+  if (table && !cb(table)) return false
+
+  const nFields = findFieldPath(ctx, prop)
+  for (let i = 0; i < nFields.length; i++) {
+    if (nFields[i].relation) {
+      table = nFields[i].relation!.table
     }
-    return true
-  })
+    else if (ctx.ctxs[table].map.id != nFields[i].prop) {
+      const flag = `${table}.${nFields[i].prop}`
+      if (!cb(flag)) return false
+    }
+
+    if (table && !cb(table)) return false
+  }
+  return true
 }
 
 /**

@@ -25,11 +25,11 @@ const props = defineProps<{
 }>()
 
 const config = useConfig()
-const ctx = () => config.cruds[props.table]
+const ctx = () => config.ctxs[props.table]
 
 const _prop = $(() => {
   let table = normalizeField(ctx(), props.prop).relation!.table
-  const _ctx = config.cruds[table]
+  const _ctx = config.ctxs[table]
   if (_ctx.middle) {
     return props.prop + '.' + _ctx.rels.find(e => e.relation.table != props.table)!.prop
   } else {
@@ -37,7 +37,7 @@ const _prop = $(() => {
   }
 })
 
-const relCtx = $(() => config.cruds[normalizeField(ctx(), _prop()).relation!.table])
+const relCtx = $(() => config.ctxs[normalizeField(ctx(), _prop()).relation!.table])
 
 const reversedProp = $(() => pathReverse(ctx(), _prop()))
 const reversedField = $(() => normalizeField(relCtx(), reversedProp()))

@@ -69,7 +69,7 @@ const emit = defineEmits(['update:modelValue'])
 const selectRef = ref()
 
 const config = useConfig()
-const ctx = () => config.cruds[props.rel.table]
+const ctx = () => config.ctxs[props.rel.table]
 
 const { data: list, loading, run } = useRequest(
   (str) => {

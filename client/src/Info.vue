@@ -1,14 +1,5 @@
 <template>
-  <!-- <el-card class="el-card--small" :header="ctx.label"> -->
-    <ElDescriptions border :column="column" style="margin-bottom: 22px;">
-    <!-- <ElDescriptionsItem v-for="(col, i) in cols" :label="col.label" :span="i == cols.length - 1 ? column - (i % column) : 1">
-      <RelTag v-if="col.relation" :data="getP($data, col.prop)" :rel="col.relation" />
-      <template v-else>{{ getP($data, col.prop) }}</template>
-    </ElDescriptionsItem>
-
-    <ElDescriptionsItem v-for="col in cols_html" :label="col.label" :span="column">
-      <div v-html="getP($data, col.prop)"></div>
-    </ElDescriptionsItem> -->
+  <ElDescriptions border :column="column" style="margin-bottom: 22px;">
 
     <ElDescriptionsItem v-for="col in parsed.fields" :label="col.label">
       <RelTag v-if="col.relation" :data="getP($data, col.prop)" :rel="col.relation" />

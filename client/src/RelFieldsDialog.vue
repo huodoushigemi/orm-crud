@@ -44,7 +44,7 @@ const state = shallowReactive({
   table: '',
 })
 
-const ctx = computed(() => config.cruds[state.table])
+const ctx = computed(() => config.ctxs[state.table])
 
 const value = computed({
   get: () => props.modelValue.map(e => e.split('.')),

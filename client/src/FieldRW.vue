@@ -1,39 +1,37 @@
 <template>
   <el-tree :data="datas()" :props="{ label: 'label', children: 'children' }" node-key="key">
     <template #default="{ node, data }">
-      <el-checkbox :model-value="r.includes(data.key)" @update:model-value="toggle(r, data)" :indeterminate="indeterminate(r, data)" label="R" size="large" style="margin-left: 0px; margin-right: 12px; padding: 0 6px 0 0;" @click.stop />
-      <el-checkbox :model-value="w.includes(data.key)" @update:model-value="toggle(w, data)" :indeterminate="indeterminate(w, data)" label="W" size="large" style="margin-left: 0px; margin-right: 12px; padding: 0 16px 0 0;" @click.stop />
-      <!-- <el-check-tag :checked="r.includes(data.key)" @change="toggle(r, data)" style="margin-right: 12px;" effect="light" @click.stop>R</el-check-tag> -->
-      <!-- <el-check-tag :checked="w.includes(data.key)" @change="toggle(w, data)" style="margin-right: 12px;" effect="light" @click.stop>W</el-check-tag> -->
+      <el-checkbox :model-value="permis.r(data.key)" @update:model-value="toggle(data, permis.r)" :indeterminate="indeterminate(r, data)" label="R" size="large" style="margin-left: 0px; margin-right: 12px; padding: 0 6px 0 0;" @click.stop />
+      <el-checkbox :model-value="permis.w(data.key)" @update:model-value="toggle(data, permis.w)" :indeterminate="indeterminate(w, data)" label="W" size="large" style="margin-left: 0px; margin-right: 12px; padding: 0 16px 0 0;" @click.stop />
       {{ data.label }}
     </template>
   </el-tree>
 </template>
 
 <script setup lang="ts">
-import { remove } from '@vue/shared';
-import { useConfig } from './context';
-import { $ } from './hooks';
+import { remove } from '@vue/shared'
+import { useConfig } from './context'
+import { $ } from './hooks'
+import { IRWPermis } from './RWPermis'
 
-defineProps<{
-  r: string[]
-  w: string[]
+const props = defineProps<{
+  permis: IRWPermis
 }>()
 
 const config = useConfig()
 
-const datas = $(() => Object.values(config.cruds).map(e => ({
-  label: e.label || e.table,
-  key: e.table,
-  children: e.fields.filter(e => !e.relation).map(f => ({
+const datas = $(() => Object.values(config.ctxs).map(ctx => ({
+  label: ctx.label || ctx.table,
+  key: ctx.table,
+  children: ctx.fields.filter(e => !e.relation && ctx.map.id != e.prop).map(f => ({
     label: f.label,
-    key: `${e.table}.${f.prop}`
+    key: `${ctx.table}.${f.prop}`
   }))
 })))
 
-function toggle(arr = [], data) {
+function toggle(data, setter: (flag: string, plus?: boolean) => void) {
   const { key } = data
-  const set = new Set(arr)
+  // const set = new Set(arr)
 
   if (data.children?.length) {
     const checkedAll = data.children.every(e => set.has(e.key))

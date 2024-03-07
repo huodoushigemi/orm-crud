@@ -52,7 +52,7 @@ onMounted(async () => {
   })
 
   graph.data({
-    nodes: Object.values(config.cruds).filter(e => !e.middle).map(e => ({
+    nodes: Object.values(config.ctxs).filter(e => !e.middle).map(e => ({
       id: e.table,
       label: e.label,
       size: props.table == e.table ? 64 : 46,
@@ -61,10 +61,10 @@ onMounted(async () => {
       const map = new Set()
       const ret = []
 
-      Object.values(config.cruds).forEach(ctx => {
+      Object.values(config.ctxs).forEach(ctx => {
         if (ctx.middle) return
         ctx.rels.forEach(relField => {
-          const relCtx = config.cruds[relField.relation.table]
+          const relCtx = config.ctxs[relField.relation.table]
           const table = relCtx.middle
             ? relCtx.rels.find(e => e.relation.table != ctx.table)?.relation?.table
             : relCtx.table

@@ -1,4 +1,5 @@
-import { createCruds } from './crud'
+import { IRWPermis } from './RWPermis'
+import { createCtxs } from './crud'
 
 export interface Field {
   label?: string
@@ -80,8 +81,11 @@ export interface NormalizedTableOpt {
 
 export interface ConfigProviderProps {
   tables: Record<string, TableOpt>
+  rwMap: Record<string, number>
 }
 
-export interface ConfigProviderContext extends ConfigProviderProps {
-  cruds: ReturnType<typeof createCruds>
+export interface ConfigProviderContext {
+  tables: Record<string, TableOpt>
+  ctxs: ReturnType<typeof createCtxs>
+  rwPermis: IRWPermis
 }

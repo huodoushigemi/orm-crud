@@ -31,7 +31,7 @@ const emit = defineEmits(['update:modelValue'])
 
 const config = useConfig()
 
-const ctx = () => config.cruds[props.table]
+const ctx = () => config.ctxs[props.table]
 const rel = () => props.field.relation
 
 const paths = () => findFieldPath(ctx(), props.field.prop)

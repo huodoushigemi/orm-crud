@@ -1,5 +1,5 @@
 <template>
-  <el-tag v-for="item in toArr(data)" style="cursor: pointer; margin-right: 4px;" @click="$refs.info.open(item, config.cruds[rel.table])">
+  <el-tag v-for="item in toArr(data)" style="cursor: pointer; margin-right: 4px;" @click="$refs.info.open(item, config.ctxs[rel.table])">
     {{ item[rel.label] }}
   </el-tag>
 

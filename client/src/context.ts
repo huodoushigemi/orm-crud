@@ -1,5 +1,5 @@
-import { InjectionKey, inject } from "vue"
-import { ConfigProviderContext } from "./props"
+import { InjectionKey, inject } from 'vue'
+import { ConfigProviderContext } from './props'
 
 export const configContextKey = Symbol() as InjectionKey<ConfigProviderContext>
 
