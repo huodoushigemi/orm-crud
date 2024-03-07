@@ -51,11 +51,11 @@ import { reactive, ref, watchEffect } from 'vue'
 import { isArray } from '@vue/shared'
 import { Arrayable } from '@vueuse/core'
 import { useRequest } from 'vue-request'
+import { Relation } from '@orm-crud/core'
+import { toArr, pickLP, findFieldPath } from '@orm-crud/core/utils'
 import { get, set } from 'lodash-es'
 import Table from './Table.vue'
-import { Relation } from './props'
 import { useConfig } from './context'
-import { toArr, pickLP, findFieldPath } from './utils'
 
 type Obj = Record<string, any>
 

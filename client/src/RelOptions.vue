@@ -29,8 +29,8 @@ import { computed, ref, watch, nextTick, onMounted, watchEffect } from 'vue'
 import { Arrayable, toReactive, unrefElement, useCurrentElement, useInfiniteScroll, useVModel } from '@vueuse/core'
 import { useLoadMore } from 'vue-request'
 import { pick } from 'lodash-es'
+import { Relation } from '@orm-crud/core'
 import Options from './Options.vue'
-import { RelField, Relation } from './props'
 import { useConfig } from './context'
 
 type Obj = Record<string, any>

@@ -1,8 +1,10 @@
 <template>
-  <el-tree :data="datas()" :props="{ label: 'label', children: 'children' }" node-key="key">
+  <el-tree :data="datas" :props="{ label: 'label', children: 'children' }" node-key="key">
     <template #default="{ node, data }">
-      <el-checkbox :model-value="permis.r(data.key)" @update:model-value="toggle(data, permis.r)" :indeterminate="indeterminate(r, data)" label="R" size="large" style="margin-left: 0px; margin-right: 12px; padding: 0 6px 0 0;" @click.stop />
-      <el-checkbox :model-value="permis.w(data.key)" @update:model-value="toggle(data, permis.w)" :indeterminate="indeterminate(w, data)" label="W" size="large" style="margin-left: 0px; margin-right: 12px; padding: 0 16px 0 0;" @click.stop />
+      <div @click.stop>
+        <el-checkbox :model-value="permis.r(data.key)" @update:model-value="toggle(data, permis.r)" :indeterminate="indeterminate(data, permis.r)" label="R" size="large" style="margin-left: 0px; margin-right: 0; padding: 0 18px 0 0;" @click.stop />
+        <el-checkbox :model-value="permis.w(data.key)" @update:model-value="toggle(data, permis.w)" :indeterminate="indeterminate(data, permis.w)" label="W" size="large" style="margin-left: 0px; margin-right: 12px; padding: 0 16px 0 0;" @click.stop />
+      </div>
       {{ data.label }}
     </template>
   </el-tree>
@@ -14,11 +16,12 @@ import { useConfig } from './context'
 import { $ } from './hooks'
 import { IRWPermis } from './RWPermis'
 
-const props = defineProps<{
-  permis: IRWPermis
-}>()
+// const props = defineProps<{
+//   permis: IRWPermis
+// }>()
 
 const config = useConfig()
+const permis = config.rwPermis
 
 const datas = $(() => Object.values(config.ctxs).map(ctx => ({
   label: ctx.label || ctx.table,
@@ -29,37 +32,34 @@ const datas = $(() => Object.values(config.ctxs).map(ctx => ({
   }))
 })))
 
-function toggle(data, setter: (flag: string, plus?: boolean) => void) {
-  const { key } = data
-  // const set = new Set(arr)
-
-  if (data.children?.length) {
-    const checkedAll = data.children.every(e => set.has(e.key))
-    if (!set.has(key) || !checkedAll) {
-      set.has(key) || arr.push(key)
-      data.children.forEach(e => set.has(e.key) || arr.push(e.key))
+function toggle(node, oper: (flag: string, plus?: boolean) => boolean) {
+  const { key } = node
+  if (node.children) {
+    const checkedAll = node.children.every(e => oper(e.key))
+    if (!oper(key) || !checkedAll) {
+      oper(key, true)
+      node.children.forEach(e => oper(e.key, true))
     } else {
-      remove(arr, key)
-      data.children.forEach(e => remove(arr, e.key))
+      oper(key, false)
+      node.children.forEach(e => oper(e.key, false))
     }
   }
   else if (key.includes('.')) {
-    set.has(key) ? remove(arr, key) : arr.push(key)
-    set.has(key) ? set.delete(key) : set.add(key)
+    oper(key) ? oper(key, false) : oper(key, true)
 
     const table = key.split('.')[0]
     const parentData = datas().find(e => e.key == table)!
-    if (parentData.children.some(e => set.has(e.key))) {
-      set.has(table) || arr.push(table)
+    if (parentData.children.some(e => oper(e.key))) {
+      oper(table, true)
     } else {
-      remove(arr, table)
+      oper(table, false)
     }
   }
 }
 
-function indeterminate(arr = [], data) {
-  if (!data.children) return false
-  if (!arr.includes(data.key)) return false
-  return data.children.some(e => !arr.includes(e.key))
+function indeterminate(node, oper: (flag: string, plus?: boolean) => boolean) {
+  if (!node.children) return false
+  if (!oper(node.key)) return false
+  return node.children.some(e => !oper(e.key))
 }
 </script>

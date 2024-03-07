@@ -2,10 +2,9 @@ import { isObject, isArray } from '@vue/shared'
 import { add, get, merge, set } from 'lodash-es'
 import { objectPick } from '@vueuse/core'
 import { extend } from 'umi-request'
-import { findFieldPath, isRelMany } from '../../utils'
-import { NormalizedField } from '../../props'
+import { findFieldPath, isRelMany } from '../utils'
+import { NormalizedField, TableCtx } from '../types'
 import { ApiAdapterInterface } from './interface'
-import { TableCtx } from '..'
 
 const request = extend({
   prefix: 'http://localhost:3000/prisma'

@@ -27,12 +27,11 @@ import { toReactive, useBreakpoints, breakpointsTailwind, reactify, reactifyObje
 import { useRequest } from 'vue-request'
 import { ElDescriptions, ElDescriptionsItem } from 'element-plus'
 import { set, pick, unionBy } from 'lodash-es'
-import { findFieldPath, getP, isRelMany, normalizeField, pathReverse } from './utils'
+import { TableCtx, NormalizedField } from '@orm-crud/core'
+import { findFieldPath, getP, isRelMany, normalizeField, pathReverse } from '@orm-crud/core/utils'
 import RelTag from './RelTag.vue'
 import Table from './Table.vue'
 import { useConfig } from './context'
-import { TableCtx } from './crud'
-import { NormalizedField } from './props'
 
 const props = withDefaults(defineProps<{
   ctx: TableCtx

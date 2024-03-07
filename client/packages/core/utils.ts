@@ -1,13 +1,12 @@
 import { Arrayable } from '@vueuse/core'
 import { isObject, isArray } from '@vue/shared'
 import { get, set, merge, isEqual, keyBy } from 'lodash-es'
-import { TableCtx } from './crud'
-import { Field, NormalizedField, RelField, Relation } from './props'
+import { TableCtx, Field, NormalizedField, RelField, Relation } from './types'
 
 export function findFieldPath(ctx: TableCtx, prop: string | string[]): NormalizedField[] {
   return (Array.isArray(prop) ? prop : prop.split('.')).map((e, i, arr) => {
     const ret = ctx.keybyed[e]
-    if (!ret) throw new Error(`找不到字段 ${prop}`)
+    if (!ret) throw new Error(`表 ${ctx.table} 找不到字段 ${prop}`)
     const isLast = i == arr.length - 1
     if (!isLast && !ret.relation) throw new Error(`${prop}: ${e} 缺少 relation`)
     if (!isLast) ctx = ctx.ctxs[ret.relation!.table]
@@ -178,7 +177,7 @@ export function checkPermis(ctx: TableCtx, data: any, cb: (flag: string) => bool
     if (field.relation) return
     
     const flag = `${ctx.table}.${field.prop}`
-    if (!cb(p)) return flag
+    if (!cb(flag)) return flag
   })
 }
 
@@ -195,18 +194,24 @@ export function fieldsFilter(ctx: TableCtx, fields: string[], cb: (flag: string)
 export function fieldFilter(ctx: TableCtx, prop: string, cb: (flag: string) => boolean) {
   let table = ctx.table
   if (table && !cb(table)) return false
-
-  const nFields = findFieldPath(ctx, prop)
-  for (let i = 0; i < nFields.length; i++) {
-    if (nFields[i].relation) {
-      table = nFields[i].relation!.table
+  
+  if (prop.includes('.')) {
+    const nFields = findFieldPath(ctx, prop)  
+    for (let i = 0; i < nFields.length; i++) {
+      if (nFields[i].relation) {
+        table = nFields[i].relation!.table
+      }
+      else if (ctx.ctxs[table].map.id != nFields[i].prop) {
+        const flag = `${table}.${nFields[i].prop}`
+        if (!cb(flag)) return false
+      }
+  
+      if (table && !cb(table)) return false
     }
-    else if (ctx.ctxs[table].map.id != nFields[i].prop) {
-      const flag = `${table}.${nFields[i].prop}`
-      if (!cb(flag)) return false
-    }
-
-    if (table && !cb(table)) return false
+  }
+  else {
+    const flag = `${ctx.table}.${prop}`
+    return cb(flag)
   }
   return true
 }
@@ -222,19 +227,19 @@ export function dataWalker(ctx: TableCtx, data: any, cb: (ctx: TableCtx, field: 
         const arr = data[k]
         let ret: string
         for (let i = 0; i < arr.length; i++) {
-          ret = cb(ctx, arr[i], permis)
+          ret = cb(ctx, arr[i])
           if (ret !== undefined) return ret
 
           const relCtx = ctx.ctxs[field.relation.table]
-          dataWalker(relCtx, arrp[i], cb)
+          dataWalker(relCtx, arr[i], cb)
         }
       }
       else {
-        return checkPermis(ctx.ctxs[field.relation.table], data[k])
+        return dataWalker(ctx.ctxs[field.relation.table], data[k], cb)
       }
     }
     else {
-      const ret = cb()
+      const ret = cb(ctx, field)
       if (ret !== undefined) return ret
     }
   }

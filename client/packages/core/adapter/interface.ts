@@ -1,4 +1,4 @@
-import { TableCtx } from '../index'
+import { TableCtx } from '../types'
 
 type Obj = Record<string, any>
 type Pageable = { $page?: number; $pageSize?: number } & Obj

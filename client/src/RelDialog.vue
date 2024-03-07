@@ -1,19 +1,16 @@
 <template>
-  <el-dialog v-if="data" v-bind="$attrs" :title="relCtx().label" append-to-body top="5vh" width="75%">
+  <el-dialog v-if="data" v-bind="$attrs" :title="relCtx.label" append-to-body top="5vh" width="75%">
     <Table
-      :table="relCtx().table"
-      :searchs="[reversedProp()]"
-      :extraQuery="set({}, reversedProp(), pick(data, [reversedRel().prop, reversedRel().label]))"
+      :table="relCtx.table"
+      :searchs="[reversedProp]"
+      :extraQuery="set({}, reversedProp, pick(data, [reversedRel.prop, reversedRel.label]))"
     />
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { reactive, computed, shallowReactive } from 'vue'
-import { NormalizedField, RelField } from './props'
+import { normalizeField, pathReverse } from '@orm-crud/core/utils'
 import { useConfig } from './context'
-import { TableCtx } from './crud'
-import { findFieldPath, normalizeField, pathReverse } from './utils'
 import Table from './Table.vue'
 import { pick, set } from 'lodash-es'
 import { $ } from './hooks'

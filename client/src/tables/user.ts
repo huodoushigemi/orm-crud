@@ -1,4 +1,4 @@
-import { TableOpt } from "../props"
+import { TableOpt } from '@orm-crud/core'
 
 const required = true
 

@@ -20,9 +20,8 @@
 import { computed, ref, shallowReactive } from 'vue'
 import { CascaderProps } from 'element-plus'
 import { remove } from '@vue/shared'
-import { TableCtx } from './crud'
-import { findFieldPath, isRelMany } from './utils'
-import { Field, NormalizedField, RelField } from './props'
+import { Field, NormalizedField, TableCtx } from '@orm-crud/core'
+import { findFieldPath, isRelMany } from '@orm-crud/core/utils'
 import { useConfig } from './context'
 import { pick } from 'lodash-es'
 

@@ -1,15 +1,9 @@
 import { isString, unionBy } from 'lodash-es'
-import { Field, NormalizedField, NormalizedTableOpt, TableOpt } from '../props'
-import { normalizeField } from '../utils'
+import { Field, TableOpt } from './types'
+import { normalizeField } from './utils'
 import { ApiAdapterInterface } from './adapter/interface'
 import { prismaAdapter } from './adapter/prisma'
-
-export type TableCtx = NormalizedTableOpt & ApiAdapterInterface & {
-  table: string
-  keybyed: Record<string, NormalizedField>
-  tables: Record<string, TableOpt>
-  ctxs: Record<string, TableCtx>
-}
+import { TableCtx } from './types'
 
 type FieldFilter = (ctx: TableCtx, prop: string) => boolean
 
@@ -62,12 +56,16 @@ function createCtx(tables: Record<string, TableOpt>, table: string, ctxs: Record
   const _ff = (e: Field | string) => fieldFilter ? fieldFilter(ctx, isString(e) ? e : e.prop) : true
   const views = config.views?.length ? config.views : unionBy(config.columns, config.forms, e => isString(e) ? e : e.prop)
   
-  config.fields.filter(_ff).forEach((e, i) => ctx.fields[i] = normalizeField(ctx, e))
-  config.columns?.filter(_ff).forEach((e, i) => ctx.columns[i] = normalizeField(ctx, e))
-  config.searchs?.filter(_ff).forEach((e, i) => ctx.searchs[i] = normalizeField(ctx, e))
-  config.forms?.filter(_ff).forEach((e, i) => ctx.forms[i] = normalizeField(ctx, e))
+  config.fields.forEach((e, i) => ctx.fields[i] = normalizeField(ctx, e))
+  config.columns?.forEach((e, i) => ctx.columns[i] = normalizeField(ctx, e))
+  config.searchs?.forEach((e, i) => ctx.searchs[i] = normalizeField(ctx, e))
+  config.forms?.forEach((e, i) => ctx.forms[i] = normalizeField(ctx, e))
   views.filter(_ff).forEach((e, i) => ctx.views[i] = normalizeField(ctx, e))
-
+  
+  ctx.columns = ctx.columns.filter(_ff)
+  ctx.searchs = ctx.searchs.filter(_ff)
+  ctx.forms = ctx.forms.filter(_ff)
+  ctx.fields = ctx.fields.filter(_ff)
 
   Object.freeze(ctx)
 

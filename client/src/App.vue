@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import Table from './Table.vue'
 import ConfigProvider from './ConfigProvider.vue'
-import { TableOpt } from './props';
 import tables from './tables/index'
 import RelGraph from './RelGraph.vue';
 import RelGraphDialog from './RelGraphDialog.vue'
@@ -11,14 +10,16 @@ import { useDialogBind } from './hooks'
 import { ref } from 'vue';
 
 const relgraphBind = useDialogBind()
-const r = ref([]), w = ref([])
+
+const rwMap = ref({ 'User': 6, 'User.name': 4, 'User.age': 6 })
 </script>
 
 <template>
-  <ConfigProvider :tables="tables">
+  {{ rwMap }}
+  <ConfigProvider :tables="tables" :rw-map="rwMap">
     
-    <FieldRWV :r="r" :w="w" />
-        
+    <FieldRWV  />
+
     <Table table="User" />
 
     <br />

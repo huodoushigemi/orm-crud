@@ -8,11 +8,11 @@ export function RWPermis(map: Record<string, number>): IRWPermis {
     r: (flag, plus) => 
       plus == true ? !!(map[flag] = (map[flag] || 0) | 4) :
       plus == false ? !!(map[flag] = (map[flag] || 0) & ~4)
-      : !!(map[flag] & 4),
+      : !!((map[flag] || 0) & 4),
 
     w: (flag, plus) => 
       plus == true ? !!(map[flag] = (map[flag] || 0) | 2) :
       plus == false ? !!(map[flag] = (map[flag] || 0) & ~2)
-      : !!(map[flag] & 2),
+      : !!((map[flag] || 0) & 2),
   }
 }

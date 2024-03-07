@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="tsx">
-import { Relation } from './props'
+import { Relation } from '@orm-crud/core'
 import { useConfig } from './context'
 import InfoDialog from './InfoDialog.vue'
 

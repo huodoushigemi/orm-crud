@@ -33,14 +33,13 @@ import { ElMessage } from 'element-plus'
 import { ElFormRender, ElFormItemRender } from 'el-form-render'
 import { useRequest } from 'vue-request'
 import { get, isArray, isEqual, keyBy, pick, set } from 'lodash-es'
+import { NormalizedField, TableCtx } from '@orm-crud/core'
+import { isRelMany, normalizeField, inMany, diff } from '@orm-crud/core/utils'
 import RelSelect from './RelSelect.vue'
 import { useConfig } from './context'
 import { useStorage } from './hooks'
 import RelFieldsDialog from './RelFieldsDialog.vue'
-import { isRelMany, normalizeField, inMany, diff } from './utils'
-import { TableCtx } from './crud'
 import RelSelect2 from './RelSelect2.vue'
-import { NormalizedField } from './props'
 
 const props = defineProps<{
   table: string

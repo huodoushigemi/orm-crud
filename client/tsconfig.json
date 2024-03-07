@@ -18,7 +18,13 @@
     /* Linting */
     "strict": true,
     "strictNullChecks": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    "baseUrl": "./",
+    "paths": {
+      "@orm-crud/core": ["packages/core/index.ts"],
+      "@orm-crud/core/*": ["packages/core/*.ts"],
+    }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
   "exclude": ["@el-lowcode/**"],

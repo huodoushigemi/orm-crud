@@ -16,7 +16,7 @@
 import { isObject } from '@vue/shared'
 import { Arrayable } from '@vueuse/core'
 import { get } from 'lodash-es'
-import { toArr, pickLP } from './utils'
+import { pickLP, toArr } from '@orm-crud/core/utils'
 
 type Obj = Record<string, any>
 

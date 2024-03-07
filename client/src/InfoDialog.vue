@@ -15,11 +15,11 @@
 <script setup lang="ts">
 import { computed, shallowReactive, ref, watchEffect, watch } from 'vue'
 import { toReactive, breakpointsTailwind, useBreakpoints, useLocalStorage } from '@vueuse/core'
+import { TableCtx } from '@orm-crud/core'
 import { useStorage } from './hooks'
 import { useZIndex } from 'element-plus/es/hooks/index'
 import Info from './Info.vue'
 import RelFieldsDialog from './RelFieldsDialog.vue'
-import { TableCtx } from './crud'
 
 // 响应式布局
 const breakpoints = useBreakpoints(breakpointsTailwind)
