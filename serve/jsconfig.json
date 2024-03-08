@@ -2,14 +2,14 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "strict": true,
+    "strict": false,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
     "allowJs": true,
     "skipLibCheck": true,
+    "noImplicitAny": false,
     "moduleResolution": "bundler",
     "outDir": "./dist",
-    "noEmitOnError": true,
+    "noEmitOnError": false,
     "paths": {
       "@orm-crud/core": ["../client/packages/core/index.ts"],
       "@orm-crud/core/*": ["../client/packages/core/*"],
