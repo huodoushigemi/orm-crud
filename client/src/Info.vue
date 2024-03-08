@@ -47,7 +47,7 @@ const column = computed(() => breakpoints.smallerOrEqual('sm').value ? 2 : 3)
 const nFields = computed(() => props.fields?.map(e => normalizeField(props.ctx, e)))
 
 const $data = computed(() => req.data.value || {})
-const req = useRequest(({ data, fields }) => props.ctx.find(data, fields), { manual: true })
+const req = useRequest(({ data, fields }) => props.ctx.api.find(data, fields), { manual: true })
 
 watch(() => {
   const { data, ctx, fields } = props

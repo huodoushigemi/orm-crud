@@ -59,7 +59,7 @@ const { data, dataList, loadMoreAsync, refresh, loading, noMore } = useLoadMore(
   async (d: any) => {
     d ||= { page: 0 }
     const { table, label, prop } = props.rel, { pageSize } = props
-    const { list, total } = await config.ctxs[table].page({ [label]: search.value, $page: ++d.page, $pageSize: pageSize })
+    const { list, total } = await config.ctxs[table].api.page({ [label]: search.value, $page: ++d.page, $pageSize: pageSize })
     if (props.defaultFirst && props.modelValue === undefined && d.page == 1 && list.length) value.value = pick(list[0], [prop, label])
     return { list, total, page: d.page }
   },

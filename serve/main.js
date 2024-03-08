@@ -9,6 +9,13 @@ const router = new Router({ prefix: '/prisma' })
 
 const prisma = new PrismaClient()
 
+import tables from '../client/src/tables'
+import { createCtxs } from '../client/packages/core'
+import { createPrismaAdapter } from '../client/packages/core/adapter/prisma'
+
+const ctxs = createCtxs(tables)
+const api = createPrismaAdapter(prisma)
+
 const lowerCase = s => s.replace(s[0], s[0].toLowerCase())
 
 router.post('/crud', async (ctx, next) => {
@@ -23,6 +30,49 @@ router.post('/crud', async (ctx, next) => {
     ctx.body = ret
   }
 })
+
+router.post('/find/:table', async (ctx, next) => {
+  const { table } = ctx.params
+  const data = ctx.request.body
+  ctx.body = await api.find(ctxs[table], data.where, data.fields)
+})
+
+router.post('/finds/:table', async (ctx, next) => {
+  const { table } = ctx.params
+  const data = ctx.request.body
+  ctx.body = await api.finds(ctxs[table], data.where, data.fields)
+})
+
+router.post('/page/:table', async (ctx, next) => {
+  const { table } = ctx.params
+  ctx.body = await api.page(ctxs[table], ctx.request.body)
+})
+
+router.post('/create/:table', async (ctx, next) => {
+  const { table } = ctx.params
+  ctx.body = await api.create(ctxs[table], ctx.request.body)
+})
+
+router.post('/update/:table', async (ctx, next) => {
+  const { table } = ctx.params
+  ctx.body = await api.update(ctxs[table], ctx.request.body)
+})
+
+router.post('/remove/:table', async (ctx, next) => {
+  const { table } = ctx.params
+  ctx.body = await api.remove(ctxs[table], ctx.request.body)
+})
+
+router.post('/removes/:table', async (ctx, next) => {
+  const { table } = ctx.params
+  ctx.body = await api.removes(ctxs[table], ctx.request.body)
+})
+
+router.post('/count/:table', async (ctx, next) => {
+  const { table } = ctx.params
+  ctx.body = await api.count(ctxs[table], ctx.request.body)
+})
+
 
 async function handlerErr(ctx, next) {
   try {

@@ -50,19 +50,19 @@ const searchModel = ref({})
 
 async function request(_, data, type) {
   if (type == 'list') {
-    return ctx().page(data, props.columns?.map(e => normalizeField(ctx(), e)).map(e => e.prop))
+    return ctx().api.page(data, props.columns?.map(e => normalizeField(ctx(), e)).map(e => e.prop))
   }
   if (type == 'new') {
-    return await ctx().create(data)
+    return await ctx().api.create(data)
   }
   if (type == 'edit') {
-    return await ctx().update(data)
+    return await ctx().api.update(data)
   }
   if (type == 'del') {
-    return await ctx().remove(data)
+    return await ctx().api.remove(data)
   }
   if (type == 'get') {
-    return await ctx().find(data)
+    return await ctx().api.find(data)
   }
 }
 

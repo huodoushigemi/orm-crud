@@ -1,4 +1,5 @@
-import { ApiAdapterInterface } from './adapter/interface'
+import { IApiAdapter } from './adapter/interface'
+export * from './adapter/interface'
 
 export interface Field {
   label?: string
@@ -78,9 +79,13 @@ export interface NormalizedTableOpt {
   map: Required<TableOpt['map']>
 }
 
-export type TableCtx = NormalizedTableOpt & ApiAdapterInterface & { 
+export type TableCtx = NormalizedTableOpt & { 
   table: string
   keybyed: Record<string, NormalizedField>
   tables: Record<string, TableOpt>
   ctxs: Record<string, TableCtx>
+  api: { [K in keyof IApiAdapter]: IApiAdapter[K] extends (...arg: infer Arg) => any ? Arg extends [any, ...o: infer O] ? (...arg: O) => ReturnType<IApiAdapter[K]> : never  : never }
 }
+
+export type FieldFilter = (ctx: TableCtx, prop: string) => boolean
+export type TableCtxs = Record<string, TableCtx>

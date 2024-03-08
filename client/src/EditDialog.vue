@@ -73,7 +73,7 @@ function processOpt(ctx: TableCtx, field: NormalizedField, queue: NormalizedFiel
 const nFields = computed(() => fields.value.map(e => normalizeField(ctx(), e)))
 
 const $data = ref()
-const req = useRequest(({ data, fields }) => ctx().find(data, fields), { manual: true })
+const req = useRequest(({ data, fields }) => ctx().api.find(data, fields), { manual: true })
 
 watch(
   () => ({ data: pick(props.data, idKey()), fields: fields.value }),
@@ -101,9 +101,9 @@ async function ok() {
 
   try {
     if (isNew()) {
-      await ctx().create(data)
+      await ctx().api.create(data)
     } else {
-      await ctx().update({ [idKey()]: model[idKey()], ...data })
+      await ctx().api.update({ [idKey()]: model[idKey()], ...data })
     }
     ElMessage({ message: '操作成功', type: 'success' })
     emit('update:vis', false)
