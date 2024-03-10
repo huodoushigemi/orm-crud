@@ -50,6 +50,7 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits(['update:modelValue'])
 const config = useConfig()
+const ctx = () => config.ctxs[props.rel.table]
 
 const value = useVModel(props, 'modelValue')
 
@@ -58,8 +59,12 @@ const search = ref(''), searchTemp = ref('')
 const { data, dataList, loadMoreAsync, refresh, loading, noMore } = useLoadMore(
   async (d: any) => {
     d ||= { page: 0 }
-    const { table, label, prop } = props.rel, { pageSize } = props
-    const { list, total } = await config.ctxs[table].api.page({ [label]: search.value, $page: ++d.page, $pageSize: pageSize })
+    const { label, prop } = props.rel, { pageSize } = props
+    const { list, total } = await ctx().api.page({
+      where: { [label]: search.value, $page: ++d.page },
+      skip: (++d.page - 1) * pageSize,
+      take: pageSize
+    })
     if (props.defaultFirst && props.modelValue === undefined && d.page == 1 && list.length) value.value = pick(list[0], [prop, label])
     return { list, total, page: d.page }
   },

@@ -1,15 +1,23 @@
 import { TableCtx } from '../types'
 
 type Obj = Record<string, any>
-type Pageable = { $page?: number; $pageSize?: number } & Obj
+
+export type FindOpt = {
+  where: Record<string, any>
+  select?: string[]
+  orderBy?: Record<string, 'asc' | 'desc' | undefined>
+  skip?: number
+  take?: number
+
+}
 
 export interface IApiAdapter {
-  find(ctx: TableCtx, data, fields?: string[]): Promise<any>
-  finds(ctx: TableCtx, data: Pageable, fields?: string[]): Promise<any[]>
-  page(ctx: TableCtx, data: Pageable, fields?: string[]): Promise<{ total: number; list: any[] }>
+  find(ctx: TableCtx, opt: FindOpt): Promise<any>
+  finds(ctx: TableCtx, opt: FindOpt): Promise<any[]>
+  page(ctx: TableCtx, opt: FindOpt): Promise<{ total: number; list: any[] }>
+  count(ctx: TableCtx, opt: FindOpt): Promise<any>
   create(ctx: TableCtx, data): Promise<any>
   update(ctx: TableCtx, data): Promise<any>
-  count(ctx: TableCtx, data): Promise<any>
   remove(ctx: TableCtx, data): Promise<any>
   removes(ctx: TableCtx, data): Promise<any>
 }

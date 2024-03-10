@@ -169,7 +169,7 @@ export function diff(ctx: TableCtx, d1, d2) {
 /**
  * 返回无权限的标识
  */
-export function checkPermis(ctx: TableCtx, data: any, cb: (flag: string) => boolean) {
+export function checkDataPermis(ctx: TableCtx, data: any, cb: (flag: string) => boolean) {
   return dataWalker(ctx, data, (ctx, field) => {
     if (!cb(ctx.table)) return ctx.table
     if (ctx.map.id == field.prop) return
@@ -219,8 +219,9 @@ export function fieldFilter(ctx: TableCtx, prop: string, cb: (flag: string) => b
 /**
  * 遍历数据，cb 返回值时会停止遍历并将其返回
  */
-export function dataWalker(ctx: TableCtx, data: any, cb: (ctx: TableCtx, field: NormalizedField) => any) {
+export function dataWalker(ctx: TableCtx, data: Record<string, any>, cb: (ctx: TableCtx, field: NormalizedField) => any) {
   for (let k in data) {
+    if (k[0] == '$') return
     const field = ctx.keybyed[k]
     if (field.relation) {
       if (isArray(data[k])) {

@@ -26,6 +26,12 @@ async function main() {
   console.log(
     await api.find(ctxs.User, {
       id: 1
+    }),
+    await api.finds(ctxs.User, {
+      videos: [
+        { video: { id: 1 } },
+        { video: { id: 2 } },
+      ]
     })
   )
 }

@@ -11,17 +11,15 @@
 </template>
 
 <script setup lang="ts">
-import { remove } from '@vue/shared'
 import { useConfig } from './context'
 import { $ } from './hooks'
 import { IRWPermis } from './RWPermis'
 
-// const props = defineProps<{
-//   permis: IRWPermis
-// }>()
+defineProps<{
+  permis: IRWPermis
+}>()
 
 const config = useConfig()
-const permis = config.rwPermis
 
 const datas = $(() => Object.values(config.ctxs).map(ctx => ({
   label: ctx.label || ctx.table,

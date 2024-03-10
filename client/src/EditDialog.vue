@@ -1,45 +1,34 @@
 <template>
-  <el-dialog v-if="data" v-bind="$attrs" append-to-body class="orm-edit-dialog">
+  <el-dialog v-bind="$attrs" append-to-body class="orm-edit-dialog">
     <template #header>
       <span class="el-dialog__title">{{ isNew() ? '创建' : '编辑' }}</span>
-      <el-button type="info" text bg size="small" style="margin-left: 12px;" @click="() => $refs.xxx.open(ctx().table)">
+      <el-button type="info" text bg size="small" style="margin-left: 12px;" @click="fieldsBind.vis = true">
         <i-ep:setting />
       </el-button>
     </template>
 
-    <ElFormRender v-if="$data" ref="formRef" :model="$data" label-Width="100px">
-      <template v-for="col in nFields">
-        <ElFormItemRender v-if="col.relation" v-bind="col"  :el="{ is: col.editor }">
-          <!-- <RelSelect :modelValue="get($data, col.prop)" @update:modelValue="set($data, col.prop, $event)" :rel="col.relation!" :multiple="isRelMany(col.relation!.rel)" /> -->
-          <RelSelect2 :model="$data" :raw="req.data.value" :table="table" :field="col" />
-        </ElFormItemRender>
-        <ElFormItemRender v-else v-bind="col" :el="{ is: col.editor }" />
-      </template>
-    </ElFormRender>
+    <EditForm ref="formRef" :table="table" :model="model" :fields="select" />
 
     <template #footer>
       <el-button>取消</el-button>
       <el-button type="primary" :disabled="okLoading" :loading="okLoading" @click="ok">确认</el-button>
     </template>
 
-    <RelFieldsDialog ref="xxx" v-model="fields" :defaults="defaults" :filter="fieldFilter" :process-opt="processOpt" />
+    <FieldsDialog v-if="fieldsBind.showing" v-bind="fieldsBind" :table="table" v-model:data="select" :defaults="defaults" :filter="relFieldFilter" :process-opt="processOpt" />
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, watchEffect } from 'vue'
-import { isObject } from '@vue/shared'
+import { ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import { ElFormRender, ElFormItemRender } from 'el-form-render'
 import { useRequest } from 'vue-request'
-import { get, isArray, isEqual, keyBy, pick, set } from 'lodash-es'
+import { pick } from 'lodash-es'
 import { NormalizedField, TableCtx } from '@orm-crud/core'
-import { isRelMany, normalizeField, inMany, diff } from '@orm-crud/core/utils'
-import RelSelect from './RelSelect.vue'
+import { isRelMany, diff } from '@orm-crud/core/utils'
 import { useConfig } from './context'
-import { useStorage } from './hooks'
-import RelFieldsDialog from './RelFieldsDialog.vue'
-import RelSelect2 from './RelSelect2.vue'
+import { useDialogBind, useStorage } from './hooks'
+import FieldsDialog from './FieldsDialog.vue'
+import EditForm from './EditForm.vue'
 
 const props = defineProps<{
   table: string
@@ -50,17 +39,19 @@ const emit = defineEmits(['update:vis', 'finish'])
 
 const config = useConfig()
 const ctx = () => config.ctxs[props.table]
-const idKey = () => ctx().map.id
-const isNew = () => props.data?.[idKey()] == null
+const pk = () => ctx().map.id
+const isNew = () => props.data?.[pk()] == null
+
+const fieldsBind = useDialogBind()
 
 const defaults = () => ctx().forms.map(e => e.prop)
 
-const fields = useStorage(
+const select = useStorage(
   () => `orm-edit-fields_${ctx().table}`,
   { default: defaults }
 )
 
-function fieldFilter(ctx, field: NormalizedField, queue: NormalizedField[]) {
+function relFieldFilter(ctx, field: NormalizedField, queue: NormalizedField[]) {
   const fs = queue.filter(e => isRelMany(e.relation?.rel))
   return fs.length == 0 || (fs.length == 1 && !!field.relation)
 }
@@ -70,40 +61,38 @@ function processOpt(ctx: TableCtx, field: NormalizedField, queue: NormalizedFiel
   return rel && ctx.ctxs[rel.table!].middle ? { disabled: true } : undefined
 }
 
-const nFields = computed(() => fields.value.map(e => normalizeField(ctx(), e)))
-
-const $data = ref()
-const req = useRequest(({ data, fields }) => ctx().api.find(data, fields), { manual: true })
-
+const model = ref({})
+const req = useRequest((opt) => ctx().api.find(opt), { manual: true })
 watch(
-  () => ({ data: pick(props.data, idKey()), fields: fields.value }),
-  v => v.data?.[idKey()] == null || req.run(v),
+  () => ({ where: pick(props.data, pk()), select: select.value }),
+  async opt => {
+    if (opt.where[pk()] == null) {
+      model.value = props.data || {}
+    } else {
+      await req.runAsync(opt)
+      model.value = JSON.parse(JSON.stringify(req.data.value))
+    }
+  },
   { immediate: true }
 )
-
-watchEffect(() => $data.value = props.data ? {} : undefined)
-watchEffect(() => $data.value = JSON.parse(JSON.stringify(req.data.value || {})))
-
-// watchEffect(() => console.log(nFields.value))
 
 const formRef = ref()
 const okLoading = ref(false)
 
 async function ok() {
   await formRef.value.validate()
-  // okLoading.value = true
-  const model = $data.value
+  okLoading.value = true
+  const fd = model.value
   const rData = req.data.value
 
-  // return console.log(diff(ctx(), model, rData || {}), model);
   // 只更新修改的字段
-  const data = diff(ctx(), model, rData || {})
+  const data = diff(ctx(), fd, rData || {})
 
   try {
     if (isNew()) {
       await ctx().api.create(data)
     } else {
-      await ctx().api.update({ [idKey()]: model[idKey()], ...data })
+      await ctx().api.update({ [pk()]: fd[pk()], ...data })
     }
     ElMessage({ message: '操作成功', type: 'success' })
     emit('update:vis', false)

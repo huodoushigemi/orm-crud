@@ -84,7 +84,7 @@ export type TableCtx = NormalizedTableOpt & {
   keybyed: Record<string, NormalizedField>
   tables: Record<string, TableOpt>
   ctxs: Record<string, TableCtx>
-  api: { [K in keyof IApiAdapter]: IApiAdapter[K] extends (...arg: infer Arg) => any ? Arg extends [any, ...o: infer O] ? (...arg: O) => ReturnType<IApiAdapter[K]> : never  : never }
+  api: { [K in keyof IApiAdapter]: IApiAdapter[K] extends (...arg: infer Arg) => any ? Arg extends [any, ...infer O] ? (...arg: O) => ReturnType<IApiAdapter[K]> : never  : never }
 }
 
 export type FieldFilter = (ctx: TableCtx, prop: string) => boolean

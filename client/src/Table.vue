@@ -1,31 +1,29 @@
 <script setup lang="ts">
-import { reactive, computed, ref, watchEffect } from 'vue'
-import { toReactive } from '@vueuse/core'
+import { reactive, computed, ref, watchEffect, watch } from 'vue'
+import { isString } from '@vue/shared'
 import CRUD from '@el-lowcode/crud'
-import { ElFormItemRender } from 'el-form-render/index'
 import { TableOpt } from '@orm-crud/core'
 import { getP, normalizeField } from '@orm-crud/core/utils'
-import RelSelect from './RelSelect.vue'
-import RelOptions from './RelOptions.vue'
 import RelTag from './RelTag.vue'
 import InfoDialog from './InfoDialog.vue'
 import RelDialog from './RelDialog.vue'
 import ContextMenu from './ContextMenu.vue'
 import { useConfig } from './context'
+import EditDialog from './EditDialog.vue'
+import { useDialogBind, useStorage } from './hooks'
+import RelSelect2 from './RelSelect2.vue'
+import FieldsDialog from './FieldsDialog.vue'
 
 import IEdite from '~icons/ep/edit'
 import IDelete from '~icons/ep/delete'
 import IDocument from '~icons/ep/document'
-import { linkEmits } from 'element-plus'
-import EditDialog from './EditDialog.vue'
-import { useDialogBind } from './hooks'
-import RelSelect2 from './RelSelect2.vue'
 
-defineOptions({  })
-
-const props = defineProps<Partial<TableOpt> & {
+const props = withDefaults(defineProps<Partial<TableOpt> & {
   table: string
-}>()
+  hasNew: boolean
+}>(), {
+  hasNew: true
+})
 
 CRUD.setConfig({
   field: {
@@ -43,14 +41,24 @@ const _searchs = computed(() => [
   ...props.searchs?.map(e => normalizeField(ctx(), e)).filter(e => ctx().searchs.every(ee => ee.prop != e.prop)) || [],
   ...ctx().searchs
 ])
-const _columns = computed(() => props.columns || ctx().columns)
-// row => getP(row, e.prop)
+
+// TODO
+// const cols = useStorage(`orm-columns-select_${props.table}`, {  })
+const _columns = computed(() => (props.columns || ctx().columns).map(e => normalizeField(ctx(), e)))
 
 const searchModel = ref({})
 
 async function request(_, data, type) {
   if (type == 'list') {
-    return ctx().api.page(data, props.columns?.map(e => normalizeField(ctx(), e)).map(e => e.prop))
+    return ctx().api.page({
+      where: data,
+      select: props.columns?.map(e => isString(e) ? e : e.prop),
+      skip: (data.$page - 1) * data.$pageSize,
+      take: data.$pageSize
+    })
+  }
+  if (type == 'get') {
+    return await ctx().api.find({ where: data })
   }
   if (type == 'new') {
     return await ctx().api.create(data)
@@ -61,22 +69,22 @@ async function request(_, data, type) {
   if (type == 'del') {
     return await ctx().api.remove(data)
   }
-  if (type == 'get') {
-    return await ctx().api.find(data)
-  }
 }
 
-const infoRef = ref()
+watch(_columns, () => crudRef.value.getData())
+
 const crudRef = ref()
+const fieldsBind = useDialogBind()
+const infoBind = useDialogBind()
 const editBind = useDialogBind()
-const relBind = useDialogBind({ table: '', prop: '' })
+const relBind = useDialogBind({ prop: '' })
 
 const menu = reactive({ vis: false, row: null, x: 0, y: 0 })
 const menus = computed(() => [
-  { title: '详情', icon: IDocument, onClick: () => infoRef.value.open(menu.row, ctx()) },
+  { title: '详情', icon: IDocument, onClick: () => infoBind.data = menu.row },
   { title: '编辑', icon: IEdite, onClick: () => editBind.data = menu.row },
-  { title: '删除', icon: IDelete, disabled: true, divided: true, onClick: () => infoRef.value.open(menu.row, ctx()) },
-  { title: '关联的表', children: ctx().rels.map(e => ({ title: e.label, onClick: () => Object.assign(relBind, { data: menu.row, table: ctx().table, prop: e.prop }) })) }
+  { title: '删除', icon: IDelete, disabled: true, divided: true, onClick: () => infoBind.data = menu.row },
+  { title: '关联的表', children: ctx().rels.map(e => ({ title: e.label, onClick: () => Object.assign(relBind, { data: menu.row, prop: e.prop }) })) }
 ])
 watchEffect(() => menu.vis || (menu.row = null))
 async function openMenu(row, col, e: MouseEvent) {
@@ -116,31 +124,32 @@ const log = (...arg) => console.log(...arg)
         ...$attrs.tableAttrs
       }"
     >
-      <template v-for="col in ctx().columns.filter(e => e.relation)" #[`$${col.prop}`]="{ row }">
-        <div>
+      <template v-for="col in _columns" #[`$${col.prop}`]="{ row }">
+        <div v-if="col.relation">
           <RelTag :data="getP(row, col.prop)" :rel="col.relation!" />
         </div>
+        <template v-else>
+          {{ getP(row, col.prop) }}
+        </template>
       </template>
   
       <template v-for="col in _searchs.filter(e => e.relation)" #[`search:${col.prop}`]="{ row }">
-        <!-- <RelSelect v-model="row[col.prop]" :rel="col.relation!" /> -->
         <RelSelect2 :table="table" :model="row" :raw="{}" :field="col" />
       </template>
-  
-      <!-- <template v-for="col in ctx().forms.filter(e => e.relation)" #[`form:${col.prop}`]="{ row }">
-        <RelSelect v-model="row[col.prop]" :rel="col.relation!" />
-      </template> -->
 
-      <template #header>
+      <template v-if="hasNew" #header>
         <el-button type="primary" @click="editBind.data = {}">新增</el-button>
+        <el-button type="info" text bg @click="fieldsBind.vis = true"><i-ep:setting /></el-button>
       </template>
     </CRUD>
-  
-    <InfoDialog ref="infoRef" />
 
-    <EditDialog v-bind="editBind" :table="table" @finish="crudRef.getData()" />
+    <FieldsDialog v-if="fieldsBind.showing" v-bind="fieldsBind" :table="table" />
   
-    <RelDialog v-bind="relBind" />
+    <InfoDialog v-if="infoBind.showing" v-bind="infoBind" :table="table" />
+
+    <EditDialog v-if="editBind.showing" v-bind="editBind" :table="table" @finish="crudRef.getData()" />
+  
+    <RelDialog v-if="relBind.showing" v-bind="relBind" :table="table" />
   
     <ContextMenu v-model="menu.vis" :menus="menus" :x="menu.x" :y="menu.y" />
   </div>

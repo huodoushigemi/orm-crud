@@ -11,7 +11,6 @@
   "dependencies": {
     "@el-lowcode/crud": "^1.0.2",
     "@vitejs/plugin-vue-jsx": "^3.1.0",
-    "@vue/reactivity": "^3.4.21",
     "@vue/shared": "^3.4.15",
     "@vueuse/core": "^10.7.2",
     "el-form-render": "^1.0.2",

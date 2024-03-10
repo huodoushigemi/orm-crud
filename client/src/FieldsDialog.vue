@@ -1,12 +1,12 @@
 <template>
-  <el-dialog v-if="state.vis || state.vis2" v-model="state.vis" title="展示字段" append-to-body :modal="false" width="550px" @open="state.vis2 = true" @close="state.vis2 = false">
+  <el-dialog v-bind="$attrs" append-to-body :modal="false" width="550px" draggable>
     <template #header>
-      <span class="el-dialog__title">展示字段</span>
-      <el-button text bg size="small" style="margin-left: 12px; opacity: .75;" @click="emit('update:modelValue', defaults())">还原</el-button>
+      <span class="el-dialog__title">选择字段</span>
+      <el-button text bg size="small" style="margin-left: 12px; opacity: .75;" @click="emit('update:data', defaults())">还原</el-button>
     </template>
     <div class="orm-fields">
       <div class="orm-fields_tags" style="margin-right: 8px;">
-        <el-tag v-for="ks in value" :key="ks.join('.')" type="info" size="large" closable @close="remove(modelValue, ks.join('.'))">
+        <el-tag v-for="ks in value" :key="ks.join('.')" type="info" size="large" closable @close="remove(data, ks.join('.'))">
           {{ findFieldPath(ctx, ks).map(e => e.label).join(' / ') }}
         </el-tag>
         <el-empty v-if="!value.length" description="no select" image-size="128" />
@@ -17,37 +17,31 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, shallowReactive } from 'vue'
+import { computed } from 'vue'
 import { CascaderProps } from 'element-plus'
 import { remove } from '@vue/shared'
 import { Field, NormalizedField, TableCtx } from '@orm-crud/core'
-import { findFieldPath, isRelMany } from '@orm-crud/core/utils'
+import { findFieldPath } from '@orm-crud/core/utils'
 import { useConfig } from './context'
 import { pick } from 'lodash-es'
 
 const props = defineProps<{
-  modelValue: string[]
+  table: string
+  data: string[]
   defaults: () => string[]
   filter?: (ctx: TableCtx, field: NormalizedField, queue: NormalizedField[]) => boolean
   processOpt?: (ctx: TableCtx, field: NormalizedField, queue: NormalizedField[]) => Partial<CascaderProps> | undefined
   maxDeep?: number
 }>()
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:data'])
 
 const config = useConfig()
-
-const state = shallowReactive({
-  vis: false,
-  vis2: false,
-  table: '',
-})
-
-const ctx = computed(() => config.ctxs[state.table])
+const ctx = computed(() => config.ctxs[props.table])
 
 const value = computed({
-  get: () => props.modelValue.map(e => e.split('.')),
-  set: (v) => emit('update:modelValue', sort(v).map(e => e.join('.'))),
+  get: () => props.data.map(e => e.split('.')),
+  set: (v) => emit('update:data', sort(v).map(e => e.join('.'))),
 })
 
 type Opt = Pick<Field, 'label' | 'prop' | 'relation'> & { children?: Opt[]; disabled: any }
@@ -74,7 +68,7 @@ const options = computed(() => {
       queue.pop()
     })
     return ret
-  })(state.table)
+  })(props.table)
 })
 
 function sort(value, opts = options.value) {
@@ -85,13 +79,6 @@ function sort(value, opts = options.value) {
   value.sort((a, b) => diff(a, b, opts))
   return value
 }
-
-defineExpose({
-  open(table) {
-    state.vis = true
-    state.table = table
-  }
-})
 </script>
 
 <style lang="scss">

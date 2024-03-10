@@ -1,13 +1,12 @@
-import { TableOpt, createCtxs } from '@orm-crud/core'
+import { IApiAdapter, TableOpt, createCtxs } from '@orm-crud/core'
 import { IRWPermis } from './RWPermis'
 
 export interface ConfigProviderProps {
   tables: Record<string, TableOpt>
-  rwMap: Record<string, number>
+  api: IApiAdapter
+  rwPermis?: IRWPermis
 }
 
-export interface ConfigProviderContext {
-  tables: Record<string, TableOpt>
+export interface ConfigProviderContext extends ConfigProviderProps {
   ctxs: ReturnType<typeof createCtxs>
-  rwPermis: IRWPermis
 }

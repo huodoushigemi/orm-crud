@@ -74,7 +74,10 @@ const ctx = () => config.ctxs[props.rel.table]
 const { data: list, loading, run } = useRequest(
   (str) => {
     const { label, prop } = props.rel
-    return ctx().api.finds(set({}, label, str), [prop, label])
+    return ctx().api.finds({
+      where: set({}, label, str),
+      select: [prop, label]
+    })
   },
   { initialData: [], manual: true }
 )

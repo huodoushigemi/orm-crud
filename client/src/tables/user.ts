@@ -18,7 +18,6 @@ export const User: TableOpt = {
   columns: ['id', 'name', 'age', 'email', 'posts', 'videos.video'],
   forms: ['name', { prop: 'age', editor: 'el-input-number' }, 'email', 'following', { prop: 'videos.video' }],
   searchs: ['following', 'videos.video', 'name', { prop: 'posts.title' }],
-  btns: [],
   map: { label: 'name' }
 }
 
@@ -35,7 +34,6 @@ export const Post: TableOpt = {
   columns: ['title', 'content', 'author', 'tag'],
   forms: ['title', 'content', 'author', 'tag'],
   searchs: ['title', 'content'],
-  btns: [],
   map: { label: 'title' }
 }
 
@@ -52,7 +50,6 @@ export const Comment: TableOpt = {
   columns: ['content', 'speaker', 'reply', 'post', 'post.author'],
   forms: ['content', 'post'],
   searchs: ['content', 'reply'],
-  btns: [],
   map: { label: 'content' }
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-if="data" v-bind="$attrs" :title="relCtx.label" append-to-body top="5vh" width="75%">
+  <el-dialog v-bind="$attrs" :title="relCtx.label" append-to-body top="5vh" width="75%">
     <Table
       :table="relCtx.table"
       :searchs="[reversedProp]"
@@ -25,10 +25,10 @@ const config = useConfig()
 const ctx = () => config.ctxs[props.table]
 
 const _prop = $(() => {
-  let table = normalizeField(ctx(), props.prop).relation!.table
-  const _ctx = config.ctxs[table]
-  if (_ctx.middle) {
-    return props.prop + '.' + _ctx.rels.find(e => e.relation.table != props.table)!.prop
+  let relTable = normalizeField(ctx(), props.prop).relation!.table
+  const relCtx = config.ctxs[relTable]
+  if (relCtx.middle) {
+    return props.prop + '.' + relCtx.rels.find(e => e.relation.table != props.table)!.prop
   } else {
     return props.prop
   }

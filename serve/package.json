@@ -5,9 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "node --watch main.js",
-    "test:build": "rimraf dist && tsc ./test.js  -t esnext -m esnext --allowJs --moduleResolution bundler --outDir ./dist",
-    "test": "node --experimental-specifier-resolution=node ./dist/serve/test.js"
+    "dev": "node --experimental-specifier-resolution=node --watch ./dist/serve/main.js",
+    "dev:build": "rimraf dist && tsc ./main.ts  -t esnext -m esnext --allowJs --moduleResolution bundler --outDir ./dist",
+    "test": "node --experimental-specifier-resolution=node ./dist/serve/test.js",
+    "test:build": "rimraf dist && tsc ./test.js  -t esnext -m esnext --allowJs --moduleResolution bundler --outDir ./dist"
   },
   "keywords": [],
   "author": "",
@@ -19,12 +20,13 @@
     "@types/koa-router": "^7.4.8",
     "@vue/shared": "^3.4.21",
     "@vueuse/core": "^10.9.0",
+    "esbuild": "^0.20.1",
     "koa": "^2.15.0",
     "koa-bodyparser": "^4.4.1",
     "koa-router": "^12.0.1",
     "lodash-es": "^4.17.21",
     "prisma": "^5.9.1",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vue": "^3.4.21"
   }
 }

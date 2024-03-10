@@ -6,7 +6,6 @@ specifiers:
   '@types/lodash-es': ^4.17.12
   '@vitejs/plugin-vue': ^4.5.2
   '@vitejs/plugin-vue-jsx': ^3.1.0
-  '@vue/reactivity': ^3.4.21
   '@vue/shared': ^3.4.15
   '@vueuse/core': ^10.7.2
   el-form-render: ^1.0.2
@@ -26,7 +25,6 @@ specifiers:
 dependencies:
   '@el-lowcode/crud': 1.0.2_sqjaunqmyvevzvgrdwlfpq5geq
   '@vitejs/plugin-vue-jsx': 3.1.0_vite@5.1.0+vue@3.4.18
-  '@vue/reactivity': 3.4.21
   '@vue/shared': 3.4.16
   '@vueuse/core': 10.7.2_vue@3.4.18
   el-form-render: 1.0.2_sqjaunqmyvevzvgrdwlfpq5geq
@@ -1011,12 +1009,6 @@ packages:
       '@vue/shared': 3.4.18
     dev: false
 
-  /@vue/reactivity/3.4.21:
-    resolution: {integrity: sha512-UhenImdc0L0/4ahGCyEzc/pZNwVgcglGy9HVzJ1Bq2Mm9qXOpP8RyNTjookw/gOCUlXSEtuZ2fUg5nrHcoqJcw==}
-    dependencies:
-      '@vue/shared': 3.4.21
-    dev: false
-
   /@vue/runtime-core/3.4.18:
     resolution: {integrity: sha512-7mU9diCa+4e+8/wZ7Udw5pwTH10A11sZ1nldmHOUKJnzCwvZxfJqAtw31mIf4T5H2FsLCSBQT3xgioA9vIjyDQ==}
     dependencies:
@@ -1051,10 +1043,6 @@ packages:
 
   /@vue/shared/3.4.19:
     resolution: {integrity: sha512-/KliRRHMF6LoiThEy+4c1Z4KB/gbPrGjWwJR+crg2otgrf/egKzRaCPvJ51S5oetgsgXLfc4Rm5ZgrKHZrtMSw==}
-    dev: false
-
-  /@vue/shared/3.4.21:
-    resolution: {integrity: sha512-PuJe7vDIi6VYSinuEbUIQgMIRZGgM8e4R+G+/dQTk0X1NEdvgvvgv7m+rfmDH1gZzyA1OjjoWskvHlfRNfQf3g==}
     dev: false
 
   /@vueuse/core/10.7.2_vue@3.4.18:

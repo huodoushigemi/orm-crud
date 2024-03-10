@@ -9,9 +9,10 @@
 
   <el-card v-for="table in parsed.tables" class="el-card--small" :header="table.label" shadow="nerve" style="margin-bottom: 16px;">
     <Table
+      :key="table.prop"
       :table="table.table"
       :columns="table.columns"
-      :extraQuery="set({ $pageSize: 5 }, pathReverse(ctx, table.prop), pick(data, ctx.map.id))"
+      :extraQuery="set({ $pageSize: 5 }, pathReverse(ctx(), table.prop), pick(data, ctx().map.id))"
       :hasNew="false"
       :searchAttrs="{ size: 'small' }"
       :tableAttrs="{ size: 'small', border: true, tooltipEffect: true }"
@@ -34,9 +35,9 @@ import Table from './Table.vue'
 import { useConfig } from './context'
 
 const props = withDefaults(defineProps<{
-  ctx: TableCtx
+  table: string
   data: Record<string, any>
-  fields: string[]
+  select: string[]
 }>(), {
   data: () => ({})
 })
@@ -44,16 +45,18 @@ const props = withDefaults(defineProps<{
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const column = computed(() => breakpoints.smallerOrEqual('sm').value ? 2 : 3)
 
-const nFields = computed(() => props.fields?.map(e => normalizeField(props.ctx, e)))
+const config = useConfig()
+const ctx = () => config.ctxs[props.table]
+const nFields = computed(() => props.select?.map(e => normalizeField(ctx(), e)))
 
 const $data = computed(() => req.data.value || {})
-const req = useRequest(({ data, fields }) => props.ctx.api.find(data, fields), { manual: true })
+const req = useRequest((opt) => ctx().api.find(opt), { manual: true })
 
 watch(() => {
-  const { data, ctx, fields } = props
+  const { data, select } = props
   if (!data) return
-  const prop = ctx.map.id
-  return { data: { [prop]: data[prop] }, fields }
+  const pk = ctx().map.id
+  return { where: { [pk]: data[pk] }, select }
 }, v => {
   v && req.run(v)
 }, {
@@ -68,18 +71,18 @@ function parseFields() {
   const fields = [] as NormalizedField[]
   const tables = {} as Record<string, TableXXX>
   nFields.value.forEach(e => {
-    const fs = findFieldPath(props.ctx, e.prop)
-    if (!fs.length) return
-    const manyI = fs.findIndex(e => e.relation && isRelMany(e.relation.rel))
-    if (manyI == -1 || manyI == fs.length - 1) {
+    const fs = findFieldPath(ctx(), e.prop)
+    let manyI = fs.length - 1
+    while (--manyI > -1) if (isRelMany(fs[manyI].relation?.rel)) break
+    if (manyI == -1) {
       fields.push(e)
     } else {
       const col = fs[manyI], table = col.relation!.table, prop = e.prop.split('.').slice(0, manyI + 1).join('.')
-      const tableOpt = tables[prop] ||= { table, label: normalizeField(props.ctx, prop).label, prop, columns: [] }
+      const tableOpt = tables[prop] ||= { table, label: normalizeField(ctx(), prop).label, prop, columns: [] }
       tableOpt.columns.push(e.prop.replace(`${prop}.`, ''))
     }
   })
-  
+
   return { fields, tables }
 }
 </script>

@@ -77,7 +77,7 @@ onMounted(async () => {
           ret.push({ source: ctx.table, target: table })
         })
       })
-      
+
       return ret
     })()
   })

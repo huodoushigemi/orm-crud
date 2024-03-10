@@ -93,13 +93,13 @@ export function selectInput(ctx: TableCtx, paths: string[]) {
       }
     })
     return o
-  }, { [ctx.map.id]: true })
+  }, { [ctx.map.id]: true } as any)
 }
 
 export function whereInput(ctx: TableCtx, data: any) {
   // 后序遍历
   function rrr(obj, ps1 = <string[]>[]) {
-    const ret = {}
+    const ret = {} as any
     for (let k in obj) {
       if (k[0] == '$') continue
       ps1.push(k)
@@ -153,21 +153,36 @@ export function createPrismaAdapter(prisma): IApiAdapter {
   const _delegate = (table) => prisma[lowerCase(table)]
   
   return {
-    async find(ctx, data, fields) {
-      fields = fields?.length ? fields : [...ctx.columns, ...ctx.forms].map(e => e.prop)
+    async find(ctx, { where, select }) {
+      select = select?.length ? select : [...ctx.columns, ...ctx.forms].map(e => e.prop)
       return await _delegate(ctx.table).findUnique({
-        select: selectInput(ctx, fields),
-        where: data,
+        select: selectInput(ctx, select),
+        // todo
+        where: where,
       })
     },
 
-    async finds(ctx, data, fields) {
-      fields = fields?.length ? fields : ctx.columns.map(e => e.prop)
+    async finds(ctx, { where, select, skip, take, orderBy }) {
+      select = select?.length ? select : ctx.columns.map(e => e.prop)
       return await _delegate(ctx.table).findMany({
-        select: selectInput(ctx, fields),
-        where: whereInput(ctx, data),
-        skip: data.$pageSize ? (data.$page - 1) * data.$pageSize : undefined,
-        take: data.$pageSize
+        select: selectInput(ctx, select),
+        where: whereInput(ctx, where),
+        skip,
+        take,
+        orderBy
+      })
+    },
+
+    async page(...args) {
+      return {
+        list: await this.finds(...args),
+        total: await this.count(...args),
+      }
+    },
+
+    async count(ctx, { where }) {
+      return await _delegate(ctx.table).count({
+        where: whereInput(ctx, where)
       })
     },
 
@@ -199,18 +214,5 @@ export function createPrismaAdapter(prisma): IApiAdapter {
         }
       })
     },
-
-    async page(...args) {
-      return {
-        list: await this.finds(...args),
-        total: await this.count(...args),
-      }
-    },
-
-    async count(ctx, data) {
-      return await _delegate(ctx.table).update({
-        where: whereInput(ctx, data)
-      })
-    }
   }
 }

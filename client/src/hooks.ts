@@ -16,16 +16,19 @@ export function useDialogBind<T extends any, E extends Record<string, any>>(extr
     data: undefined as T | undefined,
     ref: el => ins.value = el,
     ins,
-    onClosed: () => state.data = undefined,
+    showing: false,
+    onClosed: () => (state.showing = false, state.data = undefined),
     'onUpdate:modelValue': v => vis.value = v,
     'onUpdate:vis': v => vis.value = v,
     'onUpdate:data': v => state.data = v,
   })
 
+  watchEffect(() => vis.value && (state.showing = true))
+
   watch(() => state.data, v => {
     if (v == null) return
     vis.value = true
-  })
+  }, { flush: 'sync' })
 
   return state
 }
