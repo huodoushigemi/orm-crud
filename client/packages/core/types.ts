@@ -1,9 +1,13 @@
 import { IApiAdapter } from './adapter/interface'
 export * from './adapter/interface'
 
-export interface Field {
+export type Field = FieldBase
+
+export interface FieldBase {
   label?: string
   prop: string
+  relation?: Relation
+  inverseSide?: InverseSide
   /**
    * @default 'equals'
    * @see [Prisma Reference](https://www.prisma.io/docs/orm/reference/prisma-client-reference#filter-conditions-and-operators)
@@ -11,7 +15,6 @@ export interface Field {
   filter?: 'contains' | 'endsWith' | 'equals' | 'gt' | 'gte' | 'in' | 'lt' | 'lte' | 'not' | 'notIn' | 'startsWith'
   required?: boolean
   html?: Boolean
-  relation?: Omit<Relation, 'prop'>
   // todo
   options?: any[]
   // todo
@@ -29,29 +32,34 @@ export type FieldColumn = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'r
 export type FieldForm = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'editor' | 'editable' | 'required'>
 export type FieldView = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'render' | 'html'>
 
-export type Relation = RelationOne | RelationMany
+export type Relation = RelationBase
 
 export interface RelationBase {
   table: string
   name?: string
   label?: string
-  prop?: string
+  rel: '1-1' | '1-n' | 'n-1' | 'm-n'
 }
 
-export interface RelationOne extends RelationBase {
-  rel: '1-1' | 'n-1'
+export interface InverseSide {
+  label?: string
+  prop: string
 }
 
-export interface RelationMany extends RelationBase {
-  rel: '1-n' | 'm-n'
+export type RelField = FieldBase & {
+  relation: Relation
 }
 
-export interface NormalizedField extends Omit<Field, 'relation'> {
+export interface NormalizedField extends Field {
   label: string
   relation?: Required<Relation>
+  inverseSide?: Required<InverseSide>
 }
 
-export type RelField = NormalizedField & { relation: Required<Relation> }
+export type NRelField = NormalizedField & {
+  relation: Required<Relation> & { prop: string }
+  inverseSide: Required<InverseSide>
+}
 
 export interface TableOpt<T = string> {
   label: string

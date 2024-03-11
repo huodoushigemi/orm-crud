@@ -51,6 +51,7 @@ const log = (...arg) => console.log(...arg)
     <RelGraphDialog v-if="relgraphBind.showing" v-bind="relgraphBind" table="User" />
     <FieldRWDialog v-if="fieldRwBind.showing" v-bind="fieldRwBind" @ok="log" />
 
-    <el-button @click="fieldRwBind.data = rwPermis">open</el-button>
+    <!-- <el-button @click="fieldRwBind.data = rwPermis">open</el-button> -->
+    <el-button @click="relgraphBind.vis = true">open</el-button>
   </ConfigProvider>
 </template>

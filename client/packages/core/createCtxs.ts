@@ -1,5 +1,5 @@
 import { isString, unionBy } from 'lodash-es'
-import { Field, TableOpt, TableCtx, TableCtxs, FieldFilter, IApiAdapter } from './types'
+import { Field, TableOpt, TableCtx, TableCtxs, FieldFilter, IApiAdapter, NormalizedField } from './types'
 import { normalizeField } from './utils'
 
 type CreateCtxsOptions = {
@@ -7,7 +7,39 @@ type CreateCtxsOptions = {
   api?: IApiAdapter
 }
 
+const inverseRelMap = {
+  '1-1': '1-1',
+  '1-n': 'n-1',
+  'n-1': '1-n',
+  'm-n': 'm-n',
+} as const
+
 export function createCtxs(tables: Record<string, TableOpt>, opt?: CreateCtxsOptions): TableCtxs {
+  // init inverseSide
+  const set = new WeakSet
+  Object.keys(tables).forEach(table => {
+    const tableOpt = tables[table]
+    tableOpt.fields.forEach(e => {
+      if (set.has(e)) return
+      const rel = e.relation
+      if (!rel || !e.inverseSide) return
+      if (rel) {
+        const side = e?.inverseSide
+        const field: Field = {
+          label: side.label,
+          prop: side.prop,
+          relation: {
+            table,
+            rel: inverseRelMap[rel.rel],
+          },
+          inverseSide: { label: e.label, prop: e.prop }
+        }
+        set.add(field)
+        tables[rel.table].fields.push(field)
+      }
+    })
+  })
+
   const ctxs = new Proxy({}, {
     get(obj, table: string, receiver) {
       return obj[table] ||= createCtx(tables, table, ctxs, opt)
