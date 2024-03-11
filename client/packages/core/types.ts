@@ -13,17 +13,20 @@ export interface Field {
   html?: Boolean
   relation?: Omit<Relation, 'prop'>
   // todo
-  options?: string
+  options?: any[]
   // todo
   type?: string
   // todo
   editor?: any
   // todo
   render?: any
+  // todo
+  /** @default true */
+  editable?: boolean
 }
 
 export type FieldColumn = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'render'>
-export type FieldForm = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'editor'>
+export type FieldForm = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'editor' | 'editable' | 'required'>
 export type FieldView = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'render' | 'html'>
 
 export type Relation = RelationOne | RelationMany
@@ -36,7 +39,7 @@ export interface RelationBase {
 }
 
 export interface RelationOne extends RelationBase {
-  rel?: '1-1' | 'n-1'
+  rel: '1-1' | 'n-1'
 }
 
 export interface RelationMany extends RelationBase {

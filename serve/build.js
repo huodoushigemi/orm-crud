@@ -8,4 +8,5 @@ await esbuild.build({
   external: Object.keys(pkg.dependencies),
   platform: 'node',
   format: 'esm',
+  charset: 'utf8',
 })

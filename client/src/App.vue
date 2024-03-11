@@ -41,12 +41,12 @@ const log = (...arg) => console.log(...arg)
   {{ rwMap }}
   <ConfigProvider :tables="tables" :api="api">
 
-    <Table table="User" />
+    <Table table="gfdc_auth_user" />
 
     <br />
 
     <!-- <Table table="Post" /> -->
-    <Table table="Video" />
+    <!-- <Table table="Video" /> -->
 
     <RelGraphDialog v-if="relgraphBind.showing" v-bind="relgraphBind" table="User" />
     <FieldRWDialog v-if="fieldRwBind.showing" v-bind="fieldRwBind" @ok="log" />

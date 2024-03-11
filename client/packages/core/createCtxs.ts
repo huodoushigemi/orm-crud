@@ -51,7 +51,7 @@ function createCtx(tables: Record<string, TableOpt>, table: string, ctxs: TableC
     ctxs,
     btns: [],
     middle: config.middle || false,
-    map: { label: config.map?.label || '', id: config.map?.id || 'id' },
+    map: ((pk) => ({ label: config.map?.label || pk, id: pk }))(config.map?.id || 'id'),
     api: Object.keys(api).reduce((o, k) => (o[k] = (...args) => api[k](ctx, ...args), o), {}) as any
   }
 

@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "node --experimental-specifier-resolution=node --watch ./dist/serve/main.js",
+    "dev": "node build.js && node dist/main.js",
     "dev:build": "rimraf dist && tsc ./main.ts  -t esnext -m esnext --allowJs --moduleResolution bundler --outDir ./dist",
     "test": "node --experimental-specifier-resolution=node ./dist/serve/test.js",
     "test:build": "rimraf dist && tsc ./test.js  -t esnext -m esnext --allowJs --moduleResolution bundler --outDir ./dist"
@@ -16,6 +16,7 @@
   "dependencies": {
     "@koa/cors": "^5.0.0",
     "@prisma/client": "5.9.1",
+    "@prisma/generator-helper": "^5.10.2",
     "@types/koa": "^2.14.0",
     "@types/koa-router": "^7.4.8",
     "@vue/shared": "^3.4.21",

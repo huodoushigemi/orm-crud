@@ -1,7 +1,9 @@
 import * as user from './user'
+import * as gfdc from './gfdc'
 
 const tables = {
-  ...user
+  // ...user
+  ...gfdc
 }
 
 export default tables

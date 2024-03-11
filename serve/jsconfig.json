@@ -12,7 +12,7 @@
     "noEmitOnError": false,
     "paths": {
       "@orm-crud/core": ["../client/packages/core/index.ts"],
-      "@orm-crud/core/*": ["../client/packages/core/*"],
+      "@orm-crud/core/*": ["../client/packages/core/*"]
     }
   },
   "files": ["./test.js"]

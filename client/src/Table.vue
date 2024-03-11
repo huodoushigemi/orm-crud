@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { reactive, computed, ref, watchEffect, watch } from 'vue'
-import { isString } from '@vue/shared'
+import { isArray, isString } from '@vue/shared'
 import CRUD from '@el-lowcode/crud'
-import { TableOpt } from '@orm-crud/core'
+import { NormalizedField, TableOpt } from '@orm-crud/core'
 import { getP, normalizeField } from '@orm-crud/core/utils'
 import RelTag from './RelTag.vue'
 import InfoDialog from './InfoDialog.vue'
@@ -42,17 +42,24 @@ const _searchs = computed(() => [
   ...ctx().searchs
 ])
 
-// TODO
-// const cols = useStorage(`orm-columns-select_${props.table}`, {  })
-const _columns = computed(() => (props.columns || ctx().columns).map(e => normalizeField(ctx(), e)))
+const defaults = () => ctx().columns.map(e => isString(e) ? e : e.prop)
+const cols = useStorage(() => `orm-columns-select_${props.table}`, { default: defaults })
+const _columns = computed(() => (props.columns || cols.value).map(e => normalizeField(ctx(), e)))
+
+const formatter = (row, col: NormalizedField, val) => {
+  const findLabel = (e) => col.options!.find(e => e.value == val)?.label || val
+  return col.options
+    ? isArray(val) ? val.map(findLabel) : findLabel(val)
+    : val
+}
 
 const searchModel = ref({})
 
 async function request(_, data, type) {
   if (type == 'list') {
     return ctx().api.page({
-      where: data,
-      select: props.columns?.map(e => isString(e) ? e : e.prop),
+      where: { ...data, $page: undefined, $pageSize: undefined },
+      select: _columns.value.map(e => isString(e) ? e : e.prop),
       skip: (data.$page - 1) * data.$pageSize,
       take: data.$pageSize
     })
@@ -129,7 +136,7 @@ const log = (...arg) => console.log(...arg)
           <RelTag :data="getP(row, col.prop)" :rel="col.relation!" />
         </div>
         <template v-else>
-          {{ getP(row, col.prop) }}
+          {{ formatter(row, col, getP(row, col.prop)) }}
         </template>
       </template>
   
