@@ -20,7 +20,7 @@ import IDocument from '~icons/ep/document'
 
 const props = withDefaults(defineProps<Partial<TableOpt> & {
   table: string
-  hasNew: boolean
+  hasNew?: boolean
 }>(), {
   hasNew: true
 })

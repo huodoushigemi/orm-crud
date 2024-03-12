@@ -1,6 +1,6 @@
 import { isString, unionBy } from 'lodash-es'
 import { Field, TableOpt, TableCtx, TableCtxs, FieldFilter, IApiAdapter, NormalizedField } from './types'
-import { normalizeField } from './utils'
+import { genLabel, normalizeField } from './utils'
 
 type CreateCtxsOptions = {
   fieldFilter?: FieldFilter
@@ -15,6 +15,8 @@ const inverseRelMap = {
 } as const
 
 export function createCtxs(tables: Record<string, TableOpt>, opt?: CreateCtxsOptions): TableCtxs {
+  const { fieldFilter, api = {} } = opt || {}
+  
   // init inverseSide
   const set = new WeakSet
   Object.keys(tables).forEach(table => {
@@ -40,71 +42,63 @@ export function createCtxs(tables: Record<string, TableOpt>, opt?: CreateCtxsOpt
     })
   })
 
-  const ctxs = new Proxy({}, {
-    get(obj, table: string, receiver) {
-      return obj[table] ||= createCtx(tables, table, ctxs, opt)
-    },
-    set(obj, table: string, val) {
-      obj[table] = val
-      return true
-    },
-    ownKeys() {
-      return Object.keys(tables)
-    },
-    has(_, p) {
-      return Reflect.has(tables, p)
-    },
-    getOwnPropertyDescriptor() {
-      return { enumerable: true, configurable: true }
+  // init ctxs
+  const ctxs = Object.keys(tables).reduce((ctxs, table) => {
+    const tableOpt = tables[table]
+    ctxs[table] = {
+      ...tableOpt,
+      fields: [],
+      get rels() { return this.fields.filter(e => e.relation) as any },
+      table,
+      keybyed: {},
+      columns: [],
+      searchs: [],
+      forms: [],
+      views: [],
+      tables,
+      ctxs,
+      btns: [],
+      middle: tableOpt.middle || false,
+      map: ((pk) => ({ label: tableOpt.map?.label || pk, id: pk }))(tableOpt.map?.id || 'id'),
+      api: Object.keys(api).reduce((o, k) => (o[k] = (...args) => api[k](ctxs[table], ...args), o), {}) as any
+    }
+    return ctxs
+  }, {} as TableCtxs)
+
+  // init fields
+  Object.values(ctxs).forEach(ctx => {
+    const tableOpt = tables[ctx.table]
+    tableOpt.fields.forEach((e, i) => {
+      const rel = e.relation
+      ctx.keybyed[e.prop] = ctx.fields[i] = {
+        ...e,
+        label: e.label || e.prop,
+        relation: rel ? { ...rel, label: ctxs[rel.table].map.label, prop: ctxs[rel.table].map.id || 'id' } : undefined,
+      }
+    })
+  })
+
+  // init columns/searchs/forms/views
+  Object.values(ctxs).forEach(ctx => {
+    const tableOpt = tables[ctx.table]
+    const views = tableOpt.views?.length ? tableOpt.views : unionBy(tableOpt.columns, tableOpt.forms, e => isString(e) ? e : e.prop)
+
+    tableOpt.columns?.forEach((e, i) => ctx.columns[i] = normalizeField(ctx, e))
+    tableOpt.searchs?.forEach((e, i) => ctx.searchs[i] = normalizeField(ctx, e))
+    tableOpt.forms?.forEach((e, i) => ctx.forms[i] = normalizeField(ctx, e))
+    views.forEach((e, i) => ctx.views[i] = normalizeField(ctx, e))
+    
+    if (fieldFilter) {
+      const _ff = (e: NormalizedField) => fieldFilter(ctx, e.prop)
+      ctx.views = ctx.views.filter(_ff)
+      ctx.columns = ctx.columns.filter(_ff)
+      ctx.searchs = ctx.searchs.filter(_ff)
+      ctx.forms = ctx.forms.filter(_ff)
+      ctx.fields = ctx.fields.filter(_ff)
     }
   })
 
+  Object.freeze(ctxs)
+
   return ctxs
-}
-
-function createCtx(tables: Record<string, TableOpt>, table: string, ctxs: TableCtxs, opt?: CreateCtxsOptions) {
-  const config = tables[table]
-  
-  if (!config) throw new Error(`找不到 Table: ${table}`)
-
-  const { fieldFilter, api = {} } = opt || {}
-  
-  const ctx: TableCtx = ctxs[table] = {
-    ...config,
-    fields: [],
-    get rels() { return this.fields.filter(e => e.relation) as any },
-    table,
-    keybyed: {},
-    columns: [],
-    searchs: [],
-    forms: [],
-    views: [],
-    tables,
-    ctxs,
-    btns: [],
-    middle: config.middle || false,
-    map: ((pk) => ({ label: config.map?.label || pk, id: pk }))(config.map?.id || 'id'),
-    api: Object.keys(api).reduce((o, k) => (o[k] = (...args) => api[k](ctx, ...args), o), {}) as any
-  }
-
-  const views = config.views?.length ? config.views : unionBy(config.columns, config.forms, e => isString(e) ? e : e.prop)
-  
-  config.fields.forEach((e, i) => ctx.fields[i] = normalizeField(ctx, e))
-  config.columns?.forEach((e, i) => ctx.columns[i] = normalizeField(ctx, e))
-  config.searchs?.forEach((e, i) => ctx.searchs[i] = normalizeField(ctx, e))
-  config.forms?.forEach((e, i) => ctx.forms[i] = normalizeField(ctx, e))
-  views.forEach((e, i) => ctx.views[i] = normalizeField(ctx, e))
-  
-  if (fieldFilter) {
-    const _ff = (e: Field | string) => fieldFilter(ctx, isString(e) ? e : e.prop)
-    ctx.views = ctx.views.filter(_ff)
-    ctx.columns = ctx.columns.filter(_ff)
-    ctx.searchs = ctx.searchs.filter(_ff)
-    ctx.forms = ctx.forms.filter(_ff)
-    ctx.fields = ctx.fields.filter(_ff)
-  }
-
-  Object.freeze(ctx)
-
-  return ctx
 }

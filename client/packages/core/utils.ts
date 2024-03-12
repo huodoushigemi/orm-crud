@@ -1,15 +1,20 @@
 import { Arrayable } from '@vueuse/core'
 import { isObject, isArray } from '@vue/shared'
 import { get, set, merge, isEqual, keyBy } from 'lodash-es'
-import { TableCtx, Field, NormalizedField, RelField, Relation } from './types'
+import { TableCtx, Field, NormalizedField, RelField, Relation, NRelField } from './types'
 
 export function findFieldPath(ctx: TableCtx, prop: string | string[]): NormalizedField[] {
+  let _ctx = ctx
   return (Array.isArray(prop) ? prop : prop.split('.')).map((e, i, arr) => {
-    const ret = ctx.keybyed[e]
-    if (!ret) throw new Error(`表 ${ctx.table} 找不到字段 ${prop}`)
+    const ret = _ctx.keybyed[e]
+    if (!ret) {
+      throw new Error(`表 ${ctx.table} 找不到字段 ${prop}`)
+    }
     const isLast = i == arr.length - 1
-    if (!isLast && !ret.relation) throw new Error(`${prop}: ${e} 缺少 relation`)
-    if (!isLast) ctx = ctx.ctxs[ret.relation!.table]
+    if (!isLast && !ret.relation) {
+      throw new Error(`${prop}: ${e} 缺少 relation`)
+    }
+    if (!isLast) _ctx = _ctx.ctxs[ret.relation!.table]
     return ret
   })
 }
@@ -33,7 +38,7 @@ export function normalizeField(ctx: TableCtx, field: Field | string): Normalized
         ? (() => {
           const { table } = field.relation, { map } = ctx.ctxs[table]
           return merge(
-            { rel: '1-1', label: map.label, prop: map.id } as Required<Relation>,
+            { label: map.label, prop: map.id } as Partial<NRelField['relation']>,
             field.relation
           )
         })()
@@ -43,11 +48,10 @@ export function normalizeField(ctx: TableCtx, field: Field | string): Normalized
     if (cache && ret.render) cache.render ||= ret.render
     return ctx.keybyed[field.prop] ||= ret
   }
-
 }
 
 export function genLabel(ctx: TableCtx, prop: string) {
-  return prop.split('.').length > 1 ? findFieldPath(ctx, prop).map(e => e.label).join('.') : prop
+  return prop.includes('.') ? findFieldPath(ctx, prop).map(e => e.label).join('.') : prop
 }
 
 export function getP(obj, prop) {

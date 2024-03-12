@@ -160,7 +160,7 @@ model gfdc_auth_org {
   MODIFY_TIME      DateTime?               @default(now()) @db.DateTime(0)
   DEL_FLAG         Int?                    @default(0)
   VERSION          Int?                    @default(1)
-  USER             gfdc_auth_user_extend[]
+  USER_EXTEND      gfdc_auth_user_extend[]
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -168,6 +168,7 @@ model gfdc_auth_resource {
   ID             String                    @id @db.VarChar(32)
   RESOURCE_NAME  String                    @db.VarChar(32)
   RESOURCE_CODE  String?                   @db.VarChar(32)
+  SYSTEM         gfdc_auth_system_info?    @relation(fields: [SYSTEM_ID], references: [ID])
   SYSTEM_ID      String                    @db.VarChar(32)
   RESOURCE_URL   String?                   @db.VarChar(512)
   RESOURCE_DESC  String?                   @db.VarChar(200)
@@ -177,7 +178,9 @@ model gfdc_auth_resource {
   EXT_PARAMS     String?                   @db.Text
   RESOURCE_LEVEL Int?
   SORT_TYPE      Int                       @default(1)
+  PARENT         gfdc_auth_resource?       @relation("resource_children", fields: [PARENT_ID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
   PARENT_ID      String                    @db.VarChar(32)
+  CHILDREN       gfdc_auth_resource[]      @relation("resource_children")
   COMPONENT      String?                   @db.VarChar(64)
   ICON_TYPE      String?                   @default("lib") @db.VarChar(36)
   ICON           String?                   @db.VarChar(128)
@@ -301,19 +304,20 @@ model gfdc_auth_system_admin {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_system_info {
-  ID          String           @id @db.VarChar(32)
-  SYSTEM_NAME String           @db.VarChar(32)
-  SYSTEM_CODE String           @db.VarChar(32)
-  SYSTEM_DESC String?          @db.VarChar(64)
-  CREATOR_NO  String?          @db.VarChar(20)
-  CREATOR     String?          @db.VarChar(36)
-  CREATE_TIME DateTime?        @default(now()) @db.DateTime(0)
-  MODIFIER_NO String?          @db.VarChar(20)
-  MODIFIER    String?          @db.VarChar(36)
-  MODIFY_TIME DateTime?        @default(now()) @db.DateTime(0)
-  DEL_FLAG    Int?             @default(0)
-  VERSION     Int?             @default(1)
+  ID          String               @id @db.VarChar(32)
+  SYSTEM_NAME String               @db.VarChar(32)
+  SYSTEM_CODE String               @db.VarChar(32)
+  SYSTEM_DESC String?              @db.VarChar(64)
+  CREATOR_NO  String?              @db.VarChar(20)
+  CREATOR     String?              @db.VarChar(36)
+  CREATE_TIME DateTime?            @default(now()) @db.DateTime(0)
+  MODIFIER_NO String?              @db.VarChar(20)
+  MODIFIER    String?              @db.VarChar(36)
+  MODIFY_TIME DateTime?            @default(now()) @db.DateTime(0)
+  DEL_FLAG    Int?                 @default(0)
+  VERSION     Int?                 @default(1)
   ROLE        gfdc_auth_role[]
+  RESOURCE    gfdc_auth_resource[]
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -386,7 +390,7 @@ model gfdc_auth_user_extend {
   USER           gfdc_auth_user @relation(fields: [USER_ID], references: [ID])
   USER_ID        String         @db.VarChar(36)
   IS_MAIN_JOB    Int            @default(1)
-  ORG            gfdc_auth_org?  @relation(fields: [ORG_ID], references: [ID])
+  ORG            gfdc_auth_org? @relation(fields: [ORG_ID], references: [ID])
   ORG_ID         String         @db.VarChar(32)
   POSITION_NAME  String?        @db.VarChar(256)
   POSITION_LAYER String?        @db.VarChar(30)

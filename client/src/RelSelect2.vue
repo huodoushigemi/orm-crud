@@ -66,7 +66,10 @@ const val = computed({
 
       set(props.model, p1, arr)
     } else {
-      set({}, props.field.prop, v)
+      v = set({}, props.field.prop, v)
+      console.log(v);
+      
+      emit('update:modelValue', v)
     }
   }
 })

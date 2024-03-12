@@ -20,10 +20,8 @@ export const gfdc_auth_user: TableOpt = {
     { prop: 'MODIFY_TIME' },
     { prop: 'DEL_FLAG' },
     { prop: 'VERSION' },
-    // { label: '用户扩展', prop: 'EXTEND', relation: { table: 'gfdc_auth_user_extend', rel: '1-n' } },
-    // { label: '用户角色', prop: "USER_ROLE", relation: { table: 'gfdc_auth_user_role', rel: '1-n' } },
   ],
-  columns: ['EMP_NO', 'USER_NAME', 'USER_ACCOUNT', 'USER_STATE', 'USER_ROLE.ROLE', 'PERSON_PHOTO', 'MOBILE', 'EMAIL'],
+  columns: ['EMP_NO', 'USER_NAME', 'USER_ACCOUNT', 'USER_STATE', 'USER_ROLE.ROLE', 'MOBILE', 'EMAIL'],
   searchs: ['USER_NAME'],
   forms: ['EMP_NO', 'USER_NAME', 'USER_ACCOUNT', 'USER_STATE', 'PERSON_PHOTO', 'MOBILE', 'EMAIL'],
   map: { label: 'USER_NAME', id: 'ID' },
@@ -49,6 +47,7 @@ export const gfdc_auth_user_extend: TableOpt = {
     { prop: 'VERSION' },
   ],
   columns: ['USER', 'IS_MAIN_JOB', 'ORG', 'POSITION_NAME', 'POSITION_LAYER', 'CREATOR', 'CREATE_TIME'],
+  searchs: ['ORG'],
   map: { id: 'ID' },
 }
 
@@ -79,7 +78,6 @@ export const gfdc_auth_org: TableOpt = {
     { prop: 'MODIFY_TIME' },
     { prop: 'DEL_FLAG' },
     { prop: 'VERSION' },
-    // { prop: 'USER_EXTEND', relation: { table: 'gfdc_auth_user_extend', rel: '1-n' } },
   ],
   columns: ['DEPT_NO', 'DEPT_NAME', 'DEPT_LAYER', 'ALL_PID'],
   map: { label: 'DEPT_NAME', id: 'ID' },
@@ -100,10 +98,9 @@ export const gfdc_auth_role: TableOpt = {
     { prop: "MODIFY_TIME" },
     { prop: "DEL_FLAG" },
     { prop: "VERSION" },
-    // { prop: "USER_ROLE", relation: { table: 'gfdc_auth_user_role', rel: '1-n' } },
-    // { prop: 'ROLE_RESOURCE', relation: { table: 'gfdc_auth_role_resource', rel: '1-n' } },
   ],
   columns: ['ROLE_NAME', 'ROLE_DESC', 'SYSTEM', 'CREATOR', 'CREATE_TIME'],
+  forms: ['SYSTEM', 'ROLE_RESOURCE.RESOURCE'],
   map: { label: 'ROLE_NAME', id: 'ID' },
 }
 
@@ -114,26 +111,27 @@ export const gfdc_auth_user_role: TableOpt = {
     { prop: 'USER', relation: { table: 'gfdc_auth_user', rel: 'n-1' }, inverseSide: { label: '用户角色', prop: 'USER_ROLE' } },
     { prop: 'ROLE', relation: { table: 'gfdc_auth_role', rel: 'n-1' }, inverseSide: { label: '用户角色', prop: 'USER_ROLE' } },
   ],
+  columns: ['USER', 'ROLE'],
   middle: true,
   map: { id: 'ID' },
 }
 
 export const gfdc_auth_resource: TableOpt = {
-  label: '系统资源',
+  label: '资源',
   fields: [
     { prop: 'ID' },
-    { prop: 'RESOURCE_NAME' },
+    { prop: 'RESOURCE_NAME', filter: 'contains' },
     { prop: 'RESOURCE_CODE' },
-    { prop: 'SYSTEM' },
+    { prop: 'SYSTEM', relation: { table: 'gfdc_auth_system_info', rel: 'n-1' }, inverseSide: { label: '系统资源', prop: 'RESOURCE' } },
     { prop: 'RESOURCE_URL' },
     { prop: 'RESOURCE_DESC' },
-    { prop: 'RESOURCE_TYPE' },
-    { prop: 'OPEN_TYPE' },
+    { prop: 'RESOURCE_TYPE', options: [{ label: '菜单', value: 1 }, { label: '按钮', value: 2 }] },
+    { prop: 'OPEN_TYPE', options: [{ label: '菜单', value: 0 }, { label: 'iframe', value: 1 }] },
     { prop: 'EXT_URL' },
     { prop: 'EXT_PARAMS' },
     { prop: 'RESOURCE_LEVEL' },
     { prop: 'SORT_TYPE' },
-    { prop: 'PARENT' },
+    { prop: 'PARENT', relation: { table: 'gfdc_auth_resource', rel: 'n-1' }, inverseSide: { label: '系统', prop: 'CHILDREN' } },
     { prop: 'COMPONENT' },
     { prop: 'ICON_TYPE' },
     { prop: 'ICON' },
@@ -149,10 +147,10 @@ export const gfdc_auth_resource: TableOpt = {
     { prop: 'MODIFY_TIME' },
     { prop: 'DEL_FLAG' },
     { prop: 'VERSION' },
-    // { prop: 'ROLE_RESOURCE', relation: { table: 'gfdc_auth_role_resource', rel: '1-n' } },
   ],
-  columns: ['RESOURCE_NAME', 'RESOURCE_CODE', 'SYSTEM', 'RESOURCE_URL', 'RESOURCE_TYPE', 'OPEN_TYPE', 'EXT_URL', 'EXT_PARAMS', 'RESOURCE_LEVEL', 'PARENT', 'COMPONENT', 'ICON_TYPE', 'ICON', 'HIDDEN', 'IF_CACHE', 'CREATOR', 'CREATE_TIME'],
-  forms: ['RESOURCE_NAME', 'RESOURCE_CODE', 'SYSTEM', 'RESOURCE_URL', 'RESOURCE_TYPE', 'OPEN_TYPE', 'EXT_URL', 'EXT_PARAMS', 'RESOURCE_LEVEL', 'PARENT', 'COMPONENT', 'ICON_TYPE', 'ICON', 'HIDDEN', 'IF_CACHE'],
+  columns: ['RESOURCE_NAME', 'RESOURCE_CODE', 'SYSTEM', 'RESOURCE_URL', 'COMPONENT', 'RESOURCE_TYPE', 'OPEN_TYPE', 'EXT_URL', 'EXT_PARAMS', 'PARENT', 'HIDDEN', 'IF_CACHE'],
+  searchs: ['PARENT', 'ROLE_RESOURCE.ROLE'],
+  forms: ['RESOURCE_NAME', 'RESOURCE_CODE', 'SYSTEM', 'PARENT', 'RESOURCE_URL', 'COMPONENT', 'RESOURCE_TYPE', 'OPEN_TYPE', 'EXT_URL', 'EXT_PARAMS', 'RESOURCE_LEVEL', 'ICON_TYPE', 'ICON', 'HIDDEN', 'IF_CACHE', 'ROLE_RESOURCE.ROLE'],
   map: { label: 'RESOURCE_NAME', id: 'ID' },
 }
 
@@ -160,15 +158,15 @@ export const gfdc_auth_role_resource: TableOpt = {
   label: '_角色资源',
   fields: [
     { prop: 'ID' },
-    { prop: 'ROLE', relation: { table: 'gfdc_auth_role', rel: 'n-1' }, inverseSide: { label: '角色资源', prop: 'ROLE_RESOURCE' } },
-    { prop: 'RESOURCE', relation: { table: 'gfdc_auth_resource', rel: 'n-1' }, inverseSide: { label: '角色资源', prop: 'ROLE_RESOURCE' } },
+    { prop: 'ROLE', relation: { table: 'gfdc_auth_role', rel: 'n-1' }, inverseSide: { label: '资源', prop: 'ROLE_RESOURCE' } },
+    { prop: 'RESOURCE', relation: { table: 'gfdc_auth_resource', rel: 'n-1' }, inverseSide: { label: '角色', prop: 'ROLE_RESOURCE' } },
   ],
   middle: true,
   map: { id: 'ID' },
 }
 
 export const gfdc_auth_system_info: TableOpt = {
-  label: '系统信息',
+  label: '系统',
   fields: [
     { prop: 'ID' },
     { prop: 'SYSTEM_NAME' },
@@ -182,7 +180,6 @@ export const gfdc_auth_system_info: TableOpt = {
     { prop: 'MODIFY_TIME' },
     { prop: 'DEL_FLAG' },
     { prop: 'VERSION' },
-    // { prop: 'ROLE', relation: { table: 'gfdc_auth_role', rel: '1-n' } },
   ],
   columns: ['SYSTEM_NAME', 'SYSTEM_CODE', 'SYSTEM_DESC', 'CREATOR', 'CREATE_TIME'],
   forms: ['SYSTEM_NAME', 'SYSTEM_CODE', 'SYSTEM_DESC'],

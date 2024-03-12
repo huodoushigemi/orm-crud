@@ -52,7 +52,7 @@ export type RelField = FieldBase & {
 
 export interface NormalizedField extends Field {
   label: string
-  relation?: Required<Relation>
+  relation?: Required<Relation> & { prop: string }
   inverseSide?: Required<InverseSide>
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="关系图" v-bind="$attrs">
+  <el-dialog title="关系图" v-bind="$attrs" draggable>
     <RelGraph :table="table" />
   </el-dialog>
 </template>
