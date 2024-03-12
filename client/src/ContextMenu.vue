@@ -11,7 +11,7 @@
       >
         <div
           v-for="(item, index) in menuData"
-          :key="index"
+          :key="item.title"
           :class="[
             'agel-context-menu-item',
             item.className,

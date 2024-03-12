@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-bind="$attrs" append-to-body title="读写权限">
+  <el-dialog v-bind="$attrs" append-to-body title="读写权限" draggable>
     <FieldRW :permis="$data" />
 
     <template #footer>

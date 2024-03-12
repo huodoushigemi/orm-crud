@@ -1,22 +1,25 @@
 import { Arrayable } from '@vueuse/core'
 import { isObject, isArray } from '@vue/shared'
 import { get, set, merge, isEqual, keyBy } from 'lodash-es'
-import { TableCtx, Field, NormalizedField, RelField, Relation, NRelField } from './types'
+import { TableCtx, Field, NormalizedField, RelField, Relation, NRelField, FieldFilter } from './types'
 
-export function findFieldPath(ctx: TableCtx, prop: string | string[]): NormalizedField[] {
+export function findFieldPath(ctx: TableCtx, prop: string | string[], skip?: FieldFilter): NormalizedField[] {
   let _ctx = ctx
-  return (Array.isArray(prop) ? prop : prop.split('.')).map((e, i, arr) => {
-    const ret = _ctx.keybyed[e]
-    if (!ret) {
+  const ps = Array.isArray(prop) ? prop : prop.split('.')
+  const ret = [] as NormalizedField[]
+  for (let i = 0; i < ps.length; i++) {
+    const prop = ps[i], field = _ctx.keybyed[prop]
+    if (!field) {
       throw new Error(`表 ${ctx.table} 找不到字段 ${prop}`)
     }
-    const isLast = i == arr.length - 1
-    if (!isLast && !ret.relation) {
-      throw new Error(`${prop}: ${e} 缺少 relation`)
+    const isLast = i == ps.length - 1
+    if (!isLast && !field.relation) {
+      throw new Error(`${prop}: ${prop} 缺少 relation`)
     }
-    if (!isLast) _ctx = _ctx.ctxs[ret.relation!.table]
-    return ret
-  })
+    if (!skip?.(_ctx, prop)) ret.push(field)
+    if (!isLast) _ctx = _ctx.ctxs[field.relation!.table]
+  }
+  return ret
 }
 
 export function normalizeField(ctx: TableCtx, field: Field | string): NormalizedField {
@@ -51,7 +54,7 @@ export function normalizeField(ctx: TableCtx, field: Field | string): Normalized
 }
 
 export function genLabel(ctx: TableCtx, prop: string) {
-  return prop.includes('.') ? findFieldPath(ctx, prop).map(e => e.label).join('.') : prop
+  return prop.includes('.') ? findFieldPath(ctx, prop, ctx => ctx.middle).map(e => e.label).join('.') : prop
 }
 
 export function getP(obj, prop) {
@@ -84,15 +87,9 @@ export function pathReverse(ctx: TableCtx, ps: string[] | string) {
   const arr = isArray(ps) ? ps : ps.split('.')
   let ret = <string[]>[]
   arr.forEach(e => {
-    const col = ctx.keybyed[e], rel = col.relation!
-    const ctx2 = ctxs[rel.table]
-    const col2 = ctx2.rels.find(e => 
-      e.relation!.table == ctx.table
-      && e.relation!.name == rel.name
-      && (ctx2.table != ctx.table || e.prop != col.prop)
-    )!
-    ret.push(col2.prop)
-    ctx = ctx2
+    const col = ctx.keybyed[e]
+    ret.push(col.inverseSide!.prop)
+    ctx = ctxs[col.relation!.table]
   })
   return ret.reverse().join('.')
 }
@@ -200,7 +197,7 @@ export function fieldFilter(ctx: TableCtx, prop: string, cb: (flag: string) => b
   if (table && !cb(table)) return false
   
   if (prop.includes('.')) {
-    const nFields = findFieldPath(ctx, prop)  
+    const nFields = findFieldPath(ctx, prop)
     for (let i = 0; i < nFields.length; i++) {
       if (nFields[i].relation) {
         table = nFields[i].relation!.table

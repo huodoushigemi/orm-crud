@@ -37,16 +37,13 @@ CRUD.setConfig({
 const config = useConfig()
 const ctx = () => config.ctxs[props.table]
 
-console.log(config.ctxs);
-
-
 const _searchs = computed(() => [
   ...props.searchs?.map(e => normalizeField(ctx(), e)).filter(e => ctx().searchs.every(ee => ee.prop != e.prop)) || [],
   ...ctx().searchs
 ])
 
-const defaults = () => ctx().columns.map(e => isString(e) ? e : e.prop)
-const cols = useStorage(() => `orm-columns-select_${props.table}`, { default: defaults })
+const colsDefaults = () => ctx().columns.map(e => isString(e) ? e : e.prop)
+const cols = useStorage(() => `orm-columns-select_${props.table}`, { default: colsDefaults })
 const _columns = computed(() => (props.columns || cols.value).map(e => normalizeField(ctx(), e)))
 
 const formatter = (row, col: NormalizedField, val) => {
@@ -153,7 +150,7 @@ const log = (...arg) => console.log(...arg)
       </template>
     </CRUD>
 
-    <FieldsDialog v-if="fieldsBind.showing" v-bind="fieldsBind" :table="table" />
+    <FieldsDialog v-if="fieldsBind.showing" v-bind="fieldsBind" :table="table" v-model:data="cols" :defaults="colsDefaults" />
   
     <InfoDialog v-if="infoBind.showing" v-bind="infoBind" :table="table" />
 

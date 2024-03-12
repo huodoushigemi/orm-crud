@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-bind="$attrs" append-to-body :modal="false" width="550px" draggable>
+  <el-dialog v-bind="$attrs" append-to-body :modal="false" width="550px" draggable style="resize: horizontal; overflow: auto;">
     <template #header>
       <span class="el-dialog__title">选择字段</span>
       <el-button text bg size="small" style="margin-left: 12px; opacity: .75;" @click="emit('update:data', defaults())">还原</el-button>

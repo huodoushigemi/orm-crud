@@ -48,8 +48,6 @@ const rawKeybyed = computed(() => keyBy(toArr(getVal(props.raw)), rel().prop))
 
 const val = computed({
   get: () => {
-    console.log(getVal(props.model));
-    
     return getVal(props.model)
   },
   set: v => {
@@ -66,10 +64,7 @@ const val = computed({
 
       set(props.model, p1, arr)
     } else {
-      v = set({}, props.field.prop, v)
-      console.log(v);
-      
-      emit('update:modelValue', v)
+      set(props.model, props.field.prop, v)
     }
   }
 })
