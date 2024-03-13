@@ -8,15 +8,15 @@ export function findFieldPath(ctx: TableCtx, prop: string | string[], skip?: Fie
   const ps = Array.isArray(prop) ? prop : prop.split('.')
   const ret = [] as NormalizedField[]
   for (let i = 0; i < ps.length; i++) {
-    const prop = ps[i], field = _ctx.keybyed[prop]
+    const k = ps[i], field = _ctx.keybyed[k]
     if (!field) {
       throw new Error(`表 ${ctx.table} 找不到字段 ${prop}`)
     }
     const isLast = i == ps.length - 1
     if (!isLast && !field.relation) {
-      throw new Error(`${prop}: ${prop} 缺少 relation`)
+      throw new Error(`${prop}: ${k} 缺少 relation`)
     }
-    if (!skip?.(_ctx, prop)) ret.push(field)
+    if (!skip?.(_ctx, k)) ret.push(field)
     if (!isLast) _ctx = _ctx.ctxs[field.relation!.table]
   }
   return ret

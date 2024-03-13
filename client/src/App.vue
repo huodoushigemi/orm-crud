@@ -41,7 +41,7 @@ const log = (...arg) => console.log(...arg)
   {{ rwMap }}
   <ConfigProvider :tables="tables" :api="api">
 
-    <Table table="User" />
+    <Table table="gfdc_sjkd_data_model" />
 
     <br />
 

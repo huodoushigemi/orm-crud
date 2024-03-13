@@ -165,38 +165,39 @@ model gfdc_auth_org {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_resource {
-  ID             String                    @id @db.VarChar(32)
-  RESOURCE_NAME  String                    @db.VarChar(32)
-  RESOURCE_CODE  String?                   @db.VarChar(32)
-  SYSTEM         gfdc_auth_system_info?    @relation(fields: [SYSTEM_ID], references: [ID])
-  SYSTEM_ID      String                    @db.VarChar(32)
-  RESOURCE_URL   String?                   @db.VarChar(512)
-  RESOURCE_DESC  String?                   @db.VarChar(200)
-  RESOURCE_TYPE  Int
-  OPEN_TYPE      Int                       @default(0)
-  EXT_URL        String?                   @db.VarChar(512)
-  EXT_PARAMS     String?                   @db.Text
-  RESOURCE_LEVEL Int?
-  SORT_TYPE      Int                       @default(1)
-  PARENT         gfdc_auth_resource?       @relation("resource_children", fields: [PARENT_ID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
-  PARENT_ID      String                    @db.VarChar(32)
-  CHILDREN       gfdc_auth_resource[]      @relation("resource_children")
-  COMPONENT      String?                   @db.VarChar(64)
-  ICON_TYPE      String?                   @default("lib") @db.VarChar(36)
-  ICON           String?                   @db.VarChar(128)
-  IDENTIFY       String?                   @db.VarChar(512)
-  LEAF           Int?                      @default(0)
-  HIDDEN         Int?                      @default(0)
-  IF_CACHE       Int?                      @default(0)
-  CREATOR_NO     String?                   @db.VarChar(20)
-  CREATOR        String?                   @db.VarChar(36)
-  CREATE_TIME    DateTime?                 @default(now()) @db.DateTime(0)
-  MODIFIER_NO    String?                   @db.VarChar(20)
-  MODIFIER       String?                   @db.VarChar(36)
-  MODIFY_TIME    DateTime?                 @default(now()) @db.DateTime(0)
-  DEL_FLAG       Int?                      @default(0)
-  VERSION        Int?                      @default(1)
-  ROLE_RESOURCE  gfdc_auth_role_resource[]
+  ID                  String                          @id @db.VarChar(32)
+  RESOURCE_NAME       String                          @db.VarChar(32)
+  RESOURCE_CODE       String?                         @db.VarChar(32)
+  SYSTEM              gfdc_auth_system_info?          @relation(fields: [SYSTEM_ID], references: [ID])
+  SYSTEM_ID           String                          @db.VarChar(32)
+  RESOURCE_URL        String?                         @db.VarChar(512)
+  RESOURCE_DESC       String?                         @db.VarChar(200)
+  RESOURCE_TYPE       Int
+  OPEN_TYPE           Int                             @default(0)
+  EXT_URL             String?                         @db.VarChar(512)
+  EXT_PARAMS          String?                         @db.Text
+  RESOURCE_LEVEL      Int?
+  SORT_TYPE           Int                             @default(1)
+  PARENT              gfdc_auth_resource?             @relation("resource_children", fields: [PARENT_ID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
+  PARENT_ID           String                          @db.VarChar(32)
+  CHILDREN            gfdc_auth_resource[]            @relation("resource_children")
+  COMPONENT           String?                         @db.VarChar(64)
+  ICON_TYPE           String?                         @default("lib") @db.VarChar(36)
+  ICON                String?                         @db.VarChar(128)
+  IDENTIFY            String?                         @db.VarChar(512)
+  LEAF                Int?                            @default(0)
+  HIDDEN              Int?                            @default(0)
+  IF_CACHE            Int?                            @default(0)
+  CREATOR_NO          String?                         @db.VarChar(20)
+  CREATOR             String?                         @db.VarChar(36)
+  CREATE_TIME         DateTime?                       @default(now()) @db.DateTime(0)
+  MODIFIER_NO         String?                         @db.VarChar(20)
+  MODIFIER            String?                         @db.VarChar(36)
+  MODIFY_TIME         DateTime?                       @default(now()) @db.DateTime(0)
+  DEL_FLAG            Int?                            @default(0)
+  VERSION             Int?                            @default(1)
+  ROLE_RESOURCE       gfdc_auth_role_resource[]
+  DATA_MODEL_RESOURCE gfdc_sjkd_data_model_resource[]
 
   @@index([SYSTEM_ID], map: "pk_gare_system_id")
 }
@@ -265,26 +266,27 @@ model gfdc_auth_role_resource {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_sys_operation_log {
-  ID             String    @id @db.VarChar(32)
-  SYSTEM_CODE    String?   @db.VarChar(32)
-  MODULE_NAME    String?   @db.VarChar(255)
-  REMOTE_ADDR    String?   @db.VarChar(255)
-  USER_ID        String?   @db.VarChar(32)
-  USER_ACCOUNT   String?   @db.VarChar(255)
-  OPERATION_DESC String?   @db.VarChar(512)
-  REQUEST_URI    String?   @db.VarChar(255)
-  REQUEST_TYPE   String?   @db.VarChar(20)
-  REQUEST_PARAMS String?   @db.Text
-  EXEC_STATUS    Int?      @default(1)
+  ID             String          @id @db.VarChar(32)
+  SYSTEM_CODE    String?         @db.VarChar(32)
+  MODULE_NAME    String?         @db.VarChar(255)
+  REMOTE_ADDR    String?         @db.VarChar(255)
+  USER           gfdc_auth_user? @relation(fields: [USER_ID], references: [ID])
+  USER_ID        String?         @db.VarChar(32)
+  USER_ACCOUNT   String?         @db.VarChar(255)
+  OPERATION_DESC String?         @db.VarChar(512)
+  REQUEST_URI    String?         @db.VarChar(255)
+  REQUEST_TYPE   String?         @db.VarChar(20)
+  REQUEST_PARAMS String?         @db.Text
+  EXEC_STATUS    Int?            @default(1)
   RUNTIME        Int?
-  CREATOR_NO     String?   @db.VarChar(20)
-  CREATOR        String?   @db.VarChar(36)
-  CREATE_TIME    DateTime? @default(now()) @db.DateTime(0)
-  MODIFIER_NO    String?   @db.VarChar(20)
-  MODIFIER       String?   @db.VarChar(36)
-  MODIFY_TIME    DateTime? @default(now()) @db.DateTime(0)
-  DEL_FLAG       Int?      @default(0)
-  VERSION        Int?      @default(1)
+  CREATOR_NO     String?         @db.VarChar(20)
+  CREATOR        String?         @db.VarChar(36)
+  CREATE_TIME    DateTime?       @default(now()) @db.DateTime(0)
+  MODIFIER_NO    String?         @db.VarChar(20)
+  MODIFIER       String?         @db.VarChar(36)
+  MODIFY_TIME    DateTime?       @default(now()) @db.DateTime(0)
+  DEL_FLAG       Int?            @default(0)
+  VERSION        Int?            @default(1)
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -342,25 +344,26 @@ model gfdc_auth_task {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_user {
-  ID           String                  @id @db.VarChar(32)
-  EMP_NO       String                  @db.VarChar(36)
-  USER_NAME    String?                 @db.VarChar(64)
-  USER_ACCOUNT String?                 @db.VarChar(36)
-  PASSWORD     String                  @db.VarChar(64)
-  USER_STATE   Int                     @default(0)
-  PERSON_PHOTO String?                 @db.VarChar(999)
-  MOBILE       String?                 @db.VarChar(30)
-  EMAIL        String?                 @db.VarChar(100)
-  CREATOR_NO   String?                 @db.VarChar(20)
-  CREATOR      String?                 @db.VarChar(36)
-  CREATE_TIME  DateTime?               @default(now()) @db.DateTime(0)
-  MODIFIER_NO  String?                 @db.VarChar(20)
-  MODIFIER     String?                 @db.VarChar(36)
-  MODIFY_TIME  DateTime?               @default(now()) @db.DateTime(0)
-  DEL_FLAG     Int?                    @default(0)
-  VERSION      Int?                    @default(1)
-  EXTEND       gfdc_auth_user_extend[]
-  USER_ROLE    gfdc_auth_user_role[]
+  ID                String                        @id @db.VarChar(32)
+  EMP_NO            String                        @db.VarChar(36)
+  USER_NAME         String?                       @db.VarChar(64)
+  USER_ACCOUNT      String?                       @db.VarChar(36)
+  PASSWORD          String                        @db.VarChar(64)
+  USER_STATE        Int                           @default(0)
+  PERSON_PHOTO      String?                       @db.VarChar(999)
+  MOBILE            String?                       @db.VarChar(30)
+  EMAIL             String?                       @db.VarChar(100)
+  CREATOR_NO        String?                       @db.VarChar(20)
+  CREATOR           String?                       @db.VarChar(36)
+  CREATE_TIME       DateTime?                     @default(now()) @db.DateTime(0)
+  MODIFIER_NO       String?                       @db.VarChar(20)
+  MODIFIER          String?                       @db.VarChar(36)
+  MODIFY_TIME       DateTime?                     @default(now()) @db.DateTime(0)
+  DEL_FLAG          Int?                          @default(0)
+  VERSION           Int?                          @default(1)
+  EXTEND            gfdc_auth_user_extend[]
+  USER_ROLE         gfdc_auth_user_role[]
+  SYS_OPERATION_LOG gfdc_auth_sys_operation_log[]
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -860,18 +863,19 @@ model gfdc_service_list_indicator_define {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_sjkd_data_model {
-  ID             String    @id @db.VarChar(32)
-  MODEL_CODE     String    @db.VarChar(50)
-  MODEL_NAME     String    @db.VarChar(50)
-  DATA_FORM_JSON String?   @db.Text
-  CREATOR_NO     String?   @db.VarChar(20)
-  CREATOR        String?   @db.VarChar(36)
-  CREATE_TIME    DateTime? @default(now()) @db.DateTime(0)
-  MODIFIER_NO    String?   @db.VarChar(20)
-  MODIFIER       String?   @db.VarChar(36)
-  MODIFY_TIME    DateTime? @default(now()) @db.DateTime(0)
-  DEL_FLAG       Int?      @default(0)
-  VERSION        Int?      @default(1)
+  ID                  String                          @id @db.VarChar(32)
+  MODEL_CODE          String                          @db.VarChar(50)
+  MODEL_NAME          String                          @db.VarChar(50)
+  DATA_FORM_JSON      String?                         @db.Text
+  CREATOR_NO          String?                         @db.VarChar(20)
+  CREATOR             String?                         @db.VarChar(36)
+  CREATE_TIME         DateTime?                       @default(now()) @db.DateTime(0)
+  MODIFIER_NO         String?                         @db.VarChar(20)
+  MODIFIER            String?                         @db.VarChar(36)
+  MODIFY_TIME         DateTime?                       @default(now()) @db.DateTime(0)
+  DEL_FLAG            Int?                            @default(0)
+  VERSION             Int?                            @default(1)
+  DATA_MODEL_RESOURCE gfdc_sjkd_data_model_resource[]
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -897,17 +901,19 @@ model gfdc_sjkd_data_model_fields {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_sjkd_data_model_resource {
-  ID            String    @id @db.VarChar(32)
-  DATA_MODEL_ID String    @db.VarChar(32)
-  RESOURCE_ID   String    @db.VarChar(32)
-  CREATOR_NO    String?   @db.VarChar(20)
-  CREATOR       String?   @db.VarChar(36)
-  CREATE_TIME   DateTime? @default(now()) @db.DateTime(0)
-  MODIFIER_NO   String?   @db.VarChar(20)
-  MODIFIER      String?   @db.VarChar(36)
-  MODIFY_TIME   DateTime? @default(now()) @db.DateTime(0)
-  DEL_FLAG      Int?      @default(0)
-  VERSION       Int?      @default(1)
+  ID            String               @id @db.VarChar(32)
+  DATA_MODEL    gfdc_sjkd_data_model? @relation(fields: [DATA_MODEL_ID], references: [ID])
+  DATA_MODEL_ID String               @db.VarChar(32)
+  RESOURCE      gfdc_auth_resource?   @relation(fields: [RESOURCE_ID], references: [ID])
+  RESOURCE_ID   String               @db.VarChar(32)
+  CREATOR_NO    String?              @db.VarChar(20)
+  CREATOR       String?              @db.VarChar(36)
+  CREATE_TIME   DateTime?            @default(now()) @db.DateTime(0)
+  MODIFIER_NO   String?              @db.VarChar(20)
+  MODIFIER      String?              @db.VarChar(36)
+  MODIFY_TIME   DateTime?            @default(now()) @db.DateTime(0)
+  DEL_FLAG      Int?                 @default(0)
+  VERSION       Int?                 @default(1)
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
