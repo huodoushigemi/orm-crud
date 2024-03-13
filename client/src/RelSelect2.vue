@@ -63,8 +63,6 @@ const val = computed({
       v.forEach(e => arr.push(_set(p2, e)))
 
       set(props.model, p1, arr)
-      console.log(p1);
-      
     } else {
       set(props.model, props.field.prop, v)
     }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ElMessage } from 'element-plus'
 import Table from './Table.vue'
 import ConfigProvider from './ConfigProvider.vue'
 import tables from './tables/index'
@@ -34,6 +35,17 @@ const api: IApiAdapter = {
   removes: (ctx, data) => request.post(`/removes/${ctx.table}`, { data }),
 }
 
+// api.
+request.interceptors.response.use(async (response, options) => {
+  const { url, status } = response
+  if (status != 200) {
+    const text = await response.text()
+    ElMessage.error(text)
+    throw new Error(text)
+  }
+  return response
+})
+
 const log = (...arg) => console.log(...arg)
 </script>
 
@@ -41,7 +53,7 @@ const log = (...arg) => console.log(...arg)
   {{ rwMap }}
   <ConfigProvider :tables="tables" :api="api">
 
-    <Table table="gfdc_sjkd_data_model" />
+    <Table table="Post" />
 
     <br />
 

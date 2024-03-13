@@ -3,14 +3,15 @@ import { reactive, computed, ref, watchEffect, watch } from 'vue'
 import { isArray, isString } from '@vue/shared'
 import CRUD from '@el-lowcode/crud'
 import { NormalizedField, TableOpt } from '@orm-crud/core'
-import { getP, normalizeField } from '@orm-crud/core/utils'
+import { findFieldPath, getP, isRelMany, normalizeField } from '@orm-crud/core/utils'
+import { get, set } from 'lodash-es'
 import RelTag from './RelTag.vue'
 import InfoDialog from './InfoDialog.vue'
 import RelDialog from './RelDialog.vue'
 import ContextMenu from './ContextMenu.vue'
 import { useConfig } from './context'
 import EditDialog from './EditDialog.vue'
-import { useDialogBind, useStorage } from './hooks'
+import { $, useDialogBind, useStorage } from './hooks'
 import RelSelect2 from './RelSelect2.vue'
 import FieldsDialog from './FieldsDialog.vue'
 
@@ -37,7 +38,7 @@ CRUD.setConfig({
 const config = useConfig()
 const ctx = () => config.ctxs[props.table]
 
-const _searchs = computed(() => [
+const _searchs = $(() => [
   ...props.searchs?.map(e => normalizeField(ctx(), e)).filter(e => ctx().searchs.every(ee => ee.prop != e.prop)) || [],
   ...ctx().searchs
 ])
@@ -141,7 +142,7 @@ const log = (...arg) => console.log(...arg)
       </template>
   
       <template v-for="col in _searchs.filter(e => e.relation)" #[`search:${col.prop}`]="{ row }">
-        <RelSelect2 :table="table" :model="row" :raw="{}" :field="col" />
+        <!-- <RelSelect :modelValue="get(col.prop)" :table="table" :model="row" :raw="{}" :field="col" /> -->
       </template>
 
       <template v-if="hasNew" #header>
