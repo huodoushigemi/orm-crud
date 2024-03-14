@@ -50,10 +50,9 @@ const log = (...arg) => console.log(...arg)
 </script>
 
 <template>
-  {{ rwMap }}
   <ConfigProvider :tables="tables" :api="api">
 
-    <Table table="Post" />
+    <Table table="gfdc_auth_user" />
 
     <br />
 

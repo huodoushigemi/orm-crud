@@ -2,6 +2,7 @@
 import { reactive, computed, ref, watchEffect, watch } from 'vue'
 import { isArray, isString } from '@vue/shared'
 import CRUD from '@el-lowcode/crud'
+import { ElFormItemRender } from 'el-form-render'
 import { NormalizedField, TableOpt } from '@orm-crud/core'
 import { findFieldPath, getP, isRelMany, normalizeField } from '@orm-crud/core/utils'
 import { get, set } from 'lodash-es'
@@ -13,6 +14,7 @@ import { useConfig } from './context'
 import EditDialog from './EditDialog.vue'
 import { $, useDialogBind, useStorage } from './hooks'
 import RelSelect2 from './RelSelect2.vue'
+import Select from './Select.vue'
 import FieldsDialog from './FieldsDialog.vue'
 
 import IEdite from '~icons/ep/edit'
@@ -111,14 +113,13 @@ const log = (...arg) => console.log(...arg)
 </script>
 
 <template>
-  <!-- {{ JSON.parse(JSON.stringify(searchModel)) }} -->
+  {{ JSON.parse(JSON.stringify(searchModel)) }}
   <div class="orm-table">
     <CRUD
       v-bind="{ ...$attrs, class: null, style: null }"
       ref="crudRef"
       class="orm-table_table"
       :schema="ctx().fields"
-      :searchItems="_searchs"
       :columns="_columns"
       url="xxx"
       :request="request"
@@ -141,8 +142,17 @@ const log = (...arg) => console.log(...arg)
         </template>
       </template>
   
-      <template v-for="col in _searchs.filter(e => e.relation)" #[`search:${col.prop}`]="{ row }">
-        <!-- <RelSelect :modelValue="get(col.prop)" :table="table" :model="row" :raw="{}" :field="col" /> -->
+      <!-- <template v-for="col in _searchs.filter(e => e.relation)" #[`search:${col.prop}`]="{ row }">
+        <RelSelect2 :modelValue2="get(col.prop)" :table="table" :model="row" :raw="{}" :field="col" />
+      </template> -->
+
+      <template #search>
+        <template v-for="col in _searchs">
+          <ElFormItemRender v-if="col.relation" v-bind="col" :prop="col.prop.split('.')[0]">
+            <Select v-model="searchModel[col.prop.split('.')[0]]" :table="table" :valueKey="col.prop" />
+          </ElFormItemRender>
+          <ElFormItemRender v-else v-bind="col" />
+        </template>
       </template>
 
       <template v-if="hasNew" #header>

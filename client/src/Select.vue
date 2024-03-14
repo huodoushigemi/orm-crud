@@ -4,9 +4,8 @@
     class="orm-rel-select"
     style="min-width: 128px;"
     v-bind="$attrs"
-    :modelValue="props.modelValue"
-    @update:modelValue="emit('update:modelValue', normal($event))"
-    :value-key="rel.prop"
+    v-model="vmodel"
+    :value-key="lp[1]"
     clearable
     filterable
     remote
@@ -21,9 +20,9 @@
       <i-ep:full-screen class="orm-rel-select_expand" @click="open" />
     </template>
     
-    <el-option v-for="opt in list" :value="opt" :label="get(opt, rel.label)" />
+    <el-option v-for="opt in list" :value="opt" :label="get(opt, lp[0])" />
 
-    <el-option v-for="(opt, i) in toArr(modelValue)" :value="opt" :label="get(opt, rel.label)" :key="`_${get(opt, rel.prop)}`" hidden aria-hidden />
+    <el-option v-for="(opt, i) in toArr(vmodel)" :value="opt" :label="get(opt, lp[0])" :key="`_${get(opt, lp[1])}`" hidden aria-hidden />
 
     <!-- <template #footer>
       <div style="text-align: right;">
@@ -33,7 +32,7 @@
   </el-select>
 
   <el-dialog v-if="dialog.vis2" v-model="dialog.vis" :title="`选择${ctx().label}`" top="5vh" append-to-body @closed="closed">
-    <Table :table="rel.table" v-model:selected="dialog.selected" :tableAttrs="{ rowKey: rel.prop }" :selection="{}" :hasOperation="false" :multiple="multiple">
+    <Table :table="_table" v-model:selected="dialog.selected" :tableAttrs="{ rowKey: ctx().map.id }" :selection="{}" :hasOperation="false" :multiple="multiple">
 
     </Table>
 
@@ -52,8 +51,9 @@ import { isArray } from '@vue/shared'
 import { Arrayable } from '@vueuse/core'
 import { useRequest } from 'vue-request'
 import { Relation, NormalizedField } from '@orm-crud/core'
-import { toArr, pickLP, findFieldPath, isRelMany, toArr } from '@orm-crud/core/utils'
-import { get, set } from 'lodash-es'
+import { toArr, pickLP, findFieldPath, isRelMany, normalizeField } from '@orm-crud/core/utils'
+import { get, set, pick } from 'lodash-es'
+import { $ } from './hooks'
 import Table from './Table.vue'
 import { useConfig } from './context'
 
@@ -64,58 +64,102 @@ const props = defineProps<{
   multiple?: boolean
   // rel: Required<Relation>
   table: string
-  field: NormalizedField
+  // field: NormalizedField
+  valueKey?: string
 }>()
 
 const emit = defineEmits(['update:modelValue'])
 const selectRef = ref()
 
 const config = useConfig()
-const _table = $(() => props.field.relation?.table || prop.table)
+const fs = $(() => findFieldPath(config.ctxs[props.table], props.valueKey))
+const state = $(() => {
+  if (props.valueKey) {
+    const fs = findFieldPath(config.ctxs[props.table], props.valueKey)
+    if (fs.length == 1) {
+      const table = fs[0].relation?.table || props.table
+      return {
+        table,
+        label: config.ctxs[table].map.label,
+        prop: config.ctxs[table].map.id,
+      }
+    } else {
+      const temp = fs[fs.length - 1].relation?.table
+      const table = temp || fs[fs.length - 2].relation.table
+      return {
+        table,
+        label: config.ctxs[table].map.label,
+        prop: temp ? config.ctxs[table].map.id : props.valueKey.split('.').slice(-1)[0],
+      }
+    }
+  } else {
+    return {
+      table: props.table,
+      label: config.ctxs[props.table].map.label,
+      prop: config.ctxs[props.table].map.id,
+    }
+  }
+})
+const _table = $(() => state().table)
 const ctx = () => config.ctxs[_table()]
+const lp = $(() => [state().label, state().prop])
 
 const xx = () => {
-  const fs = findFieldPath(ctx(), props.field.prop)
-  let i = fs.findIndex(e => isRelMany(e.relation?.rel))
-  i = i > -1 ? i + 1 : fs.length
-  // return [fs.slice(0, i + 1).map(e => e.prop), fs.slice(i + 1).map(e => e.prop)]
-  return [fs.slice(0, i).map(e => e.prop), fs.slice(i).map(e => e.prop)]
+  if (props.valueKey) {
+    const fs = findFieldPath(ctx(), props.valueKey)
+    let i = Math.max(fs.findIndex(e => isRelMany(e.relation?.rel)), 0) + 1
+    // todo
+    i = fs[fs.length - 1].relation ? i : Math.min(i, fs.length - 1)
+    return [fs.slice(1, i).map(e => e.prop), fs.slice(i).map(e => e.prop)]
+  } else {
+    return [[], []]
+  }
 }
+
+const _get = (e, p) => p.length ? get(e, p) : e
+const _set = (p, e) => p.length ? set({}, p, e) : e
 
 const vmodel = computed({
   get() {
-    const [p1, p2] = xx()
-    const v1 = get(props.modelValue, p1)
+    const [fs1, fs2] = xx()
+    const v1 = _get(props.modelValue, fs1)
     if (props.multiple) {
-      return p2.length ? toArr(v1).map(e => get(e, p2)) : toArr(v1)
+      return toArr(v1).map(e => _get(e, fs2))
     } else {
-      return p2.length ? get(toArr(v1)[0], p2) : v1
+      return _get(toArr(v1)[0], fs2)
     }
   },
   set(v) {
-    const [p1, p2] = xx()
-    // const v1 = set(p1, )
+    v = isArray(v) ? v.map(e => pick(e, lp())) : pick(v || null, lp())
+
+    const [fs1, fs2] = xx()
+    
+    const hasMany = findFieldPath(ctx(), props.valueKey).findIndex(e => isRelMany(e.relation?.rel)) > -1
     if (props.multiple) {
-      // set()
-      const hasMany = findFieldPath(ctx(), props.field.prop).findIndex(e => isRelMany(e.relation?.rel)) > -1
-      // const ret = p1.length == 1 ?  : 
-      if (hasMany && p1.length == 1) {
-        if (p2.length) emit('update:modelValue', v.map(e => set(e, p1)))
+      if (hasMany) {
+        emit('update:modelValue', _set(fs1, v.map(e => _set(fs2, e))))
+      } else {
+        emit('update:modelValue', v.map(e => _set(fs2, e)))
       }
-      const arr = get()
-      // const v1 = p1.length == 1 ? 
-      // p2.length ? 
+    } else {
+      if (hasMany) {
+        emit('update:modelValue', fs1.length ? _set(fs1, [_set(fs2, v)]) : _set(fs2, v))
+      } else {
+        emit('update:modelValue', _set(fs2, v))
+      }
     }
   }
 })
 
 const { data: list, loading, run } = useRequest(
   (str) => {
-    const { label, prop } = props.rel
-    return ctx().api.finds({
-      where: set({}, label, str),
-      select: [prop, label]
-    })
+    return ctx().api.page({
+      where: set({}, lp()[0], str),
+      select: lp(),
+      // todo
+      skip: 0,
+      take: 99
+    }).then(e => e.list)
   },
   { initialData: [], manual: true }
 )
@@ -141,14 +185,9 @@ function closed() {
 function ok() {
   const { selected } = dialog
   dialog.vis = false
-  const val = normal(props.multiple ? selected : selected[0])
-  emit('update:modelValue', val)
-}
-
-function normal(e) {
-  if (e === '') e = null
-  const { rel } = props
-  return isArray(e) ? e.map(e => pickLP(e, rel)) : pickLP(e, rel)
+  // const val = normal(props.multiple ? selected : selected[0])
+  // emit('update:modelValue', val)
+  vmodel.value = selected
 }
 </script>
 

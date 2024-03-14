@@ -22,7 +22,7 @@ export const gfdc_auth_user: TableOpt = {
     { prop: 'VERSION' },
   ],
   columns: ['EMP_NO', 'USER_NAME', 'USER_ACCOUNT', 'USER_STATE', 'USER_ROLE.ROLE', 'MOBILE', 'EMAIL'],
-  searchs: ['USER_NAME'],
+  searchs: ['USER_NAME', 'USER_ROLE.ROLE'],
   forms: ['EMP_NO', 'USER_NAME', 'USER_ACCOUNT', 'USER_STATE', 'PERSON_PHOTO', 'MOBILE', 'EMAIL'],
   map: { label: 'USER_NAME', id: 'ID' },
 }
