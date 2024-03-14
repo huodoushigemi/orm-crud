@@ -4,8 +4,7 @@ import { isArray, isString } from '@vue/shared'
 import CRUD from '@el-lowcode/crud'
 import { ElFormItemRender } from 'el-form-render'
 import { NormalizedField, TableOpt } from '@orm-crud/core'
-import { findFieldPath, getP, isRelMany, normalizeField } from '@orm-crud/core/utils'
-import { get, set } from 'lodash-es'
+import { getP, normalizeField } from '@orm-crud/core/utils'
 import RelTag from './RelTag.vue'
 import InfoDialog from './InfoDialog.vue'
 import RelDialog from './RelDialog.vue'
@@ -13,7 +12,6 @@ import ContextMenu from './ContextMenu.vue'
 import { useConfig } from './context'
 import EditDialog from './EditDialog.vue'
 import { $, useDialogBind, useStorage } from './hooks'
-import RelSelect2 from './RelSelect2.vue'
 import Select from './Select.vue'
 import FieldsDialog from './FieldsDialog.vue'
 
@@ -113,7 +111,7 @@ const log = (...arg) => console.log(...arg)
 </script>
 
 <template>
-  {{ JSON.parse(JSON.stringify(searchModel)) }}
+  <!-- {{ JSON.parse(JSON.stringify(searchModel)) }} -->
   <div class="orm-table">
     <CRUD
       v-bind="{ ...$attrs, class: null, style: null }"
@@ -177,18 +175,16 @@ const log = (...arg) => console.log(...arg)
 .orm-table {
   display: flex;
 
-  &_left {
-    flex-shrink: 0;
-    max-width: 280px;
-    height: unset !important;
-    margin-right: 16px;
-  }
-
   &_table {
     flex: 1;
     width: 0;
   }
 
+  .crud-search.el-form--inline {
+    .el-select {
+      min-width: 128px;
+    }
+  }
 }
 
 .crud > .el-table .cell > .el-checkbox {

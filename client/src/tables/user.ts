@@ -8,6 +8,7 @@ export const User: TableOpt = {
     { label: 'id', prop: 'id' },
     { label: '名称', prop: 'name', required, filter: 'contains' },
     { label: '年龄', prop: 'age', required },
+    { prop: 'sex', required, options: [{ label: 'man', value: 0 }, { label: 'woman', value: 1 }] },
     { label: '邮箱', prop: 'email', required },
     { label: 'following', prop: 'following', relation: { table: 'User', rel: 'm-n' }, inverseSide: { prop: 'followedBy' } },
   ],

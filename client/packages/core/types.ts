@@ -7,7 +7,7 @@ export interface FieldBase {
   label?: string
   prop: string
   relation?: Relation
-  inverseSide?: InverseSide
+  inverseSide?: Omit<InverseSide, 'table'>
   /**
    * @default 'equals'
    * @see [Prisma Reference](https://www.prisma.io/docs/orm/reference/prisma-client-reference#filter-conditions-and-operators)
@@ -15,7 +15,6 @@ export interface FieldBase {
   filter?: 'contains' | 'endsWith' | 'equals' | 'gt' | 'gte' | 'in' | 'lt' | 'lte' | 'not' | 'notIn' | 'startsWith'
   required?: boolean
   html?: Boolean
-  // todo
   options?: any[]
   // todo
   type?: string
@@ -42,6 +41,7 @@ export interface RelationBase {
 }
 
 export interface InverseSide {
+  table: string
   label?: string
   prop: string
 }

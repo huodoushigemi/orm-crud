@@ -15,6 +15,7 @@ model User {
   email       String
   name        String
   age         Int
+  sex         Int?
   posts       Post[]       @relation("author")
   comments    Comment[]
   followedBy  User[]       @relation("follow")

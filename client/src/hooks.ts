@@ -53,10 +53,10 @@ export function useStorage<T>(key: () => string, opt: { default: () => T }) {
 
 type FnRef<T> = { (t?: T): T } & Ref<T>
 
-export function $<T>(v: MaybeRefOrGetter<T>): FnRef<T> {
+export function $<T>(v: MaybeRefOrGetter<T>, setter?: (t: T) => any): FnRef<T> {
   const _ = isRef(v)
     ? v : isFunction(v)
-    ? computed(v) as Ref<T>
+    ? computed({ get: v, set: setter! }) as Ref<T>
     : ref(v)
   const xxx = (...arg) => arg.length ? (_.value = arg[0]) : _.value
   Object.defineProperty(xxx, 'value', { get: () => _.value, set: v => _.value = v  })

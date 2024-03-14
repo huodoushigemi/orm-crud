@@ -17,13 +17,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import { CascaderProps } from 'element-plus'
 import { remove } from '@vue/shared'
+import { pick } from 'lodash-es'
 import { Field, NormalizedField, TableCtx } from '@orm-crud/core'
 import { findFieldPath } from '@orm-crud/core/utils'
+import { $ } from './hooks'
 import { useConfig } from './context'
-import { pick } from 'lodash-es'
 
 const props = defineProps<{
   table: string
@@ -37,18 +37,18 @@ const props = defineProps<{
 const emit = defineEmits(['update:data'])
 
 const config = useConfig()
-const ctx = computed(() => config.ctxs[props.table])
+const ctx = $(() => config.ctxs[props.table])
 
-const value = computed({
-  get: () => props.data.map(e => e.split('.')),
-  set: (v) => emit('update:data', sort(v).map(e => e.join('.'))),
-})
+const value = $(
+  () => props.data.map(e => e.split('.')),
+  (v) => emit('update:data', sort(v).map(e => e.join('.'))),
+)
 
 type Opt = Pick<Field, 'label' | 'prop' | 'relation'> & { children?: Opt[]; disabled: any }
 
-const options = computed(() => {
+const options = $(() => {
   const { filter = () => true, processOpt, maxDeep = 3 } = props
-  const { ctxs } = ctx.value || {}
+  const { ctxs } = ctx() || {}
   const _pick = (v: Field) => pick(v, 'label', 'prop', 'relation') as Opt
   if (!ctxs) return []
   // 递归
@@ -57,7 +57,15 @@ const options = computed(() => {
     const ctx = ctxs[table]
     ctx.fields.forEach(e => {
       const item = _pick(e)
+      
+      if (e.relation) {
+        const xx = [`${e.relation.table}.${e.inverseSide!.prop}`, `${table}.${e.prop}`]
+        if (queue.some(ee => xx.includes(`${ee.inverseSide!.table}.${ee.prop}`))) return 
+      }
+      
+
       queue.push(e)
+      
       if (processOpt) {
         Object.assign(item, processOpt(ctx, e, queue))
       }

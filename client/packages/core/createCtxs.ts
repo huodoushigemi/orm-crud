@@ -25,6 +25,7 @@ export function createCtxs(tables: Record<string, TableOpt>, opt?: CreateCtxsOpt
       if (set.has(e)) return
       const rel = e.relation
       if (!rel || !e.inverseSide) return
+      e.inverseSide.table = table
       if (rel) {
         const side = e?.inverseSide
         const field: Field = {
@@ -34,7 +35,7 @@ export function createCtxs(tables: Record<string, TableOpt>, opt?: CreateCtxsOpt
             table,
             rel: inverseRelMap[rel.rel],
           },
-          inverseSide: { label: e.label, prop: e.prop }
+          inverseSide: { table: rel.table , label: e.label, prop: e.prop }
         }
         set.add(field)
         tables[rel.table].fields.push(field)

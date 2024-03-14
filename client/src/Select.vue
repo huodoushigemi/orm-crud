@@ -70,22 +70,22 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:modelValue'])
 const selectRef = ref()
+const fs = $(() => props.valueKey ? findFieldPath(config.ctxs[props.table], props.valueKey) : [])
 
 const config = useConfig()
-const fs = $(() => findFieldPath(config.ctxs[props.table], props.valueKey))
 const state = $(() => {
   if (props.valueKey) {
-    const fs = findFieldPath(config.ctxs[props.table], props.valueKey)
-    if (fs.length == 1) {
-      const table = fs[0].relation?.table || props.table
+    // todo
+    if (fs().length == 1) {
+      const table = fs()[0].relation?.table || props.table
       return {
         table,
         label: config.ctxs[table].map.label,
         prop: config.ctxs[table].map.id,
       }
     } else {
-      const temp = fs[fs.length - 1].relation?.table
-      const table = temp || fs[fs.length - 2].relation.table
+      const temp = fs()[fs().length - 1].relation?.table
+      const table = temp || fs()[fs().length - 2].relation.table
       return {
         table,
         label: config.ctxs[table].map.label,
@@ -106,11 +106,10 @@ const lp = $(() => [state().label, state().prop])
 
 const xx = () => {
   if (props.valueKey) {
-    const fs = findFieldPath(ctx(), props.valueKey)
-    let i = Math.max(fs.findIndex(e => isRelMany(e.relation?.rel)), 0) + 1
-    // todo
-    i = fs[fs.length - 1].relation ? i : Math.min(i, fs.length - 1)
-    return [fs.slice(1, i).map(e => e.prop), fs.slice(i).map(e => e.prop)]
+    let i = fs().findIndex(e => isRelMany(e.relation?.rel))
+    i = Math.max(i, 0) + 1
+    const ri = fs().length - (fs()[fs().length - 1].relation ? 0 : 1)
+    return [fs().slice(1, i).map(e => e.prop), fs().slice(i, ri).map(e => e.prop)]
   } else {
     return [[], []]
   }
@@ -134,7 +133,7 @@ const vmodel = computed({
 
     const [fs1, fs2] = xx()
     
-    const hasMany = findFieldPath(ctx(), props.valueKey).findIndex(e => isRelMany(e.relation?.rel)) > -1
+    const hasMany = fs().findIndex(e => isRelMany(e.relation?.rel)) > -1
     if (props.multiple) {
       if (hasMany) {
         emit('update:modelValue', _set(fs1, v.map(e => _set(fs2, e))))
