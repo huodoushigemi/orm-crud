@@ -31,7 +31,7 @@
     </template> -->
   </el-select>
 
-  <el-dialog v-if="dialog.vis2" v-model="dialog.vis" :title="`选择${ctx().label}`" top="5vh" append-to-body @closed="closed">
+  <el-dialog v-if="dialog.vis2" v-model="dialog.vis" :title="`选择${ctx().label}`" class="orm-dialog" top="5vh" append-to-body draggable @closed="closed">
     <Table :table="_table" v-model:selected="dialog.selected" :tableAttrs="{ rowKey: ctx().map.id }" :selection="{}" :hasOperation="false" :multiple="multiple">
 
     </Table>
@@ -45,7 +45,7 @@
   </el-dialog>
 </template>
 
-<script setup lang="tsx">
+<script setup lang="ts">
 import { reactive, ref, watchEffect, computed } from 'vue'
 import { isArray } from '@vue/shared'
 import { Arrayable } from '@vueuse/core'
@@ -62,9 +62,7 @@ type Obj = Record<string, any>
 const props = defineProps<{
   modelValue?: Arrayable<Obj>
   multiple?: boolean
-  // rel: Required<Relation>
   table: string
-  // field: NormalizedField
   valueKey?: string
 }>()
 
@@ -74,32 +72,30 @@ const fs = $(() => props.valueKey ? findFieldPath(config.ctxs[props.table], prop
 
 const config = useConfig()
 const state = $(() => {
-  if (props.valueKey) {
-    // todo
-    if (fs().length == 1) {
-      const table = fs()[0].relation?.table || props.table
-      return {
-        table,
-        label: config.ctxs[table].map.label,
-        prop: config.ctxs[table].map.id,
-      }
-    } else {
-      const temp = fs()[fs().length - 1].relation?.table
-      const table = temp || fs()[fs().length - 2].relation.table
-      return {
-        table,
-        label: config.ctxs[table].map.label,
-        prop: temp ? config.ctxs[table].map.id : props.valueKey.split('.').slice(-1)[0],
-      }
-    }
-  } else {
-    return {
-      table: props.table,
-      label: config.ctxs[props.table].map.label,
-      prop: config.ctxs[props.table].map.id,
-    }
-  }
+  const map = config.ctxs[props.table].map
+  const last = fs()[fs().length - 1]
+
+  const label = last
+    ? last.relation
+      ? last.relation.label
+      : last.prop
+    : map.label
+
+  const prop = last
+    ? last.relation
+      ? last.relation.prop
+      : fs()[fs().length - 2]?.relation!.prop || map.id
+    : map.id
+
+  const table = last
+    ? last.relation
+      ? last.relation.table
+      : fs()[fs().length - 2]?.relation!.table || props.table
+    : props.table
+
+  return { table, label, prop }
 })
+
 const _table = $(() => state().table)
 const ctx = () => config.ctxs[_table()]
 const lp = $(() => [state().label, state().prop])

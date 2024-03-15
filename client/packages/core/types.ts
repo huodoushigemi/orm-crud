@@ -31,12 +31,11 @@ export type FieldColumn = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'r
 export type FieldForm = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'editor' | 'editable' | 'required'>
 export type FieldView = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'render' | 'html'>
 
-export type Relation = RelationBase
-
-export interface RelationBase {
+export interface Relation {
   table: string
   name?: string
   label?: string
+  prop?: string
   rel: '1-1' | '1-n' | 'n-1' | 'm-n'
 }
 
@@ -57,7 +56,7 @@ export interface NormalizedField extends Field {
 }
 
 export type NRelField = NormalizedField & {
-  relation: Required<Relation> & { prop: string }
+  relation: Required<Relation>
   inverseSide: Required<InverseSide>
 }
 

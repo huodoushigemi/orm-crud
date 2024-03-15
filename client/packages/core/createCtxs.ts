@@ -74,7 +74,7 @@ export function createCtxs(tables: Record<string, TableOpt>, opt?: CreateCtxsOpt
       ctx.keybyed[e.prop] = ctx.fields[i] = {
         ...e,
         label: e.label || e.prop,
-        relation: rel ? { ...rel, label: ctxs[rel.table].map.label, prop: ctxs[rel.table].map.id || 'id' } : undefined,
+        relation: rel ? { label: ctxs[rel.table].map.label, prop: ctxs[rel.table].map.id || 'id', ...rel } : undefined,
       }
     })
   })

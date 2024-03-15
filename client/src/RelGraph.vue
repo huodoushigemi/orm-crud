@@ -1,10 +1,10 @@
 <template>
-  <div style="height: 500px; line-height: 0;"></div>
+  <div style="line-height: 0;"></div>
 </template>
 
 <script setup lang="ts">
 import { useCurrentElement, useResizeObserver } from '@vueuse/core'
-import { onBeforeUnmount, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { useConfig } from './context';
 
 const props = defineProps<{
@@ -115,7 +115,7 @@ useResizeObserver(el, e => {
   const rect = e[0].contentRect
   if (!graph) return
   graph.changeSize(rect.width, rect.height)
-  graph.fitCenter(true)
+  // graph.fitCenter(true)
   // graph.fitView()
 })
 </script>

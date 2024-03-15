@@ -12,9 +12,6 @@ const props = defineProps<ConfigProviderProps>()
 const clone = (obj) => JSON.parse(JSON.stringify(obj))
 const tables = $(() => clone(props.tables))
 
-console.log(tables.value);
-
-
 provide(configContextKey, toReactive({
   ...toRefs(props),
   tables,

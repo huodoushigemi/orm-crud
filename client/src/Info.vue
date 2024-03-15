@@ -22,7 +22,7 @@
   </el-card>
 </template>
 
-<script setup lang="tsx">
+<script setup lang="ts">
 import { ref, computed, withDefaults, watchEffect, watch, defineComponent, PropType } from 'vue'
 import { toReactive, useBreakpoints, breakpointsTailwind, reactify, reactifyObject } from '@vueuse/core'
 import { useRequest } from 'vue-request'

@@ -6,7 +6,7 @@
   <InfoDialog v-if="infoBind.showing" v-bind="infoBind" :table="rel.table" />
 </template>
 
-<script setup lang="tsx">
+<script setup lang="ts">
 import { Relation } from '@orm-crud/core'
 import { useConfig } from './context'
 import InfoDialog from './InfoDialog.vue'

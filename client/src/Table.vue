@@ -14,6 +14,7 @@ import EditDialog from './EditDialog.vue'
 import { $, useDialogBind, useStorage } from './hooks'
 import Select from './Select.vue'
 import FieldsDialog from './FieldsDialog.vue'
+import RelGraphDialog from './RelGraphDialog.vue'
 
 import IEdite from '~icons/ep/edit'
 import IDelete from '~icons/ep/delete'
@@ -86,6 +87,7 @@ const fieldsBind = useDialogBind()
 const infoBind = useDialogBind()
 const editBind = useDialogBind()
 const relBind = useDialogBind({ prop: '' })
+const relgraphBind = useDialogBind()
 
 const menu = reactive({ vis: false, row: null, x: 0, y: 0 })
 const menus = computed(() => [
@@ -145,7 +147,7 @@ const log = (...arg) => console.log(...arg)
       </template> -->
 
       <template #search>
-        <template v-for="col in _searchs">
+        <template v-for="col in _searchs" :key="col.prop">
           <ElFormItemRender v-if="col.relation" v-bind="col" :prop="col.prop.split('.')[0]">
             <Select v-model="searchModel[col.prop.split('.')[0]]" :table="table" :valueKey="col.prop" />
           </ElFormItemRender>
@@ -156,6 +158,7 @@ const log = (...arg) => console.log(...arg)
       <template v-if="hasNew" #header>
         <el-button type="primary" @click="editBind.data = {}">新增</el-button>
         <el-button type="info" text bg @click="fieldsBind.vis = true"><i-ep:setting /></el-button>
+        <el-button type="info" text bg @click="relgraphBind.vis = true">关系图</el-button>
       </template>
     </CRUD>
 
@@ -166,6 +169,8 @@ const log = (...arg) => console.log(...arg)
     <EditDialog v-if="editBind.showing" v-bind="editBind" :table="table" @finish="crudRef.getData()" />
   
     <RelDialog v-if="relBind.showing" v-bind="relBind" :table="table" />
+
+    <RelGraphDialog v-if="relgraphBind.showing" v-bind="relgraphBind" :table="table" />
   
     <ContextMenu v-model="menu.vis" :menus="menus" :x="menu.x" :y="menu.y" />
   </div>

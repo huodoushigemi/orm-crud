@@ -52,17 +52,15 @@ const log = (...arg) => console.log(...arg)
 <template>
   <ConfigProvider :tables="tables" :api="api">
 
-    <Table table="gfdc_auth_user" />
+    <Table table="gfdc_service_list" />
 
     <br />
 
     <!-- <Table table="Post" /> -->
     <!-- <Table table="Video" /> -->
 
-    <RelGraphDialog v-if="relgraphBind.showing" v-bind="relgraphBind" table="User" />
     <FieldRWDialog v-if="fieldRwBind.showing" v-bind="fieldRwBind" @ok="log" />
 
     <!-- <el-button @click="fieldRwBind.data = rwPermis">open</el-button> -->
-    <el-button @click="relgraphBind.vis = true">open</el-button>
   </ConfigProvider>
 </template>

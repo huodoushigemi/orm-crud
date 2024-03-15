@@ -1,6 +1,6 @@
 <template>
-  <el-dialog title="关系图" v-bind="$attrs" draggable>
-    <RelGraph :table="table" />
+  <el-dialog title="关系图" class="orm-dialog" v-bind="$attrs" draggable align-center style="height: 600px">
+    <RelGraph :table="table" style="height: 100%;" />
   </el-dialog>
 </template>
 

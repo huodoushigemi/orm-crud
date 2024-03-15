@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-bind="$attrs" append-to-body class="orm-edit-dialog" draggable>
+  <el-dialog v-bind="$attrs" append-to-body class="orm-edit-dialog orm-dialog" draggable>
     <template #header>
       <span class="el-dialog__title">{{ isNew() ? '创建' : '编辑' }}</span>
       <el-button type="info" text bg size="small" style="margin-left: 12px;" @click="fieldsBind.vis = true">

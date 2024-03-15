@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-bind="$attrs" :title="relCtx.label" append-to-body top="5vh" width="75%" draggable>
+  <el-dialog v-bind="$attrs" :title="relCtx.label" class="orm-dialog" append-to-body top="5vh" width="75%" draggable>
     <Table
       :table="relCtx.table"
       :searchs="[reversedProp]"

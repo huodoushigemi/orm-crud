@@ -46,7 +46,7 @@
   </el-dialog>
 </template>
 
-<script setup lang="tsx">
+<script setup lang="ts">
 import { reactive, ref, watchEffect } from 'vue'
 import { isArray } from '@vue/shared'
 import { Arrayable } from '@vueuse/core'

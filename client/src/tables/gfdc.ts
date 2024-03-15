@@ -4,11 +4,11 @@ export const gfdc_auth_user: TableOpt = {
   label: '用户',
   fields: [
     { prop: 'ID' },
-    { prop: 'EMP_NO' },
-    { prop: 'USER_NAME' },
-    { prop: 'USER_ACCOUNT' },
+    { label: '员工编号', prop: 'EMP_NO' },
+    { label: '姓名', prop: 'USER_NAME', filter: 'contains' },
+    { label: '账号', prop: 'USER_ACCOUNT' },
     { prop: 'PASSWORD' },
-    { prop: 'USER_STATE', options: [{ label: '在职', value: 0 }, { label: '离职', value: 1 }] },
+    { label: '状态', prop: 'USER_STATE', options: [{ label: '在职', value: 0 }, { label: '离职', value: 1 }] },
     { prop: 'PERSON_PHOTO' },
     { prop: 'MOBILE' },
     { prop: 'EMAIL' },
@@ -22,7 +22,7 @@ export const gfdc_auth_user: TableOpt = {
     { prop: 'VERSION' },
   ],
   columns: ['EMP_NO', 'USER_NAME', 'USER_ACCOUNT', 'USER_STATE', 'USER_ROLE.ROLE', 'MOBILE', 'EMAIL'],
-  searchs: ['USER_NAME', 'USER_ROLE.ROLE'],
+  searchs: ['USER_NAME', 'USER_ROLE.ROLE', 'SYS_OPERATION_LOG', 'USER_STATE'],
   forms: ['EMP_NO', 'USER_NAME', 'USER_ACCOUNT', 'USER_STATE', 'PERSON_PHOTO', 'MOBILE', 'EMAIL'],
   map: { label: 'USER_NAME', id: 'ID' },
 }
@@ -119,12 +119,12 @@ export const gfdc_auth_user_role: TableOpt = {
 }
 
 export const gfdc_auth_resource: TableOpt = {
-  label: '资源',
+  label: '菜单',
   fields: [
     { prop: 'ID' },
     { prop: 'RESOURCE_NAME', filter: 'contains' },
     { prop: 'RESOURCE_CODE' },
-    { prop: 'SYSTEM', relation: { table: 'gfdc_auth_system_info', rel: 'n-1' }, inverseSide: { label: '系统资源', prop: 'RESOURCE' } },
+    { prop: 'SYSTEM', relation: { table: 'gfdc_auth_system_info', rel: 'n-1' }, inverseSide: { label: '系统菜单', prop: 'RESOURCE' } },
     { prop: 'RESOURCE_URL' },
     { prop: 'RESOURCE_DESC' },
     { prop: 'RESOURCE_TYPE', options: [{ label: '菜单', value: 1 }, { label: '按钮', value: 2 }] },
@@ -133,7 +133,7 @@ export const gfdc_auth_resource: TableOpt = {
     { prop: 'EXT_PARAMS' },
     { prop: 'RESOURCE_LEVEL' },
     { prop: 'SORT_TYPE' },
-    { prop: 'PARENT', relation: { table: 'gfdc_auth_resource', rel: 'n-1' }, inverseSide: { label: '系统', prop: 'CHILDREN' } },
+    { prop: 'PARENT', relation: { table: 'gfdc_auth_resource', rel: 'n-1' }, inverseSide: { label: '菜单', prop: 'CHILDREN' } },
     { prop: 'COMPONENT' },
     { prop: 'ICON_TYPE' },
     { prop: 'ICON' },
@@ -195,9 +195,9 @@ export const gfdc_auth_sys_operation_log: TableOpt = {
     { label: '系统', prop: 'SYSTEM_CODE' },
     { label: '模块', prop: 'MODULE_NAME' },
     { label: 'ip', prop: 'REMOTE_ADDR' },
-    { label: '用户', prop: 'USER', relation: { table: 'gfdc_auth_user', rel: 'n-1' }, inverseSide: { label: '操作日志', prop: 'SYS_OPERATION_LOG' } },
+    { label: '操作人', prop: 'USER', relation: { table: 'gfdc_auth_user', rel: 'n-1' }, inverseSide: { label: '操作日志', prop: 'SYS_OPERATION_LOG' } },
     { prop: 'USER_ACCOUNT' },
-    { prop: 'OPERATION_DESC' },
+    { label: '描述', prop: 'OPERATION_DESC', filter: 'contains' },
     { prop: 'REQUEST_URI' },
     { prop: 'REQUEST_TYPE' },
     { prop: 'REQUEST_PARAMS' },
@@ -272,7 +272,7 @@ export const gfdc_message_object: TableOpt = {
 }
 
 export const gfdc_message_task: TableOpt = {
-  label: '消息任务调度',
+  label: '消息任务',
   fields: [
     { prop: 'ID' },
     { prop: 'JOB_NAME' }, // TODO 关联 MESSAGE_CODE
@@ -334,4 +334,271 @@ export const gfdc_sjkd_data_model_resource: TableOpt = {
   ],
   middle: true,
   map: { id: 'ID' },
+}
+
+export const gfdc_auth_dictionary: TableOpt = {
+  label: '字典',
+  fields: [
+    { prop: 'ID' },
+    { prop: 'DICT_CODE' },
+    { prop: 'DICT_NAME' },
+    { prop: 'DICT_NAME_EN' },
+    { prop: 'DESCRIPTION' },
+    { prop: 'ORDER_NUM' },
+    { prop: 'USE_STATE', options: [{ label: '禁用', value: 0 }, { label: '启用', value: 1 }] },
+    { prop: 'CREATOR_NO' },
+    { prop: 'CREATOR' },
+    { prop: 'CREATE_TIME' },
+    { prop: 'MODIFIER_NO' },
+    { prop: 'MODIFIER' },
+    { prop: 'MODIFY_TIME' },
+    { prop: 'DEL_FLAG' },
+    { prop: 'VERSION' },
+  ],
+  columns: ['DICT_NAME', 'DICT_CODE', 'DICT_NAME_EN', 'DESCRIPTION', 'ORDER_NUM', 'USE_STATE', 'ITEMS'],
+  forms: ['DICT_CODE', 'DICT_NAME', 'DICT_NAME_EN', 'DESCRIPTION', 'ORDER_NUM', 'USE_STATE'],
+  searchs: ['DICT_CODE', 'DICT_NAME', 'USE_STATE'],
+  map: { label: 'DICT_NAME', id: 'ID' }
+}
+
+export const gfdc_auth_dictionary_item: TableOpt = {
+  label: '字典 Item',
+  fields: [
+    { prop: 'ID' },
+    { prop: 'DICTIONARY', relation: { table: 'gfdc_auth_dictionary', rel: 'n-1' }, inverseSide: { label: '字典 Item', prop: 'ITEMS' } },
+    { prop: 'ITEM_NAME' },
+    { prop: 'ITEM_NAME_EN' },
+    { prop: 'ITEM_VALUE' },
+    { prop: 'DESCRIPTION' },
+    { prop: 'ORDER_NUM' },
+    { prop: 'ITEM_STATE', options: [{ label: '禁用', value: 0 }, { label: '启用', value: 1 }] },
+    { prop: 'CREATOR_NO' },
+    { prop: 'CREATOR' },
+    { prop: 'CREATE_TIME' },
+    { prop: 'MODIFIER_NO' },
+    { prop: 'MODIFIER' },
+    { prop: 'MODIFY_TIME' },
+    { prop: 'DEL_FLAG' },
+    { prop: 'VERSION' },
+  ],
+  columns: ['DICTIONARY', 'ITEM_NAME', 'ITEM_NAME_EN', 'ITEM_VALUE', 'DESCRIPTION', 'ORDER_NUM', 'ITEM_STATE'],
+  forms: ['DICTIONARY', 'ITEM_NAME', 'ITEM_NAME_EN', 'ITEM_VALUE', 'DESCRIPTION', 'ORDER_NUM', 'ITEM_STATE'],
+  searchs: ['DICTIONARY', 'ITEM_NAME', 'ITEM_NAME_EN'],
+  map: { label: 'ITEM_NAME', id: 'ID' }
+}
+
+export const gfdc_report_ds: TableOpt = {
+  label: '数据源',
+  fields: [
+    { label: '主键', prop: 'ID' },
+    { label: '名称', prop: 'DS_NAME', filter: 'contains' },
+    { label: '类型', prop: 'DS_TYPE' },
+    { label: '驱动类路径', prop: 'DS_DRIVER' },
+    { label: '地址', prop: 'DS_HOST' },
+    { label: '端口号', prop: 'DS_PORT' },
+    { label: 'url', prop: 'DS_URL' },
+    { label: '账号', prop: 'USERNAME' },
+    { label: '密码', prop: 'PASSWORD' },
+    { label: '是否启用', prop: 'VALID', options: [{ label: '禁用', value: 0 }, { label: '启用', value: 1 }] },
+    { label: '创建人工号', prop: 'CREATOR_NO' },
+    { label: '创建人', prop: 'CREATOR' },
+    { label: '创建时间', prop: 'CREATE_TIME' },
+    { label: '修改人工号', prop: 'MODIFIER_NO' },
+    { label: '修改人', prop: 'MODIFIER' },
+    { label: '修改时间', prop: 'MODIFY_TIME' },
+    { label: '逻辑删除', prop: 'DEL_FLAG' },
+    { label: '乐观锁', prop: 'version' },
+  ],
+  columns: ['DS_NAME', 'DS_TYPE', 'DS_DRIVER', 'DS_URL', 'USERNAME', 'VALID'],
+  forms: ['DS_NAME', 'DS_TYPE', 'DS_DRIVER', 'DS_HOST', 'DS_PORT', 'DS_URL', 'USERNAME', 'PASSWORD', 'VALID'],
+  searchs: ['DS_NAME', 'DS_TYPE', 'VALID'],
+  map: { label: 'DS_NAME', id: 'ID' }
+}
+
+export const gfdc_report_dataset: TableOpt = {
+  label: '数据集',
+  fields: [
+    { label: '主键', prop: 'ID' },
+    { label: '数据集类型', prop: 'DATASET_TYPE' },
+    { label: '数据集名称', prop: 'DATASET_NAME', filter: 'contains' },
+    { label: '查询语句', prop: 'DATASET_SQL' }, // todo textarea
+    { label: '查询条件', prop: 'PARAMETERS' },
+    { label: '数据源', prop: 'DS', relation: { table: 'gfdc_report_ds', rel: 'n-1' }, inverseSide: { label: '数据集', prop: 'DATASET' } },
+    { label: '是否启用', prop: 'VALID', options: [{ label: '禁用', value: 0 }, { label: '启用', value: 1 }] },
+    { label: '创建人工号', prop: 'CREATOR_NO' },
+    { label: '创建人', prop: 'CREATOR' },
+    { label: '创建时间', prop: 'CREATE_TIME' },
+    { label: '修改人工号', prop: 'MODIFIER_NO' },
+    { label: '修改人', prop: 'MODIFIER' },
+    { label: '修改时间', prop: 'MODIFY_TIME' },
+    { label: '逻辑删除', prop: 'DEL_FLAG' },
+    { label: '乐观锁', prop: 'version' },
+  ],
+  columns: ['DATASET_NAME', 'DATASET_TYPE', 'PARAMETERS', 'DS', 'VALID'],
+  forms: ['DATASET_NAME', 'DATASET_TYPE', 'DATASET_SQL', 'PARAMETERS', 'DS', 'VALID'],
+  searchs: ['DATASET_NAME', 'DATASET_TYPE', 'DS', 'VALID'],
+  map: { label: 'DATASET_NAME', id: 'ID' }
+}
+
+export const gfdc_indicator_library: TableOpt = {
+  label: '指标库',
+  fields: [
+    { label: '主键', prop: 'ID' },
+    { label: '指标英文编码', prop: 'INDICATOR_CODE', filter: 'contains' },
+    { label: '指标中文名称', prop: 'INDICATOR_NAME', filter: 'contains' },
+    { label: '指标类型', prop: 'INDICATOR_TYPE' },
+    { label: '指标描述', prop: 'INDICATOR_DESC' },
+    { label: '业务逻辑', prop: 'BUSINESS_LOGIC' },
+    { label: '业务OWNER', prop: 'BUSINESS_OWNER' },
+    { label: '创建人工号', prop: 'CREATOR_NO' },
+    { label: '创建人', prop: 'CREATOR' },
+    { label: '创建时间', prop: 'CREATE_TIME' },
+    { label: '修改人工号', prop: 'MODIFIER_NO' },
+    { label: '修改人', prop: 'MODIFIER' },
+    { label: '修改时间', prop: 'MODIFY_TIME' },
+    { label: '否', prop: 'DEL_FLAG' },
+    { label: '乐观锁', prop: 'version' },
+  ],
+  columns: ['INDICATOR_CODE', 'INDICATOR_NAME', 'INDICATOR_TYPE', 'INDICATOR_DESC', 'BUSINESS_LOGIC', 'BUSINESS_OWNER', 'CREATOR', 'CREATE_TIME', 'MODIFIER', 'MODIFY_TIME'],
+  forms: ['INDICATOR_CODE', 'INDICATOR_NAME', 'INDICATOR_TYPE', 'INDICATOR_DESC', 'BUSINESS_LOGIC', 'BUSINESS_OWNER'],
+  searchs: ['INDICATOR_CODE', 'INDICATOR_NAME', 'INDICATOR_TYPE'],
+  map: { label: 'INDICATOR_NAME', id: 'ID' }
+}
+
+export const gfdc_target_head: TableOpt = {
+  label: '目标值抬头',
+  fields: [
+    { label: '主键', prop: 'ID' },
+    { label: '目标值编码', prop: 'TARGET_CODE', filter: 'contains' },
+    { label: '目标值名称', prop: 'TARGET_NAME', filter: 'contains' },
+    { label: '是否启用目标值', prop: 'TARGET_ENABLE' },
+    { label: '创建人工号', prop: 'CREATOR_NO' },
+    { label: '创建人', prop: 'CREATOR' },
+    { label: '创建时间', prop: 'CREATE_TIME' },
+    { label: '修改人工号', prop: 'MODIFIER_NO' },
+    { label: '修改人', prop: 'MODIFIER' },
+    { label: '修改时间', prop: 'MODIFY_TIME' },
+    { label: '逻辑删除', prop: 'DEL_FLAG' },
+    { label: '乐观锁', prop: 'version' },
+  ],
+  columns: ['TARGET_CODE', 'TARGET_NAME', 'TARGET_ENABLE', 'CREATOR', 'CREATE_TIME', 'MODIFIER', 'MODIFY_TIME'],
+  forms: ['TARGET_CODE', 'TARGET_NAME', 'TARGET_ENABLE', 'CREATOR', 'CREATE_TIME', 'MODIFIER', 'MODIFY_TIME'],
+  searchs: ['TARGET_CODE', 'TARGET_NAME'],
+  map: { label: 'TARGET_NAME', id: 'ID' }
+}
+
+export const gfdc_target_config: TableOpt = {
+  label: '目标值字段',
+  fields: [
+    { label: '主键', prop: 'ID' },
+    { label: '字段编码', prop: 'FIELD_CODE', filter: 'contains' },
+    { label: '字段名称', prop: 'FIELD_NAME', filter: 'contains' },
+    { label: '字段类型', prop: 'FIELD_TYPE' },
+    { label: '是否必填', prop: 'REQUIRED' },
+    { label: '关联目标值', prop: 'RELATION_TARGET_HEAD', relation: { table: 'gfdc_target_head', rel: 'n-1' }, inverseSide: { label: '关联字段', prop: 'RELATION_FIELDS' } },
+    { label: '备注', prop: 'REMARK' },
+    { label: '目标值抬头', prop: 'TARGET_HEAD', relation: { table: 'gfdc_target_head', rel: 'n-1' }, inverseSide: { label: '字段', prop: 'FIELDS' } },
+    { label: '创建人工号', prop: 'CREATOR_NO' },
+    { label: '创建人', prop: 'CREATOR' },
+    { label: '创建时间', prop: 'CREATE_TIME' },
+    { label: '修改人工号', prop: 'MODIFIER_NO' },
+    { label: '修改人', prop: 'MODIFIER' },
+    { label: '修改时间', prop: 'MODIFY_TIME' },
+    { label: '逻辑删除', prop: 'DEL_FLAG' },
+    { label: '乐观锁', prop: 'version' },
+  ],
+  columns: ['FIELD_CODE', 'FIELD_NAME', 'FIELD_TYPE', 'REQUIRED', 'RELATION_TARGET_HEAD', 'REMARK', 'TARGET_HEAD', 'CREATOR', 'CREATE_TIME', 'MODIFIER', 'MODIFY_TIME'],
+  forms: ['FIELD_CODE', 'FIELD_NAME', 'FIELD_TYPE', 'REQUIRED', 'RELATION_TARGET_HEAD', 'REMARK', 'TARGET_HEAD'],
+  searchs: ['FIELD_CODE', 'FIELD_NAME', 'FIELD_TYPE', 'RELATION_TARGET_HEAD', 'TARGET_HEAD'],
+  map: { label: 'FIELD_NAME', id: 'ID' }
+}
+
+export const gfdc_target_config_item: TableOpt = {
+  label: '目标值数据',
+  fields: [
+    { label: '主键', prop: 'ID' },
+    { label: '目标值抬头', prop: 'TARGET_HEAD', relation: { table: 'gfdc_target_head', rel: 'n-1' }, inverseSide: { label: '数据', prop: 'ITEMS' } },
+    { label: '目标值字段', prop: 'TARGET_CONFIG', relation: { table: 'gfdc_target_config', rel: 'n-1' }, inverseSide: { label: '数据', prop: 'ITEMS' } },
+    // { label: '目标值明细ID', prop: 'TARGET_ITEM', relation: { table: 'gfdc_target_config', rel: 'n-1' }, inverseSide: { label: '数据', prop: 'ITEMS' } },
+    { label: '值', prop: 'FIELD_VALUE' },
+    { label: '创建人工号', prop: 'CREATOR_NO' },
+    { label: '创建人', prop: 'CREATOR' },
+    { label: '创建时间', prop: 'CREATE_TIME' },
+    { label: '修改人工号', prop: 'MODIFIER_NO' },
+    { label: '修改人', prop: 'MODIFIER' },
+    { label: '修改时间', prop: 'MODIFY_TIME' },
+    { label: '逻辑删除', prop: 'DEL_FLAG' },
+    { label: '乐观锁', prop: 'version' },
+  ],
+  columns: ['TARGET_HEAD', 'TARGET_CONFIG', 'FIELD_VALUE', 'CREATOR', 'CREATE_TIME', 'MODIFIER', 'MODIFY_TIME'],
+  forms: ['TARGET_HEAD', 'TARGET_CONFIG', 'FIELD_VALUE'],
+  searchs: ['TARGET_HEAD', 'TARGET_CONFIG', 'FIELD_VALUE'],
+  map: { id: 'ID' }
+}
+
+export const gfdc_service_list: TableOpt = {
+  label: '服务列表',
+  fields: [
+    { label: 'ID', prop: 'ID' },
+    { label: '模块', prop: 'MODULE' },
+    { label: '菜单', prop: 'RESOURCE', relation: { table: 'gfdc_auth_resource', rel: 'n-1' }, inverseSide: { label: '服务列表', prop: 'SL' } },
+    { label: '菜单释义', prop: 'RESOURCE_DEFINE', filter: 'contains' },
+    { label: '时效', prop: 'AGEING' },
+    { label: '排序', prop: 'SORT' },
+    { label: '创建人工号', prop: 'CREATOR_NO' },
+    { label: '创建人', prop: 'CREATOR' },
+    { label: '创建时间', prop: 'CREATE_TIME' },
+    { label: '修改人工号', prop: 'MODIFIER_NO' },
+    { label: '修改人', prop: 'MODIFIER' },
+    { label: '修改时间', prop: 'MODIFY_TIME' },
+    { label: '逻辑删除', prop: 'DEL_FLAG' },
+    { label: '乐观锁', prop: 'VERSION' },
+  ],
+  columns: ['RESOURCE.SYSTEM', 'RESOURCE', 'RESOURCE_DEFINE', 'AGEING', 'MODULE', 'SORT', 'SL_INDICATOR.INDICATOR_DEFINE'],
+  forms: ['RESOURCE', 'RESOURCE_DEFINE', 'AGEING', 'MODULE', 'SORT'],
+  searchs: ['MODULE', 'RESOURCE', 'RESOURCE_DEFINE'],
+  map: { label: 'RESOURCE_DEFINE', id: 'ID' }
+}
+
+export const gfdc_service_list_indicator_define: TableOpt = {
+  label: '服务指标',
+  fields: [
+    { prop: 'ID' },
+    { prop: 'SERVICE_LIST', relation: { table: 'gfdc_service_list', rel: 'n-1' }, inverseSide: { label: '服务指标', prop: 'SL_INDICATOR' } },
+    { prop: 'INDICATOR_DEFINE', relation: { table: 'gfdc_indicator_define', rel: 'n-1' }, inverseSide: { label: '服务指标', prop: 'SL_INDICATOR' } },
+    { prop: 'CREATOR_NO' },
+    { prop: 'CREATOR' },
+    { prop: 'CREATE_TIME' },
+    { prop: 'MODIFIER_NO' },
+    { prop: 'MODIFIER' },
+    { prop: 'MODIFY_TIME' },
+    { prop: 'DEL_FLAG' },
+    { prop: 'VERSION' },
+  ],
+  middle: true,
+  map: { id: 'ID' }
+}
+
+export const gfdc_indicator_define: TableOpt = {
+  label: '指标定义',
+  fields: [
+    { label: 'ID', prop: 'ID' },
+    { label: '指标名称', prop: 'INDICATOR_NAME', filter: 'contains' },
+    { label: '计算逻辑', prop: 'CALCULATE_LOGIC', filter: 'contains' },
+    { label: '数据来源', prop: 'DATA_SOURCE', filter: 'contains' },
+    { label: '业务owner', prop: 'BUZ_OWNER', filter: 'contains' },
+    { label: '排序', prop: 'SORT' },
+    { label: '创建人工号', prop: 'CREATOR_NO' },
+    { label: '创建人', prop: 'CREATOR' },
+    { label: '创建时间', prop: 'CREATE_TIME' },
+    { label: '修改人工号', prop: 'MODIFIER_NO' },
+    { label: '修改人', prop: 'MODIFIER' },
+    { label: '修改时间', prop: 'MODIFY_TIME' },
+    { label: '逻辑删除', prop: 'DEL_FLAG' },
+    { label: '乐观锁', prop: 'VERSION' },
+  ],
+  columns: ['INDICATOR_NAME', 'CALCULATE_LOGIC', 'DATA_SOURCE', 'BUZ_OWNER', 'SL_INDICATOR.SERVICE_LIST', 'SORT'],
+  forms: ['INDICATOR_NAME', 'CALCULATE_LOGIC', 'DATA_SOURCE', 'BUZ_OWNER', 'SORT'],
+  searchs: ['INDICATOR_NAME', 'CALCULATE_LOGIC', 'DATA_SOURCE', 'BUZ_OWNER'],
+  map: { label: 'INDICATOR_NAME', id: 'ID' }
 }

@@ -5,3 +5,15 @@
 .el-card--small {
   --el-card-padding: 10px;
 }
+
+.orm-dialog {
+  display: flex;
+  flex-direction: column;
+  resize: auto;
+  overflow: auto;
+}
+
+.orm-dialog .el-dialog__body {
+  flex: 1;
+  height: 0;
+}
