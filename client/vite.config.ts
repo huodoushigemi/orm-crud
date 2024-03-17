@@ -15,7 +15,8 @@ function _resolve(dir: string) {
 export default defineConfig({
   resolve: {
     alias: {
-      '@orm-crud/core': _resolve('packages/core')
+      '@orm-crud/core': _resolve('packages/core'),
+      '@orm-crud/ep': _resolve('packages/ep')
     }
   },
   plugins: [

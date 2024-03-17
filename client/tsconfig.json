@@ -24,6 +24,8 @@
     "paths": {
       "@orm-crud/core": ["packages/core/index.ts"],
       "@orm-crud/core/*": ["packages/core/*.ts"],
+      "@orm-crud/ep": ["packages/ep/index.ts"],
+      "@orm-crud/ep/*": ["packages/ep/*"],
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],

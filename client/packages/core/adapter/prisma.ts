@@ -84,9 +84,8 @@ export function selectInput(ctx: TableCtx, paths: string[]) {
     ps.forEach((e, i) => {
       if (e.relation) {
         const { label, prop } = e.relation
-        ret[e.prop] = { select: { [prop]: true } }
+        ret[e.prop] ||= { select: { [label]: true, [prop]: true } }
         ret = ret[e.prop].select
-        merge(ret, selectInput(ctx.ctxs[e.relation.table], [label]))
       }
       else {
         ret[e.prop] = true

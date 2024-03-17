@@ -2,6 +2,7 @@
 import { reactive, computed, ref, watchEffect, watch } from 'vue'
 import { isArray, isString } from '@vue/shared'
 import CRUD from '@el-lowcode/crud'
+import Render from '@el-lowcode/render'
 import { ElFormItemRender } from 'el-form-render'
 import { NormalizedField, TableOpt } from '@orm-crud/core'
 import { getP, normalizeField } from '@orm-crud/core/utils'
@@ -137,6 +138,7 @@ const log = (...arg) => console.log(...arg)
         <div v-if="col.relation">
           <RelTag :data="getP(row, col.prop)" :rel="col.relation!" />
         </div>
+        <Render v-else-if="col.render" v-bind="col.render" :data="row" :field="col" />
         <template v-else>
           {{ formatter(row, col, getP(row, col.prop)) }}
         </template>

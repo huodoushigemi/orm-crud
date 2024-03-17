@@ -4,7 +4,7 @@
       <ElFormItemRender v-if="col.relation" v-bind="col" :el="{ is: col.editor, disabled: isDisabled(col) }">
         <RelSelect2 :model="model" :raw="raw" :table="table" :field="col" />
       </ElFormItemRender>
-      <ElFormItemRender v-else v-bind="col" :el="{ is: col.editor, disabled: isDisabled(col) }" />
+      <ElFormItemRender v-else v-bind="col" :el="{ ...col.editor, disabled: isDisabled(col) }" />
     </template>
   </ElFormRender>
 </template>
@@ -31,10 +31,11 @@ const config = useConfig()
 const ctx = () => config.ctxs[props.table]
 const rwPermis = () => config.rwPermis
 
-const isDisabled = (field: NormalizedField) => 
-  rwPermis()
-    ? !fieldFilter(ctx(), field.prop, rwPermis()!.w)
-    : undefined
+const isDisabled = (field: NormalizedField) => (
+  (rwPermis() && !fieldFilter(ctx(), field.prop, rwPermis()!.w)) ||
+  (field.editable !== undefined && !field.editable && props.model[ctx().map.id] != null) ||
+  (field.editor?.disabled)
+)
 
 const raw = ref()
 watch(() => props.model, v => raw.value = JSON.parse(JSON.stringify(v)))

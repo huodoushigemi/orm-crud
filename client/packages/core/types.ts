@@ -14,14 +14,13 @@ export interface FieldBase {
    */
   filter?: 'contains' | 'endsWith' | 'equals' | 'gt' | 'gte' | 'in' | 'lt' | 'lte' | 'not' | 'notIn' | 'startsWith'
   required?: boolean
-  html?: Boolean
   options?: any[]
   // todo
   type?: string
   // todo
-  editor?: any
+  editor?: { [k: string]: any; is?: string }
   // todo
-  render?: any
+  render?: { [k: string]: any; is: string }
   // todo
   /** @default true */
   editable?: boolean
@@ -29,7 +28,7 @@ export interface FieldBase {
 
 export type FieldColumn = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'render'>
 export type FieldForm = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'editor' | 'editable' | 'required'>
-export type FieldView = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'render' | 'html'>
+export type FieldView = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'render'>
 
 export interface Relation {
   table: string

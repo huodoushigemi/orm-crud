@@ -3,6 +3,8 @@
 
     <ElDescriptionsItem v-for="col in parsed.fields" :label="col.label">
       <RelTag v-if="col.relation" :data="getP($data, col.prop)" :rel="col.relation" />
+      <!-- <template v-else>{{ getP($data, col.prop) }}</template> -->
+      <Render v-else-if="col.render" v-bind="col.render" :data="$data" :field="col" />
       <template v-else>{{ getP($data, col.prop) }}</template>
     </ElDescriptionsItem>
   </ElDescriptions>
@@ -28,6 +30,7 @@ import { toReactive, useBreakpoints, breakpointsTailwind, reactify, reactifyObje
 import { useRequest } from 'vue-request'
 import { ElDescriptions, ElDescriptionsItem } from 'element-plus'
 import { set, pick, unionBy } from 'lodash-es'
+import Render from '@el-lowcode/render'
 import { TableCtx, NormalizedField } from '@orm-crud/core'
 import { findFieldPath, getP, isRelMany, normalizeField, pathReverse } from '@orm-crud/core/utils'
 import RelTag from './RelTag.vue'

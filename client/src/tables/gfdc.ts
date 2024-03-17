@@ -227,7 +227,7 @@ export const gfdc_guide_config: TableOpt = {
     { prop: 'EFFECTIVE_SCOPE', options: [{ label: '产品指南', value: 'SystemGuide' }, { label: '操作指南', value: 'BiGuide' }, { label: '常见问题', value: 'QuestionNormally' }] },
     { prop: 'TITLE', filter: 'contains' },
     { prop: 'ICON' },
-    { prop: 'CONTENT', editor: 'el-input', el: { type: 'textarea', autosize: { minRows: 4 } } },
+    { prop: 'CONTENT', editor: { type: 'textarea', autosize: { minRows: 4 } } },
     { prop: 'IF_VALID', options: [{ label: '失效', value: 0 }, { label: '有效', value: 1 }] },
     { prop: 'SORT' },
     { prop: 'CREATOR_NO' },

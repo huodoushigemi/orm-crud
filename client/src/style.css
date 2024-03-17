@@ -1,5 +1,11 @@
-.dark body {
-  background: #1e1e20;
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  /* background: #1e1e20; */
+  background: var(--el-bg-color);
 }
 
 .el-card--small {
@@ -16,4 +22,12 @@
 .orm-dialog .el-dialog__body {
   flex: 1;
   height: 0;
+}
+
+.crud-search {
+  background-color: var(--el-bg-color-overlay) !important;
+}
+
+.crud-header {
+  background-color: var(--el-bg-color-overlay) !important;
 }

@@ -6,14 +6,14 @@ export const User: TableOpt = {
   label: '用户',
   fields: [
     { label: 'id', prop: 'id' },
-    { label: '名称', prop: 'name', required, filter: 'contains' },
-    { label: '年龄', prop: 'age', required },
+    { label: '名称', prop: 'name', required, filter: 'contains', editor: { type: 'textarea', autosize: { minRows: 4 } } },
+    { label: '年龄', prop: 'age', required, editor: { is: 'el-input-number' } },
     { prop: 'sex', required, options: [{ label: 'man', value: 0 }, { label: 'woman', value: 1 }] },
-    { label: '邮箱', prop: 'email', required },
+    { label: '邮箱', prop: 'email', required, render: { is: 'my-img', width: 100 } },
     { label: 'following', prop: 'following', relation: { table: 'User', rel: 'm-n' }, inverseSide: { prop: 'followedBy' } },
   ],
-  columns: ['id', 'name', 'age', 'email', 'posts', 'videos.video'],
-  forms: ['name', { prop: 'age', editor: 'el-input-number' }, 'email', 'following', { prop: 'videos.video' }],
+  columns: ['id', 'name', 'age', 'sex', 'videos.video'],
+  forms: ['name', { prop: 'age' }, 'sex', 'email', 'following', { prop: 'videos.video' }],
   searchs: ['following', 'videos.video', 'name', { prop: 'posts.title' }],
   map: { label: 'name' }
 }
@@ -23,7 +23,7 @@ export const Post: TableOpt = {
   fields: [
     { label: 'id', prop: 'id' },
     { label: '标题', prop: 'title', filter: 'contains' },
-    { label: '内容', prop: 'content', html: true, filter: 'contains' },
+    { label: '内容', prop: 'content', filter: 'contains' }, 
     { label: '作者', prop: 'author', relation: { table: 'User', rel: 'n-1' }, inverseSide: { label: '文章', prop: 'posts' } },
     { label: '标签', prop: 'tag', relation: { table: 'Tag', rel: 'm-n' }, inverseSide: { label: '标签', prop: 'posts' } },
   ],
@@ -66,9 +66,9 @@ export const Video: TableOpt = {
   fields: [
     { prop: 'id' },
     { prop: 'filename' },
-    { prop: 'size', editor: 'el-input-number' },
+    { prop: 'size', editor: { is: 'el-input-number' } },
     { prop: 'type' },
-    { prop: 'duration', editor: 'el-slider' },
+    { prop: 'duration', editor: { is: 'el-slider' } },
   ],
   columns: ['id', 'filename', 'users.id', 'users.user'],
   forms: ['filename', 'size', 'type', 'duration', 'users.user'],

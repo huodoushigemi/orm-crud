@@ -1,18 +1,18 @@
 <script setup lang="ts">
+import { computed, ref, watchEffect, getCurrentInstance } from 'vue'
+import { usePreferredDark, useDark } from '@vueuse/core'
 import { ElMessage } from 'element-plus'
-import Table from './Table.vue'
-import ConfigProvider from './ConfigProvider.vue'
 import tables from './tables/index'
-import RelGraph from './RelGraph.vue';
-import RelGraphDialog from './RelGraphDialog.vue'
-import FieldRWV from './FieldRW.vue';
+import { ConfigProvider, Table, FieldRWDialog, RWPermis } from '@orm-crud/ep'
+import { useDialogBind, $ } from '@orm-crud/ep/hooks'
 
-import { useDialogBind } from './hooks'
-import { computed, ref } from 'vue';
-import FieldRWDialog from './FieldRWDialog.vue';
-import { RWPermis } from './RWPermis';
-import { extend } from 'umi-request';
-import { IApiAdapter } from '@orm-crud/core';
+import { extend } from 'umi-request'
+import { IApiAdapter } from '@orm-crud/core'
+
+import EpSunny from '~icons/ep/sunny'
+import EpMoon from '~icons/ep/moon'
+
+const vm = getCurrentInstance().proxy
 
 const relgraphBind = useDialogBind()
 const fieldRwBind = useDialogBind()
@@ -47,20 +47,108 @@ request.interceptors.response.use(async (response, options) => {
 })
 
 const log = (...arg) => console.log(...arg)
+
+// watchEffect(() => log(vm.$route.params))
+
+const table = $(
+  () => vm.$route.params.table,
+  v => vm.$router.push(`/${v}`)
+)
+
+const dark = useDark({ selector: 'html', attribute: 'class', valueDark: 'dark', valueLight: '' })
 </script>
 
 <template>
   <ConfigProvider :tables="tables" :api="api">
+    <template #default="{ tables, ctxs }">
+      <div>
+        <header class="header">
+          <span style="font-size: 1.5em; margin-left: 24px;">🎁 Demo</span>
+          <el-switch v-model="dark" style="margin-left: auto; margin-right: 24px;" size="large" :active-action-icon="EpMoon" :inactive-action-icon="EpSunny" />
+        </header>
 
-    <Table table="gfdc_service_list" />
+        <aside class="menu">
+          <div v-for="ctx in Object.values(ctxs).filter(e => !e.middle)" :class="['item', ctx.table == table && 'is-active']" @click="table = ctx.table">
+            {{ ctx.label }}
+          </div>
+        </aside>
+  
+        <el-card class="page" body-style="padding: 0">
+        <!-- <main class="page"> -->
+          <Table :table="table" />
+        <!-- </main> -->
+        </el-card>
 
-    <br />
-
-    <!-- <Table table="Post" /> -->
-    <!-- <Table table="Video" /> -->
-
-    <FieldRWDialog v-if="fieldRwBind.showing" v-bind="fieldRwBind" @ok="log" />
-
-    <!-- <el-button @click="fieldRwBind.data = rwPermis">open</el-button> -->
+      </div>
+    </template>
   </ConfigProvider>
 </template>
+
+<style lang="scss">
+.header {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  line-height: 56px;
+  margin-bottom: 12px;
+  background-color: var(--el-bg-color-overlay) !important;
+  box-shadow: var(--el-box-shadow-light);
+}
+
+.menu {
+  position: fixed;
+  top: 68px;
+  left: 0;
+  height: 100%;
+  width: 200px;
+  overflow: auto;
+  background-color: var(--el-bg-color-overlay);
+  border-radius: 0 20px 20px 0;
+  box-shadow: var(--el-box-shadow);
+}
+
+.item {
+  position: relative;
+  padding: 10px 22px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    transition: 300ms all;
+    border-radius: 0 20px 20px 0;
+    background-color: var(--el-fill-color);
+    opacity: 0.4;
+    z-index: -1;
+  }
+
+  &:hover {
+
+    &::before {
+      width: 100%;
+      opacity: 1;
+    }
+  }
+
+  &.is-active {
+    color: var(--el-color-primary);
+
+    &::before {
+      width: 100%;
+      background-color: var(--el-fill-color-dark);
+      box-shadow: 0 0 20px -10 #00000080;
+      opacity: 1;
+    }
+  }
+}
+
+.page {
+  margin-left: 216px;
+  margin-right: 16px;
+  border-radius: 20px;
+  // padding-left: 24px;
+}
+</style>
