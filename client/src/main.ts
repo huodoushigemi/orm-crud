@@ -21,7 +21,7 @@ app.component('my-img', (props) => h('img', { ...props, src: gteVal(props) }))
 app.use(createRouter({
   history: createWebHashHistory(),
   routes: [
-    { path: '/', redirect: '/User' },
+    { path: '/', redirect: '/gfdc_auth_user' },
     { path: '/:table', component: App },
   ]
 }))

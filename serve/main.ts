@@ -13,7 +13,7 @@ import tables from '../client/src/tables'
 import { FindOpt, createCtxs } from '../client/packages/core'
 import { createPrismaAdapter } from '../client/packages/core/adapter/prisma'
 import { checkDataPermis, fieldFilter, fieldsFilter } from '../client/packages/core/utils'
-import { RWPermis } from '../client/src/RWPermis'
+import { RWPermis } from '../client/packages/ep/RWPermis'
 
 const rwMap = {
   'User': 4,
@@ -104,6 +104,10 @@ async function handlerWPermis(ctx: Koa.Context) {
 }
 
 app
+  .use(async (ctx, next) => {
+    console.log(1111);
+    await next()
+  })
   .use(cors())
   .use(bodyParser())
   .use(handlerErr)
@@ -115,5 +119,6 @@ app.on('err', (err) => {
 })
 
 app.listen(3000, () => {
-  console.log('\nhttp://localhost:3000/prisma')
+  // console.log('\nhttp://0.0.0.0:3000/prisma')
+  console.log('success')
 })

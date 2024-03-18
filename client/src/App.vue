@@ -21,7 +21,7 @@ const rwMap = ref({ 'User': 6, 'User.name': 4, 'User.age': 6 })
 const rwPermis = computed(() => RWPermis(rwMap.value))
 
 const request = extend({
-  prefix: 'http://localhost:3000/prisma'
+  prefix: '/prisma'
 })
 
 const api: IApiAdapter = {
@@ -40,7 +40,7 @@ request.interceptors.response.use(async (response, options) => {
   const { url, status } = response
   if (status != 200) {
     const text = await response.text()
-    ElMessage.error(text)
+    ElMessage.error(text || status + '')
     throw new Error(text)
   }
   return response
@@ -63,7 +63,7 @@ const dark = useDark({ selector: 'html', attribute: 'class', valueDark: 'dark', 
     <template #default="{ tables, ctxs }">
       <div>
         <header class="header">
-          <span style="font-size: 1.5em; margin-left: 24px;">🎁 Demo</span>
+          <span style="font-size: 1.5em; margin-left: 24px;">🎁 财经大脑 —— 不完全重构演示</span>
           <el-switch v-model="dark" style="margin-left: auto; margin-right: 24px;" size="large" :active-action-icon="EpMoon" :inactive-action-icon="EpSunny" />
         </header>
 
@@ -75,7 +75,7 @@ const dark = useDark({ selector: 'html', attribute: 'class', valueDark: 'dark', 
   
         <el-card class="page" body-style="padding: 0">
         <!-- <main class="page"> -->
-          <Table :table="table" />
+          <Table :key="table" :table="table" :tableAttrs="{ showOverflowTooltip: true }" />
         <!-- </main> -->
         </el-card>
 
@@ -86,6 +86,8 @@ const dark = useDark({ selector: 'html', attribute: 'class', valueDark: 'dark', 
 
 <style lang="scss">
 .header {
+  position: sticky;
+  top: 0;
   display: flex;
   align-items: center;
   height: 56px;
@@ -93,13 +95,14 @@ const dark = useDark({ selector: 'html', attribute: 'class', valueDark: 'dark', 
   margin-bottom: 12px;
   background-color: var(--el-bg-color-overlay) !important;
   box-shadow: var(--el-box-shadow-light);
+  z-index: 9;
 }
 
 .menu {
   position: fixed;
   top: 68px;
   left: 0;
-  height: 100%;
+  bottom: 0;
   width: 200px;
   overflow: auto;
   background-color: var(--el-bg-color-overlay);

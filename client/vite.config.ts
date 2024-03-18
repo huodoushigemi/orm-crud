@@ -19,6 +19,12 @@ export default defineConfig({
       '@orm-crud/ep': _resolve('packages/ep')
     }
   },
+  server: {
+    host: '0.0.0.0',
+    proxy: {
+      '/prisma': 'http://localhost:3000'
+    }
+  },
   plugins: [
     vue(),
     jsx(),
