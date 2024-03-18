@@ -21,7 +21,6 @@ model User {
   followedBy  User[]       @relation("follow")
   following   User[]       @relation("follow")
   videos      User_Video[]
-  fieldRW     FieldRW?
   reviewPosts Post[]       @relation("reviewPosts")
 }
 
@@ -47,8 +46,8 @@ model Comment {
   speaker   User      @relation(fields: [speakerId], references: [id])
   speakerId Int
   comments  Comment[] @relation("reply")
-  reply     Comment   @relation("reply", fields: [replyId], references: [id])
-  replyId   Int
+  reply     Comment?   @relation("reply", fields: [replyId], references: [id])
+  replyId   Int?
 }
 
 model Tag {

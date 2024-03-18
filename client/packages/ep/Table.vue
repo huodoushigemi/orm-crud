@@ -150,10 +150,10 @@ const log = (...arg) => console.log(...arg)
 
       <template #search>
         <template v-for="col in _searchs" :key="col.prop">
-          <ElFormItemRender v-if="col.relation" v-bind="col" :prop="col.prop.split('.')[0]">
+          <ElFormItemRender v-if="col.relation" v-bind="col" :prop="col.prop.split('.')[0]" :required="false">
             <Select v-model="searchModel[col.prop.split('.')[0]]" :table="table" :valueKey="col.prop" />
           </ElFormItemRender>
-          <ElFormItemRender v-else v-bind="col" />
+          <ElFormItemRender v-else v-bind="col" :required="false" />
         </template>
       </template>
 

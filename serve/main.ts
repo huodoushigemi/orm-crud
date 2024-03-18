@@ -104,10 +104,6 @@ async function handlerWPermis(ctx: Koa.Context) {
 }
 
 app
-  .use(async (ctx, next) => {
-    console.log(1111);
-    await next()
-  })
   .use(cors())
   .use(bodyParser())
   .use(handlerErr)

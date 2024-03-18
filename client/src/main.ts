@@ -16,12 +16,14 @@ app.use(ElementPlus)
 const gteVal = ({ data, field }: { data: any; field: NormalizedField }) => get(data, field.prop)
 
 app.component('my-img', (props) => h('img', { ...props, src: gteVal(props) }))
+app.component('my-html', (props) => h('div', { ...props, innerHTML: gteVal(props) }))
 
 
 app.use(createRouter({
   history: createWebHashHistory(),
   routes: [
-    { path: '/', redirect: '/gfdc_auth_user' },
+    // { path: '/', redirect: '/gfdc_auth_user' },
+    { path: '/', redirect: '/User' },
     { path: '/:table', component: App },
   ]
 }))

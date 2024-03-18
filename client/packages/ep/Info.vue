@@ -1,5 +1,5 @@
 <template>
-  <ElDescriptions border :column="column" style="margin-bottom: 22px;">
+  <ElDescriptions class="orm-info" border :column="column" style="margin-bottom: 22px;">
 
     <ElDescriptionsItem v-for="col in parsed.fields" :label="col.label">
       <RelTag v-if="col.relation" :data="getP($data, col.prop)" :rel="col.relation" />
@@ -91,6 +91,12 @@ function parseFields() {
 </script>
 
 <style scoped lang="scss">
+.orm-info {
+  :deep(.el-descriptions__label) {
+    text-wrap: nowrap;
+  }
+}
+
 .el-card--small {
   & > :deep(.el-card__body) {
     padding: 0;
