@@ -70,6 +70,7 @@ router.post('/removes/:table', async (ctx) => {
 })
 
 
+// 处理错误
 async function handlerErr(ctx, next) {
   try {
     await next()
@@ -80,6 +81,8 @@ async function handlerErr(ctx, next) {
   }
 }
 
+
+// 处理读权限
 async function handlerRPermis(ctx: Koa.Context) {
   return
   const { table } = ctx.params
@@ -96,6 +99,8 @@ async function handlerRPermis(ctx: Koa.Context) {
   if (flag) throw new Error(`无权限的标识 ${flag}`)
 }
 
+
+// 处理写错误
 async function handlerWPermis(ctx: Koa.Context) {
   const { table } = ctx.params
   const data: any = ctx.request.body
@@ -103,10 +108,40 @@ async function handlerWPermis(ctx: Koa.Context) {
   if (flag) throw new Error(`无权限的标识 ${flag}`)
 }
 
+
+// 处理操作日志
+async function handlerLog(ctx: Koa.Context, next) {
+  if (!['create', 'update', 'remove', 'removes'].find(e => ctx.url.startsWith('/prisma/' + e))) return next()
+  const [, , action, table] = ctx.url.split('/')
+  const st = new Date
+  let EXEC_STATUS = 1
+  try {
+    await next()
+  } catch(e) {
+    EXEC_STATUS = 0
+    throw e
+  } finally {
+    await prisma.gfdc_auth_sys_operation_log.create({
+      data: {
+        REMOTE_ADDR: ctx.request.ip,
+        REQUEST_PARAMS: JSON.stringify(ctx.request.body),
+        MODULE_NAME: table,
+        REQUEST_TYPE: 'POST',
+        RUNTIME: +new Date - +st,
+        REQUEST_URI: ctx.url,
+        EXEC_STATUS,
+        CREATE_TIME: st,
+        OPERATION_DESC: action
+      }
+    })
+  }
+}
+
 app
   .use(cors())
   .use(bodyParser())
   .use(handlerErr)
+  // .use(handlerLog)
   .use(router.routes())
   // .use(router.allowedMethods())
 

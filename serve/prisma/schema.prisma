@@ -19,7 +19,7 @@ model gfdc_auth_roletogfdc_auth_user {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model bpc_cube_data {
-  ID              String  @id @db.VarChar(32)
+  ID              String  @id @default(cuid()) @db.VarChar(32)
   REPORT_ID       String? @db.VarChar(50)
   ENTITY          String? @db.VarChar(100)
   TIME            String? @db.VarChar(100)
@@ -40,7 +40,7 @@ model bpc_cube_data {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_data_permission {
-  ID              String    @id @db.VarChar(32)
+  ID              String    @id @default(cuid()) @db.VarChar(32)
   RESOURCE_ID     String    @db.VarChar(32)
   FIELD_CODE      String    @db.VarChar(32)
   FIELD_NAME      String    @db.VarChar(32)
@@ -63,7 +63,7 @@ model gfdc_auth_data_permission {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_data_permission_config {
-  ID            String    @id @db.VarChar(32)
+  ID            String    @id @default(cuid()) @db.VarChar(32)
   AUTH_TYPE     String    @db.VarChar(32)
   AUTH_TYPE_ID  String    @db.VarChar(32)
   AUTH_SCOPE    String    @db.VarChar(32)
@@ -82,7 +82,7 @@ model gfdc_auth_data_permission_config {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_dictionary {
-  ID           String                      @id @db.VarChar(32)
+  ID           String                      @id @default(cuid()) @db.VarChar(32)
   DICT_CODE    String?                     @db.VarChar(128)
   DICT_NAME    String?                     @db.VarChar(128)
   DICT_NAME_EN String?                     @db.VarChar(128)
@@ -102,7 +102,7 @@ model gfdc_auth_dictionary {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_dictionary_item {
-  ID            String                @id @db.VarChar(32)
+  ID            String                @id @default(cuid()) @db.VarChar(32)
   DICTIONARY    gfdc_auth_dictionary? @relation(fields: [DICTIONARY_ID], references: [ID])
   DICTIONARY_ID String                @db.VarChar(32)
   ITEM_NAME     String?               @db.VarChar(128)
@@ -123,7 +123,7 @@ model gfdc_auth_dictionary_item {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_login_log {
-  ID           String    @id @db.VarChar(32)
+  ID           String    @id @default(cuid()) @db.VarChar(32)
   SYSTEM_CODE  String?   @db.VarChar(32)
   USER_ID      String?   @db.VarChar(32)
   EMP_NO       String?   @db.VarChar(36)
@@ -138,7 +138,9 @@ model gfdc_auth_login_log {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_org {
-  ID               String                  @id @db.VarChar(32)
+  ID               String                  @id @default(cuid()) @db.VarChar(32)
+  CHILDREN         gfdc_auth_org[]         @relation("tree")
+  PARENT           gfdc_auth_org?          @relation("tree", fields: [PARENT_ID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
   PARENT_ID        String                  @db.VarChar(36)
   DEPT_NO          String?                 @db.VarChar(36)
   DEPT_NAME        String                  @db.VarChar(500)
@@ -167,7 +169,7 @@ model gfdc_auth_org {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_resource {
-  ID                  String                          @id @db.VarChar(32)
+  ID                  String                          @id @default(cuid()) @db.VarChar(32)
   RESOURCE_NAME       String                          @db.VarChar(32)
   RESOURCE_CODE       String?                         @db.VarChar(32)
   SYSTEM              gfdc_auth_system_info?          @relation(fields: [SYSTEM_ID], references: [ID])
@@ -207,7 +209,7 @@ model gfdc_auth_resource {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_role {
-  ID            String                    @id @db.VarChar(32)
+  ID            String                    @id @default(cuid()) @db.VarChar(32)
   ROLE_NAME     String                    @db.VarChar(32)
   ROLE_DESC     String?                   @db.VarChar(64)
   SYSTEM        gfdc_auth_system_info     @relation(fields: [SYSTEM_ID], references: [ID])
@@ -228,7 +230,7 @@ model gfdc_auth_role {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_role_data_permission {
-  ID                        String    @id @db.VarChar(32)
+  ID                        String    @id @default(cuid()) @db.VarChar(32)
   ROLE_RESOURCE_ID          String    @db.VarChar(32)
   DATA_PERMISSION_CONFIG_ID String    @db.VarChar(32)
   IF_ENABLE                 Int?      @default(0)
@@ -249,7 +251,7 @@ model gfdc_auth_role_data_permission {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_role_resource {
-  ID          String             @id @db.VarChar(32)
+  ID          String             @id @default(cuid()) @db.VarChar(32)
   ROLE        gfdc_auth_role     @relation(fields: [ROLE_ID], references: [ID])
   ROLE_ID     String             @db.VarChar(32)
   RESOURCE    gfdc_auth_resource @relation(fields: [RESOURCE_ID], references: [ID])
@@ -269,7 +271,7 @@ model gfdc_auth_role_resource {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_sys_operation_log {
-  ID             String          @id @db.VarChar(32)
+  ID             String          @id @default(cuid()) @db.VarChar(32)
   SYSTEM_CODE    String?         @db.VarChar(32)
   MODULE_NAME    String?         @db.VarChar(255)
   REMOTE_ADDR    String?         @db.VarChar(255)
@@ -294,7 +296,7 @@ model gfdc_auth_sys_operation_log {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_system_admin {
-  ID          String    @id @db.VarChar(32)
+  ID          String    @id @default(cuid()) @db.VarChar(32)
   SYSTEM_ID   String    @db.VarChar(32)
   USER_ID     String    @db.VarChar(32)
   CREATOR_NO  String?   @db.VarChar(20)
@@ -309,7 +311,7 @@ model gfdc_auth_system_admin {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_system_info {
-  ID          String               @id @db.VarChar(32)
+  ID          String               @id @default(cuid()) @db.VarChar(32)
   SYSTEM_NAME String               @db.VarChar(32)
   SYSTEM_CODE String               @db.VarChar(32)
   SYSTEM_DESC String?              @db.VarChar(64)
@@ -327,7 +329,7 @@ model gfdc_auth_system_info {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_task {
-  ID              String    @id @db.VarChar(32)
+  ID              String    @id @default(cuid()) @db.VarChar(32)
   JOB_NAME        String    @db.VarChar(32)
   DESCRIPTION     String?   @db.VarChar(128)
   CRON_EXPRESSION String?   @db.VarChar(32)
@@ -347,7 +349,7 @@ model gfdc_auth_task {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_user {
-  ID                String                        @id @db.VarChar(32)
+  ID                String                        @id @default(cuid()) @db.VarChar(32)
   EMP_NO            String                        @db.VarChar(36)
   USER_NAME         String?                       @db.VarChar(64)
   USER_ACCOUNT      String?                       @db.VarChar(36)
@@ -371,7 +373,7 @@ model gfdc_auth_user {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_user_data_permission {
-  ID                        String    @id @db.VarChar(32)
+  ID                        String    @id @default(cuid()) @db.VarChar(32)
   USER_RESOURCE_ID          String    @db.VarChar(32)
   DATA_PERMISSION_CONFIG_ID String    @db.VarChar(32)
   IF_ENABLE                 Int?      @default(0)
@@ -392,7 +394,7 @@ model gfdc_auth_user_data_permission {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_user_extend {
-  ID             String         @id @db.VarChar(32)
+  ID             String         @id @default(cuid()) @db.VarChar(32)
   USER           gfdc_auth_user @relation(fields: [USER_ID], references: [ID])
   USER_ID        String         @db.VarChar(36)
   IS_MAIN_JOB    Int            @default(1)
@@ -417,7 +419,7 @@ model gfdc_auth_user_extend {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_user_resource {
-  ID          String    @id @db.VarChar(32)
+  ID          String    @id @default(cuid()) @db.VarChar(32)
   USER_ID     String    @db.VarChar(32)
   RESOURCE_ID String    @db.VarChar(32)
   CREATOR_NO  String?   @db.VarChar(20)
@@ -435,7 +437,7 @@ model gfdc_auth_user_resource {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_auth_user_role {
-  ID          String         @id @db.VarChar(32)
+  ID          String         @id @default(cuid()) @db.VarChar(32)
   USER        gfdc_auth_user @relation(fields: [USER_ID], references: [ID])
   USER_ID     String         @db.VarChar(32)
   ROLE        gfdc_auth_role @relation(fields: [ROLE_ID], references: [ID])
@@ -495,7 +497,7 @@ model gfdc_data_asset_indicator {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_exchange_rate_history {
-  ID            String   @id @db.VarChar(32)
+  ID            String   @id @default(cuid()) @db.VarChar(32)
   CURRENCY_FROM String?  @db.VarChar(10)
   CURRENCY_TO   String?  @db.VarChar(10)
   RATE          Decimal? @db.Decimal(20, 6)
@@ -504,7 +506,7 @@ model gfdc_exchange_rate_history {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_feedback {
-  ID          String    @id @db.VarChar(32)
+  ID          String    @id @default(cuid()) @db.VarChar(32)
   FEEDBACK    String?   @db.VarChar(500)
   CREATOR     String?   @db.VarChar(36)
   CREATOR_NO  String?   @db.VarChar(20)
@@ -518,7 +520,7 @@ model gfdc_feedback {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_guide_config {
-  ID              String    @id @db.VarChar(32)
+  ID              String    @id @default(cuid()) @db.VarChar(32)
   SYSTEM_CODE     String    @db.VarChar(50)
   EFFECTIVE_SCOPE String    @db.VarChar(50)
   TITLE           String    @db.VarChar(100)
@@ -538,7 +540,7 @@ model gfdc_guide_config {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_indicator_define {
-  ID              String                               @id @db.VarChar(32)
+  ID              String                               @id @default(cuid()) @db.VarChar(32)
   INDICATOR_NAME  String?                              @db.VarChar(50)
   CALCULATE_LOGIC String?                              @db.LongText
   DATA_SOURCE     String?                              @db.VarChar(200)
@@ -717,7 +719,7 @@ model gfdc_message_rule_config {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_message_send_history {
-  ID          String    @id @db.VarChar(32)
+  ID          String    @id @default(cuid()) @db.VarChar(32)
   MESSAGE_ID  String    @db.VarChar(32)
   SEND_TYPE   String    @db.VarChar(50)
   TITLE       String    @db.VarChar(200)
@@ -732,7 +734,7 @@ model gfdc_message_send_history {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_message_task {
-  ID              String    @id @db.VarChar(32)
+  ID              String    @id @default(cuid()) @db.VarChar(32)
   JOB_NAME        String?   @db.VarChar(156)
   DESCRIPTION     String?   @db.VarChar(128)
   CRON_EXPRESSION String?   @db.VarChar(32)
@@ -752,7 +754,7 @@ model gfdc_message_task {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_message_wechat_his {
-  id                String    @id @db.VarChar(32)
+  id                String    @id @default(cuid()) @db.VarChar(32)
   message           String?   @db.LongText
   wechat_message_id String?   @db.VarChar(100)
   active            String?   @db.VarChar(100)
@@ -768,7 +770,7 @@ model gfdc_message_wechat_his {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_message_wechat_html {
-  id           String    @id @db.VarChar(32)
+  id           String    @id @default(cuid()) @db.VarChar(32)
   message_code String?   @db.VarChar(100)
   html         String?   @db.LongText
   CREATOR_NO   String?   @db.VarChar(20)
@@ -826,7 +828,7 @@ model gfdc_report_ds {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_search_log {
-  ID          String    @id @db.VarChar(32)
+  ID          String    @id @default(cuid()) @db.VarChar(32)
   REFERER     String    @db.VarChar(200)
   KEYWORD     String    @db.VarChar(200)
   CREATOR_NO  String?   @db.VarChar(20)
@@ -836,7 +838,7 @@ model gfdc_search_log {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_service_list {
-  ID              String                               @id @db.VarChar(32)
+  ID              String                               @id @default(cuid()) @db.VarChar(32)
   MODULE          String?                              @db.VarChar(50)
   RESOURCE        gfdc_auth_resource?                  @relation(fields: [RESOURCE_ID], references: [ID])
   RESOURCE_ID     String?                              @db.VarChar(32)
@@ -856,7 +858,7 @@ model gfdc_service_list {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_service_list_indicator_define {
-  ID                  String                 @id @db.VarChar(32)
+  ID                  String                 @id @default(cuid()) @db.VarChar(32)
   SERVICE_LIST        gfdc_service_list?     @relation(fields: [SERVICE_LIST_ID], references: [ID])
   SERVICE_LIST_ID     String?                @db.VarChar(32)
   INDICATOR_DEFINE    gfdc_indicator_define? @relation(fields: [INDICATOR_DEFINE_ID], references: [ID])
@@ -873,7 +875,7 @@ model gfdc_service_list_indicator_define {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_sjkd_data_model {
-  ID                  String                          @id @db.VarChar(32)
+  ID                  String                          @id @default(cuid()) @db.VarChar(32)
   MODEL_CODE          String                          @db.VarChar(50)
   MODEL_NAME          String                          @db.VarChar(50)
   DATA_FORM_JSON      String?                         @db.Text
@@ -890,7 +892,7 @@ model gfdc_sjkd_data_model {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_sjkd_data_model_fields {
-  ID                  String    @id @db.VarChar(32)
+  ID                  String    @id @default(cuid()) @db.VarChar(32)
   DATA_MODEL_ID       String    @db.VarChar(32)
   FIELD_CODE          String    @db.VarChar(50)
   FIELD_NAME          String    @db.VarChar(50)
@@ -911,7 +913,7 @@ model gfdc_sjkd_data_model_fields {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_sjkd_data_model_resource {
-  ID            String                @id @db.VarChar(32)
+  ID            String                @id @default(cuid()) @db.VarChar(32)
   DATA_MODEL    gfdc_sjkd_data_model? @relation(fields: [DATA_MODEL_ID], references: [ID])
   DATA_MODEL_ID String                @db.VarChar(32)
   RESOURCE      gfdc_auth_resource?   @relation(fields: [RESOURCE_ID], references: [ID])
@@ -1080,7 +1082,7 @@ model gfdc_target_item {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model gfdc_three_major_report {
-  ID             String  @id @db.VarChar(32)
+  ID             String  @id @default(cuid()) @db.VarChar(32)
   API_CODE       String? @db.VarChar(50)
   API_NAME       String? @db.VarChar(50)
   STOCK_TYPE     String? @db.VarChar(50)
@@ -1112,7 +1114,7 @@ model gfdc_user_collect_info {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model zbpc_fw_exp_001 {
-  ID            String  @id @db.VarChar(32)
+  ID            String  @id @default(cuid()) @db.VarChar(32)
   ENTITY_CODE   String? @db.VarChar(100)
   ENTITY_NAME   String? @db.VarChar(100)
   TIME          String? @db.VarChar(100)

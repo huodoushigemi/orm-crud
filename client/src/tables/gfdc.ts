@@ -55,7 +55,7 @@ export const gfdc_auth_org: TableOpt = {
   label: '组织',
   fields: [
     { label: 'ID', prop: 'ID' },
-    { label: '父', prop: 'PARENT_ID' },
+    { label: '父', prop: 'PARENT', relation: { table: 'gfdc_auth_org', rel: 'n-1' }, inverseSide: { label: '子', prop: 'CHILDREN' } },
     { label: '组织编号', prop: 'DEPT_NO' },
     { label: '组织名称', prop: 'DEPT_NAME', filter: 'contains' },
     { label: '组织层级', prop: 'DEPT_LAYER' },
@@ -192,8 +192,8 @@ export const gfdc_auth_sys_operation_log: TableOpt = {
   label: '操作日志',
   fields: [
     { prop: 'ID' },
-    { label: '系统', prop: 'SYSTEM_CODE' },
-    { label: '模块', prop: 'MODULE_NAME' },
+    { label: '系统', prop: 'SYSTEM_CODE' }, // todo
+    { label: '模块', prop: 'MODULE_NAME' }, // todo
     { label: 'ip', prop: 'REMOTE_ADDR' },
     { label: '操作人', prop: 'USER', relation: { table: 'gfdc_auth_user', rel: 'n-1' }, inverseSide: { label: '操作日志', prop: 'SYS_OPERATION_LOG' } },
     { prop: 'USER_ACCOUNT' },
@@ -202,7 +202,7 @@ export const gfdc_auth_sys_operation_log: TableOpt = {
     { prop: 'REQUEST_TYPE' },
     { prop: 'REQUEST_PARAMS' },
     { prop: 'EXEC_STATUS', options: [{ label: '失败', value: 0 }, { label: '成功', value: 1 }] },
-    { prop: 'RUNTIME' },
+    { prop: 'RUNTIME', editor: { is: 'el-input-number' } },
     { prop: 'CREATOR_NO' },
     { prop: 'CREATOR' },
     { prop: 'CREATE_TIME' },
@@ -253,7 +253,7 @@ export const gfdc_guide_config: TableOpt = {
     { prop: 'EFFECTIVE_SCOPE', options: [{ label: '产品指南', value: 'SystemGuide' }, { label: '操作指南', value: 'BiGuide' }, { label: '常见问题', value: 'QuestionNormally' }] },
     { prop: 'TITLE', filter: 'contains' },
     { prop: 'ICON' },
-    { prop: 'CONTENT', editor: { type: 'textarea', autosize: { minRows: 4 } } },
+    { prop: 'CONTENT', editor: { type: 'textarea', autosize: { minRows: 4 } }, render: { is: 'my-html' } },
     { prop: 'IF_VALID', options: [{ label: '失效', value: 0 }, { label: '有效', value: 1 }] },
     { prop: 'SORT' },
     { prop: 'CREATOR_NO' },
@@ -275,8 +275,8 @@ export const gfdc_message_object: TableOpt = {
   label: '消息中心',
   fields: [
     { prop: 'ID' },
-    { prop: 'MESSAGE_NAME' },
-    { prop: 'MESSAGE_CODE' },
+    { prop: 'MESSAGE_NAME', filter: 'contains' },
+    { prop: 'MESSAGE_CODE', filter: 'contains' },
     { prop: 'TYPE' },
     { prop: 'TITLE' },
     { prop: 'MESSAGE' },
@@ -292,8 +292,8 @@ export const gfdc_message_object: TableOpt = {
     { prop: 'end_time' },
   ],
   columns: ['MESSAGE_NAME', 'MESSAGE_CODE', 'TYPE', 'CREATOR', 'CREATE_TIME'],
-  // forms: ['MESSAGE_NAME', 'MESSAGE_CODE', 'TYPE'],
-  // searchs: ['MESSAGE_NAME', 'MESSAGE_CODE'],
+  forms: ['MESSAGE_NAME', 'MESSAGE_CODE', 'TYPE'],
+  searchs: ['MESSAGE_NAME', 'MESSAGE_CODE'],
   map: { label: 'MESSAGE_NAME', id: 'ID' },
 }
 
@@ -344,7 +344,7 @@ export const gfdc_sjkd_data_model: TableOpt = {
 }
 
 export const gfdc_sjkd_data_model_resource: TableOpt = {
-  label: '数据模型资源',
+  label: '_数据模型资源',
   fields: [
     { prop: 'ID' },
     { prop: 'DATA_MODEL', relation: { table: 'gfdc_sjkd_data_model', rel: 'n-1' }, inverseSide: { label: '资源', prop: 'DATA_MODEL_RESOURCE' } },
@@ -447,7 +447,7 @@ export const gfdc_report_dataset: TableOpt = {
     { label: '主键', prop: 'ID' },
     { label: '数据集类型', prop: 'DATASET_TYPE' },
     { label: '数据集名称', prop: 'DATASET_NAME', filter: 'contains' },
-    { label: '查询语句', prop: 'DATASET_SQL' }, // todo textarea
+    { label: '查询语句', prop: 'DATASET_SQL', editor: { type: 'textarea', autosize: { minRows: 4 } } },
     { label: '查询条件', prop: 'PARAMETERS' },
     { label: '数据源', prop: 'DS', relation: { table: 'gfdc_report_ds', rel: 'n-1' }, inverseSide: { label: '数据集', prop: 'DATASET' } },
     { label: '是否启用', prop: 'VALID', options: [{ label: '禁用', value: 0 }, { label: '启用', value: 1 }] },
@@ -587,7 +587,7 @@ export const gfdc_service_list: TableOpt = {
 }
 
 export const gfdc_service_list_indicator_define: TableOpt = {
-  label: '服务指标',
+  label: '_服务指标',
   fields: [
     { prop: 'ID' },
     { prop: 'SERVICE_LIST', relation: { table: 'gfdc_service_list', rel: 'n-1' }, inverseSide: { label: '服务指标', prop: 'SL_INDICATOR' } },

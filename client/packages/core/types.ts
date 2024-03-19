@@ -17,10 +17,12 @@ export interface FieldBase {
   options?: any[]
   // todo
   type?: string
-  // todo
   editor?: { [k: string]: any; is?: string }
-  // todo
   render?: { [k: string]: any; is: string }
+  // todo
+  searcher?: { [k: string]: any; is: string }
+  // todo
+  select?: { [k: string]: any; is: string }
   // todo
   /** @default true */
   editable?: boolean

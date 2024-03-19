@@ -22,8 +22,8 @@ app.component('my-html', (props) => h('div', { ...props, innerHTML: gteVal(props
 app.use(createRouter({
   history: createWebHashHistory(),
   routes: [
-    // { path: '/', redirect: '/gfdc_auth_user' },
-    { path: '/', redirect: '/User' },
+    { path: '/', redirect: '/gfdc_auth_user' },
+    // { path: '/', redirect: '/User' },
     { path: '/:table', component: App },
   ]
 }))
