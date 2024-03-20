@@ -57,6 +57,7 @@ const formatter = (row, col: NormalizedField, val) => {
 }
 
 const searchModel = ref({})
+let orderBy: any
 
 async function request(_, data, type) {
   if (type == 'list') {
@@ -64,7 +65,8 @@ async function request(_, data, type) {
       where: { ...data, $page: undefined, $pageSize: undefined },
       select: _columns.value.map(e => isString(e) ? e : e.prop),
       skip: (data.$page - 1) * data.$pageSize,
-      take: data.$pageSize
+      take: data.$pageSize,
+      orderBy
     })
   }
   if (type == 'get') {
@@ -121,7 +123,7 @@ const log = (...arg) => console.log(...arg)
       ref="crudRef"
       class="orm-table_table"
       :schema="ctx().fields"
-      :columns="_columns"
+      :columns="_columns.map(e => ({ ...e, sortable: !e.relation && !e.prop.includes('.') && 'custom' }))"
       url="xxx"
       :request="request"
       v-model:search="searchModel"
@@ -131,6 +133,10 @@ const log = (...arg) => console.log(...arg)
         rowKey: ctx().map.id,
         cellStyle: ({ row }) => row == menu.row ? { 'background-color': 'var(--el-table-current-row-bg-color)' } : undefined,
         onRowContextmenu: openMenu,
+        onSortChange: ({ prop, order }) => {
+          orderBy = order ? { [prop]: order.replace('ending', '') } : undefined
+          crudRef.getData()
+        },
         ...$attrs.tableAttrs
       }"
     >
