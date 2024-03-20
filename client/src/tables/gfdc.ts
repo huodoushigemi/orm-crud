@@ -21,7 +21,7 @@ export const gfdc_auth_user: TableOpt = {
     { label: '逻辑删除', prop: 'DEL_FLAG' },
     { label: '乐观锁', prop: 'VERSION' },
   ],
-  columns: ['EMP_NO', 'USER_NAME', 'USER_ACCOUNT', 'USER_STATE', 'PERSON_PHOTO', 'MOBILE', 'EMAIL'],
+  columns: ['EMP_NO', 'USER_NAME', 'USER_ACCOUNT', 'USER_STATE', 'PERSON_PHOTO', 'MOBILE', 'EMAIL', 'CREATE_TIME'],
   searchs: ['USER_NAME', 'USER_ROLE.ROLE', 'USER_STATE'],
   forms: ['EMP_NO', 'USER_NAME', 'USER_ACCOUNT', 'USER_STATE', 'PERSON_PHOTO', 'MOBILE', 'EMAIL'],
   map: { label: 'USER_NAME', id: 'ID' },
@@ -383,7 +383,7 @@ export const gfdc_auth_dictionary: TableOpt = {
   ],
   columns: ['DICT_NAME', 'DICT_CODE', 'DICT_NAME_EN', 'DESCRIPTION', 'ORDER_NUM', 'USE_STATE', 'ITEMS'],
   forms: ['DICT_CODE', 'DICT_NAME', 'DICT_NAME_EN', 'DESCRIPTION', 'ORDER_NUM', 'USE_STATE'],
-  searchs: ['DICT_CODE', 'DICT_NAME', 'USE_STATE'],
+  searchs: ['DICT_CODE', 'DICT_NAME', 'USE_STATE', 'ITEMS'],
   map: { label: 'DICT_NAME', id: 'ID' }
 }
 
@@ -392,7 +392,7 @@ export const gfdc_auth_dictionary_item: TableOpt = {
   fields: [
     { prop: 'ID' },
     { prop: 'DICTIONARY', relation: { table: 'gfdc_auth_dictionary', rel: 'n-1' }, inverseSide: { label: '字典 Item', prop: 'ITEMS' } },
-    { prop: 'ITEM_NAME' },
+    { prop: 'ITEM_NAME', filter: 'contains' },
     { prop: 'ITEM_NAME_EN' },
     { prop: 'ITEM_VALUE' },
     { prop: 'DESCRIPTION' },
