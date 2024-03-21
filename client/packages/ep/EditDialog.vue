@@ -10,7 +10,7 @@
     <EditForm ref="formRef" :table="table" :model="model" :fields="select" />
 
     <template #footer>
-      <el-button>取消</el-button>
+      <el-button @click="emit('update:vis', false)">取消</el-button>
       <el-button type="primary" :disabled="okLoading" :loading="okLoading" @click="ok">确认</el-button>
     </template>
 

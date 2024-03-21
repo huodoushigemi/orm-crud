@@ -7,41 +7,8 @@ type CreateCtxsOptions = {
   api?: IApiAdapter
 }
 
-const inverseRelMap = {
-  '1-1': '1-1',
-  '1-n': 'n-1',
-  'n-1': '1-n',
-  'm-n': 'm-n',
-} as const
-
 export function createCtxs(tables: Record<string, TableOpt>, opt?: CreateCtxsOptions): TableCtxs {
   const { fieldFilter, api = {} } = opt || {}
-  
-  // init inverseSide
-  const set = new WeakSet
-  Object.keys(tables).forEach(table => {
-    const tableOpt = tables[table]
-    tableOpt.fields.forEach(e => {
-      if (set.has(e)) return
-      const rel = e.relation
-      if (!rel || !e.inverseSide) return
-      e.inverseSide.table = table
-      if (rel) {
-        const side = e?.inverseSide
-        const field: Field = {
-          label: side.label,
-          prop: side.prop,
-          relation: {
-            table,
-            rel: inverseRelMap[rel.rel],
-          },
-          inverseSide: { table: rel.table , label: e.label, prop: e.prop }
-        }
-        set.add(field)
-        tables[rel.table].fields.push(field)
-      }
-    })
-  })
 
   // init ctxs
   const ctxs = Object.keys(tables).reduce((ctxs, table) => {

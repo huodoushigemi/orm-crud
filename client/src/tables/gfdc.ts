@@ -80,6 +80,7 @@ export const gfdc_auth_org: TableOpt = {
     { label: '乐观锁', prop: 'VERSION' },
   ],
   columns: ['DEPT_NO', 'DEPT_NAME', 'DEPT_LAYER', 'ALL_PID', 'DEPT_STATE'],
+  forms: ['DEPT_NO', 'DEPT_NAME', 'DEPT_LAYER', 'ALL_PID', 'DEPT_STATE'],
   searchs: ['DEPT_NAME', 'DEPT_STATE'],
   map: { label: 'DEPT_NAME', id: 'ID' },
 }

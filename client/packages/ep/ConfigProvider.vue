@@ -15,7 +15,7 @@ const tables = $(() => clone(props.tables))
 const config: ConfigProviderContext = toReactive({
   ...toRefs(props),
   tables,
-  ctxs: computed(() => createCtxs(tables.value, {
+  ctxs: computed(() => createCtxs(tables(), {
     fieldFilter: props.rwPermis ? (ctx, prop) => fieldFilter(ctx, prop, props.rwPermis!.r) : undefined,
     api: props.api,
   })),

@@ -224,6 +224,7 @@ model gfdc_auth_role {
   VERSION       Int?                      @default(1)
   USER_ROLE     gfdc_auth_user_role[]
   ROLE_RESOURCE gfdc_auth_role_resource[]
+  FIELD_RW      field_rw?
 
   @@index([SYSTEM_ID], map: "pk_gar_system_id")
 }
@@ -1164,4 +1165,14 @@ model zbpc_fw_exp_001 {
   COL042        String? @db.VarChar(50)
   COL043        String? @db.VarChar(50)
   COL044        String? @db.VarChar(50)
+}
+
+model field_rw {
+  ID          String          @id @default(cuid()) @db.VarChar(32)
+  // user   User   @relation(fields: [userId], references: [id])
+  // userId Int    @unique
+  PERMIS      String          @db.Text
+  CREATE_TIME DateTime?       @default(now()) @db.DateTime(0)
+  ROLE        gfdc_auth_role? @relation(fields: [ROLE_ID], references: [ID])
+  ROLE_ID     String?         @unique
 }

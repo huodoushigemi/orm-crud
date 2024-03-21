@@ -1,7 +1,7 @@
 import { Arrayable } from '@vueuse/core'
 import { isObject, isArray } from '@vue/shared'
 import { get, set, merge, isEqual, keyBy } from 'lodash-es'
-import { TableCtx, Field, NormalizedField, RelField, Relation, NRelField, FieldFilter } from './types'
+import { TableCtx, Field, NormalizedField, RelField, NRelField, FieldFilter, TableOpt } from './types'
 
 export function findFieldPath(ctx: TableCtx, prop: string | string[], skip?: FieldFilter): NormalizedField[] {
   let _ctx = ctx
@@ -202,7 +202,7 @@ export function fieldFilter(ctx: TableCtx, prop: string, cb: (flag: string) => b
       if (nFields[i].relation) {
         table = nFields[i].relation!.table
       }
-      else if (ctx.ctxs[table].map.id != nFields[i].prop) {
+      else {
         const flag = `${table}.${nFields[i].prop}`
         if (!cb(flag)) return false
       }
@@ -211,8 +211,14 @@ export function fieldFilter(ctx: TableCtx, prop: string, cb: (flag: string) => b
     }
   }
   else {
-    const flag = `${ctx.table}.${prop}`
-    return cb(flag)
+    const nField = normalizeField(ctx, prop)
+    if (nField.relation) {
+      table = nField.relation.table
+      return cb(table)
+    } else {
+      const flag = `${ctx.table}.${prop}`
+      return cb(flag)
+    }
   }
   return true
 }
@@ -245,4 +251,40 @@ export function dataWalker(ctx: TableCtx, data: Record<string, any>, cb: (ctx: T
       if (ret !== undefined) return ret
     }
   }
+}
+
+const inverseRelMap = {
+  '1-1': '1-1',
+  '1-n': 'n-1',
+  'n-1': '1-n',
+  'm-n': 'm-n',
+} as const
+
+export function transformTables(tables: Record<string, TableOpt>) {
+  // transform inverseSide
+  const set = new WeakSet
+  Object.keys(tables).forEach(table => {
+    const tableOpt = tables[table]
+    tableOpt.fields.forEach(e => {
+      if (set.has(e)) return
+      const rel = e.relation
+      if (!rel) return
+      if (!e.inverseSide) throw new Error(`表 ${table} 关联字段 ${e.prop} 缺失 inverseSide`)
+
+      e.inverseSide.table = table
+      const side = e.inverseSide
+      const field: Field = {
+        label: side.label,
+        prop: side.prop,
+        relation: {
+          table,
+          rel: inverseRelMap[rel.rel],
+        },
+        inverseSide: { table: rel.table , label: e.label, prop: e.prop }
+      }
+      set.add(field)
+      tables[rel.table].fields.push(field)
+    })
+  })
+  return tables
 }

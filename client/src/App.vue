@@ -17,9 +17,6 @@ const vm = getCurrentInstance().proxy
 const relgraphBind = useDialogBind()
 const fieldRwBind = useDialogBind()
 
-const rwMap = ref({ 'User': 6, 'User.name': 4, 'User.age': 6 })
-const rwPermis = computed(() => RWPermis(rwMap.value))
-
 const request = extend({
   prefix: '/prisma'
 })
@@ -37,11 +34,15 @@ const api: IApiAdapter = {
 
 // api.
 request.interceptors.response.use(async (response, options) => {
-  const { url, status } = response
+  const { status } = response
   if (status != 200) {
     const text = await response.text()
     ElMessage.error(text || status + '')
     throw new Error(text)
+  }
+  
+  if (options.url == '/update/field_rw') {
+    await getRWPermis()
   }
   return response
 })
@@ -55,16 +56,28 @@ const table = $(
   v => vm.$router.push(`/${v}`)
 )
 
+const rwMap = ref({})
+const rwPermis = computed(() => RWPermis(rwMap.value))
+getRWPermis()
+
+function getRWPermis() {
+  return request.post('/find/field_rw', { data: { where: { ID: 'clu10rd0900009qie86kzs47n' } } }).then(e => rwMap.value = JSON.parse(e.PERMIS))
+}
+
+
 const dark = useDark({ selector: 'html', attribute: 'class', valueDark: 'dark', valueLight: '' })
+const admin = ref(false)
 </script>
 
 <template>
-  <ConfigProvider :tables="tables" :api="api">
+  <ConfigProvider :tables="tables" :api="api" :rwPermis="admin ? undefined : rwPermis">
     <template #default="{ tables, ctxs }">
       <div>
         <header class="header">
-          <span style="font-size: 1.5em; margin-left: 24px;">🎁 财经大脑 —— 不完全重构演示</span>
-          <el-switch v-model="dark" style="margin-left: auto; margin-right: 24px;" size="large" :active-action-icon="EpMoon" :inactive-action-icon="EpSunny" />
+          <span style="font-size: 1.5em; margin-left: 24px;">🎁  —— 不完全重构演示</span>
+          <div style="flex: 1"></div>
+          <el-switch v-model="admin" style="margin-left: 16px; margin-right: 24px;" size="large" active-text="admin" />
+          <el-switch v-model="dark" style="margin-left: 16px; margin-right: 24px;" size="large" :active-action-icon="EpMoon" :inactive-action-icon="EpSunny" />
         </header>
 
         <aside class="menu">

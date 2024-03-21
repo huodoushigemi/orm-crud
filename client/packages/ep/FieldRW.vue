@@ -15,9 +15,11 @@ import { useConfig } from './context'
 import { $ } from './hooks'
 import { IRWPermis } from './RWPermis'
 
-defineProps<{
+const props = defineProps<{
   permis: IRWPermis
 }>()
+
+const emit = defineEmits(['change'])
 
 const config = useConfig()
 
@@ -37,9 +39,11 @@ function toggle(node, oper: (flag: string, plus?: boolean) => boolean) {
     if (!oper(key) || !checkedAll) {
       oper(key, true)
       node.children.forEach(e => oper(e.key, true))
+      emit('change', props.permis)
     } else {
       oper(key, false)
       node.children.forEach(e => oper(e.key, false))
+      emit('change', props.permis)
     }
   }
   else if (key.includes('.')) {
@@ -49,8 +53,10 @@ function toggle(node, oper: (flag: string, plus?: boolean) => boolean) {
     const parentData = datas().find(e => e.key == table)!
     if (parentData.children.some(e => oper(e.key))) {
       oper(table, true)
+      emit('change', props.permis)
     } else {
       oper(table, false)
+      emit('change', props.permis)
     }
   }
 }
