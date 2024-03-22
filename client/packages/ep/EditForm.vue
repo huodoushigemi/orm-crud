@@ -42,7 +42,11 @@ watch(() => props.model, v => raw.value = JSON.parse(JSON.stringify(v)))
 
 const fields = () => props.fields || ctx().forms?.map(e => isString(e) ? e : e.prop)
 
-const nFields = computed(() => fields().map(e => normalizeField(ctx(), e)))
+const nFields = computed(() => {
+  let ret = fields().map(e => normalizeField(ctx(), e))
+  if (rwPermis()) 
+  return ret
+})
 
 const formRef = ref({})
 defineExpose(toReactive(formRef))

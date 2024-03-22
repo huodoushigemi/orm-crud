@@ -7,7 +7,7 @@ const field_rw: TableOpt = {
   label: '字段权限',
   fields: [
     { prop: 'ID' },
-    { label: '权限', prop: 'PERMIS', editor: { is: 'field-rw-input' } }
+    { label: '权限', prop: 'PERMIS', filter: 'contains', editor: { is: 'field-rw-input' } }
   ],
   columns: ['PERMIS'],
   forms: ['PERMIS'],
