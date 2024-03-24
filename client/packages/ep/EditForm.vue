@@ -1,10 +1,10 @@
 <template>
   <ElFormRender ref="formRef" :model="model" label-Width="100px">
     <template v-for="col in nFields">
-      <ElFormItemRender v-if="col.relation" v-bind="col" :el="{ is: col.editor, disabled: isDisabled(col) }">
+      <ElFormItemRender v-if="col.relation" v-bind="col" :el="{ ...col.el, disabled: isDisabled(col) }">
         <RelSelect2 :model="model" :raw="raw" :table="table" :field="col" />
       </ElFormItemRender>
-      <ElFormItemRender v-else v-bind="col" :el="{ ...col.editor, disabled: isDisabled(col) }" />
+      <ElFormItemRender v-else v-bind="col" :el="{ ...col.el, disabled: isDisabled(col) }" />
     </template>
   </ElFormRender>
 </template>
@@ -15,7 +15,7 @@ import { isString } from '@vue/shared'
 import { toReactive } from '@vueuse/core'
 import { ElFormRender, ElFormItemRender } from 'el-form-render'
 import { NormalizedField } from '@orm-crud/core'
-import { normalizeField, fieldFilter } from '@orm-crud/core/utils'
+import { normalizeField, fieldFilter, nForms, fieldsFilter } from '@orm-crud/core/utils'
 import { useConfig } from './context'
 import RelSelect2 from './RelSelect2.vue'
 
@@ -43,9 +43,9 @@ watch(() => props.model, v => raw.value = JSON.parse(JSON.stringify(v)))
 const fields = () => props.fields || ctx().forms?.map(e => isString(e) ? e : e.prop)
 
 const nFields = computed(() => {
-  let ret = fields().map(e => normalizeField(ctx(), e))
-  if (rwPermis()) 
-  return ret
+  let arr = fields()
+  if (rwPermis()) arr = fieldsFilter(ctx(), arr, rwPermis()!.r)
+  return nForms(ctx(), arr)
 })
 
 const formRef = ref({})

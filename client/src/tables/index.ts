@@ -1,7 +1,6 @@
 import * as user from './user'
 import * as gfdc from './gfdc'
 import { TableOpt } from '@orm-crud/core'
-import { transformTables } from '@orm-crud/core/utils'
 
 const field_rw: TableOpt = {
   label: '字段权限',
@@ -16,9 +15,9 @@ const field_rw: TableOpt = {
 }
 
 const tables = {
-  // ...user
   field_rw,
-  ...gfdc
+  ...user,
+  // ...gfdc
 }
 
-export default transformTables(tables)
+export default tables

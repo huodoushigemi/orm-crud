@@ -3,6 +3,11 @@ export * from './adapter/interface'
 
 export type Field = FieldBase
 
+export interface LP {
+  label?: string
+  prop: string
+}
+
 export interface FieldBase {
   label?: string
   prop: string
@@ -28,13 +33,14 @@ export interface FieldBase {
   editable?: boolean
 }
 
-export type FieldColumn = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'render'>
+// export type FieldColumn = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'render'>
+export type FieldColumn = LP & Pick<Field, 'options' | 'render'> & Partial<{ formatter(row, col, val): any; width: number; align: string; class: any }>
 export type FieldForm = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'editor' | 'editable' | 'required'>
 export type FieldView = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'render'>
 
 export interface Relation {
   table: string
-  name?: string
+  // name?: string todo
   label?: string
   prop?: string
   rel: '1-1' | '1-n' | 'n-1' | 'm-n'
@@ -63,7 +69,7 @@ export type NRelField = NormalizedField & {
 
 export interface TableOpt<T = string> {
   label: string
-  fields: (Field & { prop: T })[]
+  fields: Field[]
   columns?: (FieldColumn | string)[]
   searchs?: (FieldForm | string)[]
   forms?: (FieldForm | string)[]
@@ -80,7 +86,8 @@ export interface TableOpt<T = string> {
 export interface NormalizedTableOpt {
   label: string
   fields: NormalizedField[]
-  columns: NormalizedField[]
+  // columns: NormalizedField[]
+  columns: FieldColumn[]
   searchs: NormalizedField[]
   forms: NormalizedField[]
   readonly rels: RelField[];

@@ -100,7 +100,7 @@ async function handlerRPermis(ctx: Koa.Context) {
 }
 
 
-// 处理写错误
+// 处理写权限
 async function handlerWPermis(ctx: Koa.Context) {
   const { table } = ctx.params
   const data: any = ctx.request.body

@@ -4,8 +4,8 @@ import { isArray, isString } from '@vue/shared'
 import CRUD from '@el-lowcode/crud'
 import Render from '@el-lowcode/render'
 import { ElFormItemRender } from 'el-form-render'
-import { NormalizedField, TableOpt } from '@orm-crud/core'
-import { getP, normalizeField } from '@orm-crud/core/utils'
+import { FieldColumn, NormalizedField, TableOpt } from '@orm-crud/core'
+import { fieldsFilter, getP, normalizeField, nColumns } from '@orm-crud/core/utils'
 import RelTag from './RelTag.vue'
 import InfoDialog from './InfoDialog.vue'
 import RelDialog from './RelDialog.vue'
@@ -39,6 +39,7 @@ CRUD.setConfig({
 
 const config = useConfig()
 const ctx = () => config.ctxs[props.table]
+const rwPermis = () => config.rwPermis
 
 const _searchs = $(() => [
   ...props.searchs?.map(e => normalizeField(ctx(), e)).filter(e => ctx().searchs.every(ee => ee.prop != e.prop)) || [],
@@ -46,10 +47,14 @@ const _searchs = $(() => [
 ])
 
 const colsDefaults = () => ctx().columns.map(e => isString(e) ? e : e.prop)
-const cols = useStorage(() => `orm-columns-select_${props.table}`, { default: colsDefaults })
-const _columns = computed(() => (props.columns || cols.value).map(e => normalizeField(ctx(), e)))
+const colsStorage = useStorage(() => `orm-columns-select:${props.table}`, { default: colsDefaults })
+const cols = $(() => {
+  let arr = props.columns || colsStorage.value
+  if (rwPermis()) arr = fieldsFilter(ctx(), arr, rwPermis()!.r)
+  return nColumns(ctx(), arr)
+})
 
-const formatter = (row, col: NormalizedField, val) => {
+const formatter = (row, col: FieldColumn, val) => {
   const findLabel = (e) => col.options!.find(e => e.value == val)?.label || val
   return col.options
     ? isArray(val) ? val.map(findLabel) : findLabel(val)
@@ -63,7 +68,7 @@ async function request(_, data, type) {
   if (type == 'list') {
     return ctx().api.page({
       where: { ...data, $page: undefined, $pageSize: undefined },
-      select: _columns.value.map(e => isString(e) ? e : e.prop),
+      select: cols.value.map(e => isString(e) ? e : e.prop),
       skip: (data.$page - 1) * data.$pageSize,
       take: data.$pageSize,
       orderBy
@@ -83,7 +88,7 @@ async function request(_, data, type) {
   }
 }
 
-watch(_columns, () => crudRef.value.getData())
+watch(cols, () => crudRef.value.getData())
 
 const crudRef = ref()
 const fieldsBind = useDialogBind()
@@ -123,7 +128,7 @@ const log = (...arg) => console.log(...arg)
       ref="crudRef"
       class="orm-table_table"
       :schema="ctx().fields"
-      :columns="_columns.map(e => ({ ...e, sortable: !e.relation && !e.prop.includes('.') && 'custom' }))"
+      :columns="cols.map(e => ({ ...e, sortable: !e.relation && !e.prop.includes('.') && 'custom' }))"
       url="xxx"
       :request="request"
       v-model:search="searchModel"
@@ -140,9 +145,9 @@ const log = (...arg) => console.log(...arg)
         ...$attrs.tableAttrs
       }"
     >
-      <template v-for="col in _columns" #[`$${col.prop}`]="{ row }">
-        <div v-if="col.relation">
-          <RelTag :data="getP(row, col.prop)" :rel="col.relation!" />
+      <template v-for="col in cols" #[`$${col.prop}`]="{ row }">
+        <div v-if="ctx().keybyed[col.prop].relation">
+          <RelTag :data="getP(row, col.prop)" :rel="ctx().keybyed[col.prop].relation!" />
         </div>
         <Render v-else-if="col.render" v-bind="col.render" :data="row" :field="col" />
         <template v-else>
@@ -170,7 +175,7 @@ const log = (...arg) => console.log(...arg)
       </template>
     </CRUD>
 
-    <FieldsDialog v-if="fieldsBind.showing" v-bind="fieldsBind" :table="table" v-model:data="cols" :defaults="colsDefaults" />
+    <FieldsDialog v-if="fieldsBind.showing" v-bind="fieldsBind" :table="table" v-model:data="colsStorage" :defaults="colsDefaults" />
   
     <InfoDialog v-if="infoBind.showing" v-bind="infoBind" :table="table" />
 

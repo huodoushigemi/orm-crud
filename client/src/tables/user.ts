@@ -12,8 +12,8 @@ export const User: TableOpt = {
     { label: '邮箱', prop: 'email', required, render: { is: 'my-img', height: 48 } },
     { label: 'following', prop: 'following', relation: { table: 'User', rel: 'm-n' }, inverseSide: { prop: 'followedBy' } },
   ],
-  columns: ['id', 'name', 'age', 'sex', 'videos.video'],
-  forms: ['name', { prop: 'age' }, 'sex', 'email', 'following', { prop: 'videos.video' }],
+  columns: ['id', 'name', { label: '岁', prop: 'age' }, { prop: 'sex', fixed: 'right' }, 'videos.video'],
+  forms: ['name', { prop: 'age', el: { max: 100 } }, 'sex', 'email', 'following', { prop: 'videos.video' }],
   searchs: ['following', 'videos.video', 'name', { prop: 'posts.title' }],
   map: { label: 'name' }
 }

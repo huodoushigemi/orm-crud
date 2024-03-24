@@ -28,8 +28,8 @@ app.component('field-rw-input', ({ modelValue }, { emit }) => h(FieldRW, {
 app.use(createRouter({
   history: createWebHashHistory(),
   routes: [
-    { path: '/', redirect: '/gfdc_auth_user' },
-    // { path: '/', redirect: '/User' },
+    // { path: '/', redirect: '/gfdc_auth_user' },
+    { path: '/', redirect: '/User' },
     { path: '/:table', component: App },
   ]
 }))

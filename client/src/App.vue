@@ -58,15 +58,15 @@ const table = $(
 
 const rwMap = ref({})
 const rwPermis = computed(() => RWPermis(rwMap.value))
-getRWPermis()
+// getRWPermis()
 
-function getRWPermis() {
-  return request.post('/find/field_rw', { data: { where: { ID: 'clu10rd0900009qie86kzs47n' } } }).then(e => rwMap.value = JSON.parse(e.PERMIS))
-}
+// function getRWPermis() {
+//   return request.post('/find/field_rw', { data: { where: { ID: 'clu10rd0900009qie86kzs47n' } } }).then(e => rwMap.value = JSON.parse(e.PERMIS))
+// }
 
 
 const dark = useDark({ selector: 'html', attribute: 'class', valueDark: 'dark', valueLight: '' })
-const admin = ref(false)
+const admin = ref(true)
 </script>
 
 <template>

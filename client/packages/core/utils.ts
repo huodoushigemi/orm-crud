@@ -1,7 +1,7 @@
-import { Arrayable } from '@vueuse/core'
-import { isObject, isArray } from '@vue/shared'
+import { Arrayable, normalizeDate } from '@vueuse/core'
+import { isObject, isArray, isString } from '@vue/shared'
 import { get, set, merge, isEqual, keyBy } from 'lodash-es'
-import { TableCtx, Field, NormalizedField, RelField, NRelField, FieldFilter, TableOpt } from './types'
+import { TableCtx, Field, NormalizedField, RelField, NRelField, FieldFilter, TableOpt, FieldColumn } from './types'
 
 export function findFieldPath(ctx: TableCtx, prop: string | string[], skip?: FieldFilter): NormalizedField[] {
   let _ctx = ctx
@@ -49,8 +49,55 @@ export function normalizeField(ctx: TableCtx, field: Field | string): Normalized
     } as NormalizedField
     if (cache && ret.editor) cache.editor ||= ret.editor
     if (cache && ret.render) cache.render ||= ret.render
-    return ctx.keybyed[field.prop] ||= ret
+    return ret
   }
+}
+
+export function nColumns(ctx: TableCtx, arr: (Field | string)[]): FieldColumn[] {
+  const keybyed = keyBy(ctx.columns, e => isString(e) ? e : e.prop)
+  return arr.map(e => {
+    const _prop = (e: string | { prop: string }) => isString(e) ? e : e.prop
+    const prop = _prop(e)
+    // const field = normalizeField(ctx, prop)
+    let relCol: FieldColumn | undefined
+    if (prop.includes('.')) {
+      const ps = prop.split('.')
+      const relProp = ps[ps.length - 1], aaa = ps.slice(0, -1)
+      const _ctx = aaa.reduce((_ctx, prop) => ctx.ctxs[_ctx.keybyed[prop].relation!.table], ctx)
+      const relField = _ctx.keybyed[relProp]
+      const _relCol = _ctx.columns.find(e => _prop(e) == relProp)
+      relCol = {
+        label: relField.label,
+        prop: relField.prop,
+        render: relField.render,
+        options: relField.options,
+        ...isString(_relCol) ? undefined : _relCol,
+      }
+    }
+    return {
+      render: ctx.keybyed[prop]?.render,
+      options: ctx.keybyed[prop]?.options,
+      ...relCol,
+      label: genLabel(ctx, prop),
+      prop,
+      ...isString(keybyed[prop]) ? undefined : keybyed[prop],
+      ...isString(e) ? undefined : e,
+    }
+  })
+}
+
+export function nForms(ctx: TableCtx, arr: (Field | string)[]) {
+  const keybyed = keyBy(ctx.forms, e => isString(e) ? e : e.prop)
+  return arr.map(e => {
+    const prop = isString(e) ? e : e.prop
+    const item = isString(e) ? undefined : e
+    return {
+      ...keybyed[prop],
+      ...item,
+      el: { ...keybyed[prop].editor, ...keybyed[prop].el, ...item?.el },
+      // todo
+    }
+  })
 }
 
 export function genLabel(ctx: TableCtx, prop: string) {
@@ -185,8 +232,8 @@ export function checkDataPermis(ctx: TableCtx, data: any, cb: (flag: string) => 
 /**
  * 过滤无权限的字段
  */
-export function fieldsFilter(ctx: TableCtx, fields: string[], cb: (flag: string) => boolean) {
-  return fields.filter(prop => fieldFilter(ctx, prop, cb))
+export function fieldsFilter<T extends string | { prop: any }>(ctx: TableCtx, fields: T[], cb: (flag: string) => boolean) {
+  return fields.filter(e => fieldFilter(ctx, isString(e) ? e : e.prop, cb))
 }
 
 /**
@@ -251,40 +298,4 @@ export function dataWalker(ctx: TableCtx, data: Record<string, any>, cb: (ctx: T
       if (ret !== undefined) return ret
     }
   }
-}
-
-const inverseRelMap = {
-  '1-1': '1-1',
-  '1-n': 'n-1',
-  'n-1': '1-n',
-  'm-n': 'm-n',
-} as const
-
-export function transformTables(tables: Record<string, TableOpt>) {
-  // transform inverseSide
-  const set = new WeakSet
-  Object.keys(tables).forEach(table => {
-    const tableOpt = tables[table]
-    tableOpt.fields.forEach(e => {
-      if (set.has(e)) return
-      const rel = e.relation
-      if (!rel) return
-      if (!e.inverseSide) throw new Error(`表 ${table} 关联字段 ${e.prop} 缺失 inverseSide`)
-
-      e.inverseSide.table = table
-      const side = e.inverseSide
-      const field: Field = {
-        label: side.label,
-        prop: side.prop,
-        relation: {
-          table,
-          rel: inverseRelMap[rel.rel],
-        },
-        inverseSide: { table: rel.table , label: e.label, prop: e.prop }
-      }
-      set.add(field)
-      tables[rel.table].fields.push(field)
-    })
-  })
-  return tables
 }
