@@ -1,8 +1,8 @@
 <template>
   <ElFormRender ref="formRef" :model="model" label-Width="100px">
     <template v-for="col in nFields">
-      <ElFormItemRender v-if="col.relation" v-bind="col" :el="{ ...col.el, disabled: isDisabled(col) }">
-        <RelSelect2 :model="model" :raw="raw" :table="table" :field="col" />
+      <ElFormItemRender v-if="ctx().keybyed[col.prop]?.relation" v-bind="col" :el="{ ...col.el, disabled: isDisabled(col) }">
+        <RelSelect2 :model="model" :raw="raw" :table="table" :field="normalizeField(ctx(), col.prop)" />
       </ElFormItemRender>
       <ElFormItemRender v-else v-bind="col" :el="{ ...col.el, disabled: isDisabled(col) }" />
     </template>
@@ -14,7 +14,7 @@ import { computed, ref, watch } from 'vue'
 import { isString } from '@vue/shared'
 import { toReactive } from '@vueuse/core'
 import { ElFormRender, ElFormItemRender } from 'el-form-render'
-import { NormalizedField } from '@orm-crud/core'
+import { FieldForm, NormalizedField } from '@orm-crud/core'
 import { normalizeField, fieldFilter, nForms, fieldsFilter } from '@orm-crud/core/utils'
 import { useConfig } from './context'
 import RelSelect2 from './RelSelect2.vue'
@@ -31,10 +31,10 @@ const config = useConfig()
 const ctx = () => config.ctxs[props.table]
 const rwPermis = () => config.rwPermis
 
-const isDisabled = (field: NormalizedField) => (
+const isDisabled = (field: FieldForm) => (
   (rwPermis() && !fieldFilter(ctx(), field.prop, rwPermis()!.w)) ||
   (field.editable !== undefined && !field.editable && props.model[ctx().map.id] != null) ||
-  (field.editor?.disabled)
+  (field.el?.disabled)
 )
 
 const raw = ref()

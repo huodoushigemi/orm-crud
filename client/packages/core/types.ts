@@ -35,7 +35,7 @@ export interface FieldBase {
 
 // export type FieldColumn = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'render'>
 export type FieldColumn = LP & Pick<Field, 'options' | 'render'> & Partial<{ formatter(row, col, val): any; width: number; align: string; class: any }>
-export type FieldForm = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'editor' | 'editable' | 'required'>
+export type FieldForm = LP & Pick<Field, 'options' | 'editable' | 'required'> & { el: any; [k: string]: any }
 export type FieldView = Pick<Field, 'label' | 'prop' | 'options' | 'type' | 'render'>
 
 export interface Relation {
@@ -67,7 +67,7 @@ export type NRelField = NormalizedField & {
   inverseSide: Required<InverseSide>
 }
 
-export interface TableOpt<T = string> {
+export interface TableOpt<> {
   label: string
   fields: Field[]
   columns?: (FieldColumn | string)[]
@@ -88,8 +88,8 @@ export interface NormalizedTableOpt {
   fields: NormalizedField[]
   // columns: NormalizedField[]
   columns: FieldColumn[]
-  searchs: NormalizedField[]
-  forms: NormalizedField[]
+  searchs: FieldForm[]
+  forms: FieldForm[]
   readonly rels: RelField[];
   views: NormalizedField[]
   btns: any[]

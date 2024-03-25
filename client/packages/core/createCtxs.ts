@@ -1,6 +1,6 @@
 import { isString, unionBy } from 'lodash-es'
 import { Field, TableOpt, TableCtx, TableCtxs, FieldFilter, IApiAdapter, NormalizedField, FieldColumn } from './types'
-import { genLabel, nColumns, normalizeField } from './utils'
+import { nColumns, normalizeField } from './utils'
 
 type CreateCtxsOptions = {
   fieldFilter?: FieldFilter

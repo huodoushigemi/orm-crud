@@ -16,8 +16,8 @@ const field_rw: TableOpt = {
 
 const tables = {
   field_rw,
-  ...user,
-  // ...gfdc
+  // ...user,
+  ...gfdc
 }
 
 export default tables

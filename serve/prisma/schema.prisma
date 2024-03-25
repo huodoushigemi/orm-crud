@@ -1,84 +1,1178 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
-model User {
-  id          Int          @id @default(autoincrement())
-  email       String
-  name        String
-  age         Int
-  sex         Int?
-  posts       Post[]       @relation("author")
-  comments    Comment[]
-  followedBy  User[]       @relation("follow")
-  following   User[]       @relation("follow")
-  videos      User_Video[]
-  reviewPosts Post[]       @relation("reviewPosts")
+model gfdc_auth_roletogfdc_auth_user {
+  A String @db.VarChar(32)
+  B String @db.VarChar(32)
+
+  @@unique([A, B], map: "_gfdc_auth_roleTogfdc_auth_user_AB_unique")
+  @@index([B], map: "_gfdc_auth_roleTogfdc_auth_user_B_index")
+  @@map("_gfdc_auth_roletogfdc_auth_user")
 }
 
-model Post {
-  id         Int       @id @default(autoincrement())
-  title      String
-  content    String?
-  published  Boolean   @default(false)
-  author     User?     @relation("author", fields: [authorId], references: [id])
-  authorId   Int?
-  reviewer   User?     @relation("reviewPosts", fields: [reviewerId], references: [id])
-  reviewerId Int?
-  comments   Comment[]
-  tag        Tag[]
-  userId     Int?
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model bpc_cube_data {
+  ID              String  @id @default(cuid()) @db.VarChar(32)
+  REPORT_ID       String? @db.VarChar(50)
+  ENTITY          String? @db.VarChar(100)
+  TIME            String? @db.VarChar(100)
+  ACCOUNT         String? @db.VarChar(100)
+  CATEGORY        String? @db.VarChar(100)
+  PRODUCT         String? @db.VarChar(100)
+  CLAZZ           String? @db.VarChar(100)
+  INTERCO         String? @db.VarChar(100)
+  SUBJECT         String? @db.VarChar(100)
+  MISC            String? @db.VarChar(100)
+  BP              String? @db.VarChar(100)
+  OTHER           String? @db.VarChar(100)
+  DATAFLOW        String? @db.VarChar(100)
+  MEASURES        String? @db.VarChar(100)
+  INDICATOR_TYPE  String? @db.VarChar(20)
+  INDICATOR_VALUE String? @db.VarChar(50)
 }
 
-model Comment {
-  id        Int       @id @default(autoincrement())
-  content   String
-  post      Post      @relation(fields: [postId], references: [id])
-  postId    Int
-  speaker   User      @relation(fields: [speakerId], references: [id])
-  speakerId Int
-  comments  Comment[] @relation("reply")
-  reply     Comment?   @relation("reply", fields: [replyId], references: [id])
-  replyId   Int?
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_auth_data_permission {
+  ID              String    @id @default(cuid()) @db.VarChar(32)
+  RESOURCE_ID     String    @db.VarChar(32)
+  FIELD_CODE      String    @db.VarChar(32)
+  FIELD_NAME      String    @db.VarChar(32)
+  IF_COL_PERM     Int?      @default(0)
+  IF_ROW_PERM     Int?      @default(0)
+  CONSTRAINT_TYPE String    @db.VarChar(50)
+  CONSTRAINT_JSON String?   @db.Text
+  DICT_CODE       String?   @db.VarChar(128)
+  CREATOR_NO      String?   @db.VarChar(20)
+  CREATOR         String?   @db.VarChar(36)
+  CREATE_TIME     DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO     String?   @db.VarChar(20)
+  MODIFIER        String?   @db.VarChar(36)
+  MODIFY_TIME     DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG        Int?      @default(0)
+  VERSION         Int?      @default(1)
+
+  @@index([RESOURCE_ID], map: "pk_gadp_resource_id")
 }
 
-model Tag {
-  id    Int    @id @default(autoincrement())
-  name  String
-  posts Post[]
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_auth_data_permission_config {
+  ID            String    @id @default(cuid()) @db.VarChar(32)
+  AUTH_TYPE     String    @db.VarChar(32)
+  AUTH_TYPE_ID  String    @db.VarChar(32)
+  AUTH_SCOPE    String    @db.VarChar(32)
+  AUTH_SCOPE_ID String    @db.VarChar(32)
+  RULE          String?   @db.Text
+  ROW_SQL       String?   @db.Text
+  CREATOR_NO    String?   @db.VarChar(20)
+  CREATOR       String?   @db.VarChar(36)
+  CREATE_TIME   DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO   String?   @db.VarChar(20)
+  MODIFIER      String?   @db.VarChar(36)
+  MODIFY_TIME   DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG      Int?      @default(0)
+  VERSION       Int?      @default(1)
 }
 
-model Video {
-  id       Int          @id @default(autoincrement())
-  filename String
-  size     Int
-  type     String
-  duration Int
-  users    User_Video[]
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_auth_dictionary {
+  ID           String                      @id @default(cuid()) @db.VarChar(32)
+  DICT_CODE    String?                     @db.VarChar(128)
+  DICT_NAME    String?                     @db.VarChar(128)
+  DICT_NAME_EN String?                     @db.VarChar(128)
+  DESCRIPTION  String?                     @db.VarChar(512)
+  ORDER_NUM    Int?                        @default(1)
+  USE_STATE    Int?                        @default(0)
+  CREATOR_NO   String?                     @db.VarChar(20)
+  CREATOR      String?                     @db.VarChar(36)
+  CREATE_TIME  DateTime?                   @default(now()) @db.DateTime(0)
+  MODIFIER_NO  String?                     @db.VarChar(20)
+  MODIFIER     String?                     @db.VarChar(36)
+  MODIFY_TIME  DateTime?                   @default(now()) @db.DateTime(0)
+  DEL_FLAG     Int?                        @default(0)
+  VERSION      Int?                        @default(0)
+  ITEMS        gfdc_auth_dictionary_item[]
 }
 
-model User_Video {
-  id      Int    @id @default(autoincrement())
-  user    User?  @relation(fields: [userId], references: [id])
-  userId  Int?
-  video   Video? @relation(fields: [videoId], references: [id])
-  videoId Int?
-
-  @@unique([userId, videoId])
-  @@index([userId, videoId])
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_auth_dictionary_item {
+  ID            String                @id @default(cuid()) @db.VarChar(32)
+  DICTIONARY    gfdc_auth_dictionary? @relation(fields: [DICTIONARY_ID], references: [ID])
+  DICTIONARY_ID String                @db.VarChar(32)
+  ITEM_NAME     String?               @db.VarChar(128)
+  ITEM_NAME_EN  String?               @db.VarChar(128)
+  ITEM_VALUE    String?               @db.VarChar(1024)
+  DESCRIPTION   String?               @db.VarChar(512)
+  ORDER_NUM     Int?                  @default(1)
+  ITEM_STATE    Int?                  @default(1)
+  CREATOR_NO    String?               @db.VarChar(20)
+  CREATOR       String?               @db.VarChar(36)
+  CREATE_TIME   DateTime?             @default(now()) @db.DateTime(0)
+  MODIFIER_NO   String?               @db.VarChar(20)
+  MODIFIER      String?               @db.VarChar(36)
+  MODIFY_TIME   DateTime?             @default(now()) @db.DateTime(0)
+  DEL_FLAG      Int?                  @default(0)
+  VERSION       Int?                  @default(1)
 }
 
-model FieldRW {
-  id     Int    @id @default(autoincrement())
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_auth_login_log {
+  ID           String    @id @default(cuid()) @db.VarChar(32)
+  SYSTEM_CODE  String?   @db.VarChar(32)
+  USER_ID      String?   @db.VarChar(32)
+  EMP_NO       String?   @db.VarChar(36)
+  USER_NAME    String?   @db.VarChar(100)
+  USER_ACCOUNT String?   @db.VarChar(100)
+  FROM_IP      String?   @db.VarChar(100)
+  OPERATE_SYS  String?   @db.VarChar(100)
+  IF_MOBILE    Int?
+  USER_AGENT   String?   @db.Text
+  CREATE_TIME  DateTime? @default(now()) @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_auth_org {
+  ID               String                  @id @default(cuid()) @db.VarChar(32)
+  CHILDREN         gfdc_auth_org[]         @relation("tree")
+  PARENT           gfdc_auth_org?          @relation("tree", fields: [PARENT_ID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
+  PARENT_ID        String                  @db.VarChar(36)
+  DEPT_NO          String?                 @db.VarChar(36)
+  DEPT_NAME        String                  @db.VarChar(500)
+  DEPT_LAYER       Int                     @default(0)
+  ALL_PID          String?                 @db.VarChar(999)
+  DEPT_ORDER       Int                     @default(0)
+  DEPT_STATE       Int                     @default(0)
+  IS_LEAF          Int                     @default(0)
+  DEPT_DESC        String?                 @db.VarChar(500)
+  BPC_DEPT_CODE    String?                 @db.VarChar(32)
+  BPC_DEPT_NAME    String?                 @db.VarChar(500)
+  IS_COMPANY       Int?                    @default(0)
+  EHR_COMPANY_DEPT String?                 @db.VarChar(32)
+  IS_VIRTUAL       Int?                    @default(0)
+  PARENT_NO        String?                 @db.VarChar(32)
+  CREATOR_NO       String?                 @db.VarChar(20)
+  CREATOR          String?                 @db.VarChar(36)
+  CREATE_TIME      DateTime?               @default(now()) @db.DateTime(0)
+  MODIFIER_NO      String?                 @db.VarChar(20)
+  MODIFIER         String?                 @db.VarChar(36)
+  MODIFY_TIME      DateTime?               @default(now()) @db.DateTime(0)
+  DEL_FLAG         Int?                    @default(0)
+  VERSION          Int?                    @default(1)
+  USER_EXTEND      gfdc_auth_user_extend[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_auth_resource {
+  ID                  String                          @id @default(cuid()) @db.VarChar(32)
+  RESOURCE_NAME       String                          @db.VarChar(32)
+  RESOURCE_CODE       String?                         @db.VarChar(32)
+  SYSTEM              gfdc_auth_system_info?          @relation(fields: [SYSTEM_ID], references: [ID])
+  SYSTEM_ID           String                          @db.VarChar(32)
+  RESOURCE_URL        String?                         @db.VarChar(512)
+  RESOURCE_DESC       String?                         @db.VarChar(200)
+  RESOURCE_TYPE       Int
+  OPEN_TYPE           Int                             @default(0)
+  EXT_URL             String?                         @db.VarChar(512)
+  EXT_PARAMS          String?                         @db.Text
+  RESOURCE_LEVEL      Int?
+  SORT_TYPE           Int                             @default(1)
+  PARENT              gfdc_auth_resource?             @relation("resource_children", fields: [PARENT_ID], references: [ID], onDelete: NoAction, onUpdate: NoAction)
+  PARENT_ID           String                          @db.VarChar(32)
+  CHILDREN            gfdc_auth_resource[]            @relation("resource_children")
+  COMPONENT           String?                         @db.VarChar(64)
+  ICON_TYPE           String?                         @default("lib") @db.VarChar(36)
+  ICON                String?                         @db.VarChar(128)
+  IDENTIFY            String?                         @db.VarChar(512)
+  LEAF                Int?                            @default(0)
+  HIDDEN              Int?                            @default(0)
+  IF_CACHE            Int?                            @default(0)
+  CREATOR_NO          String?                         @db.VarChar(20)
+  CREATOR             String?                         @db.VarChar(36)
+  CREATE_TIME         DateTime?                       @default(now()) @db.DateTime(0)
+  MODIFIER_NO         String?                         @db.VarChar(20)
+  MODIFIER            String?                         @db.VarChar(36)
+  MODIFY_TIME         DateTime?                       @default(now()) @db.DateTime(0)
+  DEL_FLAG            Int?                            @default(0)
+  VERSION             Int?                            @default(1)
+  ROLE_RESOURCE       gfdc_auth_role_resource[]
+  DATA_MODEL_RESOURCE gfdc_sjkd_data_model_resource[]
+  SL                  gfdc_service_list[]
+
+  @@index([SYSTEM_ID], map: "pk_gare_system_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_auth_role {
+  ID            String                    @id @default(cuid()) @db.VarChar(32)
+  ROLE_NAME     String                    @db.VarChar(32)
+  ROLE_DESC     String?                   @db.VarChar(64)
+  SYSTEM        gfdc_auth_system_info     @relation(fields: [SYSTEM_ID], references: [ID])
+  SYSTEM_ID     String                    @db.VarChar(32)
+  CREATOR_NO    String?                   @db.VarChar(20)
+  CREATOR       String?                   @db.VarChar(36)
+  CREATE_TIME   DateTime?                 @default(now()) @db.DateTime(0)
+  MODIFIER_NO   String?                   @db.VarChar(20)
+  MODIFIER      String?                   @db.VarChar(36)
+  MODIFY_TIME   DateTime?                 @default(now()) @db.DateTime(0)
+  DEL_FLAG      Int?                      @default(0)
+  VERSION       Int?                      @default(1)
+  USER_ROLE     gfdc_auth_user_role[]
+  ROLE_RESOURCE gfdc_auth_role_resource[]
+  FIELD_RW      field_rw?
+
+  @@index([SYSTEM_ID], map: "pk_gar_system_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_auth_role_data_permission {
+  ID                        String    @id @default(cuid()) @db.VarChar(32)
+  ROLE_RESOURCE_ID          String    @db.VarChar(32)
+  DATA_PERMISSION_CONFIG_ID String    @db.VarChar(32)
+  IF_ENABLE                 Int?      @default(0)
+  IF_HIDE_COL               Int?      @default(0)
+  RULE_JSON                 String    @db.Text
+  MATE_TYPE                 String    @db.VarChar(50)
+  CREATOR_NO                String?   @db.VarChar(20)
+  CREATOR                   String?   @db.VarChar(36)
+  CREATE_TIME               DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO               String?   @db.VarChar(20)
+  MODIFIER                  String?   @db.VarChar(36)
+  MODIFY_TIME               DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG                  Int?      @default(0)
+  VERSION                   Int?      @default(1)
+
+  @@index([ROLE_RESOURCE_ID], map: "pk_gardp_rr_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_auth_role_resource {
+  ID          String             @id @default(cuid()) @db.VarChar(32)
+  ROLE        gfdc_auth_role     @relation(fields: [ROLE_ID], references: [ID])
+  ROLE_ID     String             @db.VarChar(32)
+  RESOURCE    gfdc_auth_resource @relation(fields: [RESOURCE_ID], references: [ID])
+  RESOURCE_ID String             @db.VarChar(32)
+  CREATOR_NO  String?            @db.VarChar(20)
+  CREATOR     String?            @db.VarChar(36)
+  CREATE_TIME DateTime?          @default(now()) @db.DateTime(0)
+  MODIFIER_NO String?            @db.VarChar(20)
+  MODIFIER    String?            @db.VarChar(36)
+  MODIFY_TIME DateTime?          @default(now()) @db.DateTime(0)
+  DEL_FLAG    Int?               @default(0)
+  VERSION     Int?               @default(1)
+
+  @@index([RESOURCE_ID], map: "pk_garr_resource_id")
+  @@index([ROLE_ID], map: "pk_garr_role_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_auth_sys_operation_log {
+  ID             String          @id @default(cuid()) @db.VarChar(32)
+  SYSTEM_CODE    String?         @db.VarChar(32)
+  MODULE_NAME    String?         @db.VarChar(255)
+  REMOTE_ADDR    String?         @db.VarChar(255)
+  USER           gfdc_auth_user? @relation(fields: [USER_ID], references: [ID])
+  USER_ID        String?         @db.VarChar(32)
+  USER_ACCOUNT   String?         @db.VarChar(255)
+  OPERATION_DESC String?         @db.VarChar(512)
+  REQUEST_URI    String?         @db.VarChar(255)
+  REQUEST_TYPE   String?         @db.VarChar(20)
+  REQUEST_PARAMS String?         @db.Text
+  EXEC_STATUS    Int?            @default(1)
+  RUNTIME        Int?
+  CREATOR_NO     String?         @db.VarChar(20)
+  CREATOR        String?         @db.VarChar(36)
+  CREATE_TIME    DateTime?       @default(now()) @db.DateTime(0)
+  MODIFIER_NO    String?         @db.VarChar(20)
+  MODIFIER       String?         @db.VarChar(36)
+  MODIFY_TIME    DateTime?       @default(now()) @db.DateTime(0)
+  DEL_FLAG       Int?            @default(0)
+  VERSION        Int?            @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_auth_system_admin {
+  ID          String    @id @default(cuid()) @db.VarChar(32)
+  SYSTEM_ID   String    @db.VarChar(32)
+  USER_ID     String    @db.VarChar(32)
+  CREATOR_NO  String?   @db.VarChar(20)
+  CREATOR     String?   @db.VarChar(36)
+  CREATE_TIME DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO String?   @db.VarChar(20)
+  MODIFIER    String?   @db.VarChar(36)
+  MODIFY_TIME DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG    Int?      @default(0)
+  VERSION     Int?      @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_auth_system_info {
+  ID          String               @id @default(cuid()) @db.VarChar(32)
+  SYSTEM_NAME String               @db.VarChar(32)
+  SYSTEM_CODE String               @db.VarChar(32)
+  SYSTEM_DESC String?              @db.VarChar(64)
+  CREATOR_NO  String?              @db.VarChar(20)
+  CREATOR     String?              @db.VarChar(36)
+  CREATE_TIME DateTime?            @default(now()) @db.DateTime(0)
+  MODIFIER_NO String?              @db.VarChar(20)
+  MODIFIER    String?              @db.VarChar(36)
+  MODIFY_TIME DateTime?            @default(now()) @db.DateTime(0)
+  DEL_FLAG    Int?                 @default(0)
+  VERSION     Int?                 @default(1)
+  ROLE        gfdc_auth_role[]
+  RESOURCE    gfdc_auth_resource[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_auth_task {
+  ID              String    @id @default(cuid()) @db.VarChar(32)
+  JOB_NAME        String    @db.VarChar(32)
+  DESCRIPTION     String?   @db.VarChar(128)
+  CRON_EXPRESSION String?   @db.VarChar(32)
+  BEAN_CLASS      String?   @db.VarChar(64)
+  METHOD_NAME     String?   @db.VarChar(64)
+  JOB_STATUS      Int?      @default(0)
+  PARAMS          String?   @db.Text
+  CREATOR_NO      String?   @db.VarChar(20)
+  CREATOR         String?   @db.VarChar(36)
+  CREATE_TIME     DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO     String?   @db.VarChar(20)
+  MODIFIER        String?   @db.VarChar(36)
+  MODIFY_TIME     DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG        Int?      @default(0)
+  VERSION         Int?      @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_auth_user {
+  ID                String                        @id @default(cuid()) @db.VarChar(32)
+  EMP_NO            String                        @db.VarChar(36)
+  USER_NAME         String?                       @db.VarChar(64)
+  USER_ACCOUNT      String?                       @db.VarChar(36)
+  PASSWORD          String                        @db.VarChar(64)
+  USER_STATE        Int                           @default(0)
+  PERSON_PHOTO      String?                       @db.VarChar(999)
+  MOBILE            String?                       @db.VarChar(30)
+  EMAIL             String?                       @db.VarChar(100)
+  CREATOR_NO        String?                       @db.VarChar(20)
+  CREATOR           String?                       @db.VarChar(36)
+  CREATE_TIME       DateTime?                     @default(now()) @db.DateTime(0)
+  MODIFIER_NO       String?                       @db.VarChar(20)
+  MODIFIER          String?                       @db.VarChar(36)
+  MODIFY_TIME       DateTime?                     @default(now()) @db.DateTime(0)
+  DEL_FLAG          Int?                          @default(0)
+  VERSION           Int?                          @default(1)
+  EXTEND            gfdc_auth_user_extend[]
+  USER_ROLE         gfdc_auth_user_role[]
+  SYS_OPERATION_LOG gfdc_auth_sys_operation_log[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_auth_user_data_permission {
+  ID                        String    @id @default(cuid()) @db.VarChar(32)
+  USER_RESOURCE_ID          String    @db.VarChar(32)
+  DATA_PERMISSION_CONFIG_ID String    @db.VarChar(32)
+  IF_ENABLE                 Int?      @default(0)
+  IF_HIDE_COL               Int?      @default(0)
+  RULE_JSON                 String    @db.Text
+  MATE_TYPE                 String    @db.VarChar(50)
+  CREATOR_NO                String?   @db.VarChar(20)
+  CREATOR                   String?   @db.VarChar(36)
+  CREATE_TIME               DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO               String?   @db.VarChar(20)
+  MODIFIER                  String?   @db.VarChar(36)
+  MODIFY_TIME               DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG                  Int?      @default(0)
+  VERSION                   Int?      @default(1)
+
+  @@index([DATA_PERMISSION_CONFIG_ID], map: "pk_gaudp_dpc_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_auth_user_extend {
+  ID             String         @id @default(cuid()) @db.VarChar(32)
+  USER           gfdc_auth_user @relation(fields: [USER_ID], references: [ID])
+  USER_ID        String         @db.VarChar(36)
+  IS_MAIN_JOB    Int            @default(1)
+  ORG            gfdc_auth_org? @relation(fields: [ORG_ID], references: [ID])
+  ORG_ID         String         @db.VarChar(32)
+  POSITION_NAME  String?        @db.VarChar(256)
+  POSITION_LAYER String?        @db.VarChar(30)
+  REPORT_TO      String?        @default("") @db.VarChar(30)
+  OFFICE_TEL     String?        @db.VarChar(30)
+  CREATOR_NO     String?        @db.VarChar(20)
+  CREATOR        String?        @db.VarChar(36)
+  CREATE_TIME    DateTime?      @default(now()) @db.DateTime(0)
+  MODIFIER_NO    String?        @db.VarChar(20)
+  MODIFIER       String?        @db.VarChar(36)
+  MODIFY_TIME    DateTime?      @default(now()) @db.DateTime(0)
+  DEL_FLAG       Int?           @default(0)
+  VERSION        Int?           @default(1)
+
+  @@index([ORG_ID], map: "pk_gaue_org_id")
+  @@index([USER_ID], map: "pk_gaue_user_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_auth_user_resource {
+  ID          String    @id @default(cuid()) @db.VarChar(32)
+  USER_ID     String    @db.VarChar(32)
+  RESOURCE_ID String    @db.VarChar(32)
+  CREATOR_NO  String?   @db.VarChar(20)
+  CREATOR     String?   @db.VarChar(36)
+  CREATE_TIME DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO String?   @db.VarChar(20)
+  MODIFIER    String?   @db.VarChar(36)
+  MODIFY_TIME DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG    Int?      @default(0)
+  VERSION     Int?      @default(1)
+
+  @@index([RESOURCE_ID], map: "pk_gaur_resource_id")
+  @@index([USER_ID], map: "pk_gaur_user_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_auth_user_role {
+  ID          String         @id @default(cuid()) @db.VarChar(32)
+  USER        gfdc_auth_user @relation(fields: [USER_ID], references: [ID])
+  USER_ID     String         @db.VarChar(32)
+  ROLE        gfdc_auth_role @relation(fields: [ROLE_ID], references: [ID])
+  ROLE_ID     String         @db.VarChar(32)
+  CREATOR_NO  String?        @db.VarChar(20)
+  CREATOR     String?        @db.VarChar(36)
+  CREATE_TIME DateTime?      @default(now()) @db.DateTime(0)
+  MODIFIER_NO String?        @db.VarChar(20)
+  MODIFIER    String?        @db.VarChar(36)
+  MODIFY_TIME DateTime?      @default(now()) @db.DateTime(0)
+  DEL_FLAG    Int?           @default(0)
+  VERSION     Int?           @default(1)
+
+  @@index([ROLE_ID], map: "pk_gaur_role_id")
+  @@index([USER_ID], map: "pk_gaur_user_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_data_asset {
+  ID          String    @id @db.VarChar(36)
+  ASSET_CODE  String    @db.VarChar(50)
+  ASSET_NAME  String    @db.VarChar(50)
+  ASSET_TYPE  String    @db.VarChar(50)
+  ASSET_DESC  String?   @db.VarChar(256)
+  CREATOR_NO  String?   @db.VarChar(20)
+  CREATOR     String?   @db.VarChar(20)
+  CREATE_TIME DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO String?   @db.VarChar(20)
+  MODIFIER    String?   @db.VarChar(20)
+  MODIFY_TIME DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG    Int?      @default(0)
+  version     Int?      @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_data_asset_indicator {
+  ID               String    @id @db.VarChar(36)
+  ASSET_ID         String    @db.VarChar(36)
+  INDICATOR_ID     String    @db.VarChar(36)
+  SOURCE_SYS       String?   @db.VarChar(50)
+  SS_DESC          String?   @db.VarChar(500)
+  SS_TAB_CODE      String?   @db.VarChar(50)
+  SS_TAB_NAME      String?   @db.VarChar(50)
+  SS_FIELD_CODE    String?   @db.VarChar(50)
+  SS_FIELD_NAME    String?   @db.VarChar(50)
+  PROCESSING_LOGIC String?   @db.VarChar(500)
+  REMARK           String?   @db.VarChar(500)
+  CREATOR_NO       String?   @db.VarChar(20)
+  CREATOR          String?   @db.VarChar(20)
+  CREATE_TIME      DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO      String?   @db.VarChar(20)
+  MODIFIER         String?   @db.VarChar(20)
+  MODIFY_TIME      DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG         Int?      @default(0)
+  version          Int?      @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_exchange_rate_history {
+  ID            String   @id @default(cuid()) @db.VarChar(32)
+  CURRENCY_FROM String?  @db.VarChar(10)
+  CURRENCY_TO   String?  @db.VarChar(10)
+  RATE          Decimal? @db.Decimal(20, 6)
+  DATE          String?  @db.VarChar(10)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_feedback {
+  ID          String    @id @default(cuid()) @db.VarChar(32)
+  FEEDBACK    String?   @db.VarChar(500)
+  CREATOR     String?   @db.VarChar(36)
+  CREATOR_NO  String?   @db.VarChar(20)
+  CREATE_TIME DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO String?   @db.VarChar(20)
+  MODIFIER    String?   @db.VarChar(36)
+  MODIFY_TIME DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG    Int?      @default(0)
+  version     Int?      @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_guide_config {
+  ID              String    @id @default(cuid()) @db.VarChar(32)
+  SYSTEM_CODE     String    @db.VarChar(50)
+  EFFECTIVE_SCOPE String    @db.VarChar(50)
+  TITLE           String    @db.VarChar(100)
+  ICON            String?   @db.VarChar(200)
+  CONTENT         String?   @db.LongText
+  IF_VALID        Int?      @default(1)
+  SORT            Int?      @default(10)
+  CREATOR_NO      String?   @db.VarChar(20)
+  CREATOR         String?   @db.VarChar(36)
+  CREATE_TIME     DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO     String?   @db.VarChar(20)
+  MODIFIER        String?   @db.VarChar(36)
+  MODIFY_TIME     DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG        Int?      @default(0)
+  VERSION         Int?      @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_indicator_define {
+  ID              String                               @id @default(cuid()) @db.VarChar(32)
+  INDICATOR_NAME  String?                              @db.VarChar(50)
+  CALCULATE_LOGIC String?                              @db.LongText
+  DATA_SOURCE     String?                              @db.VarChar(200)
+  BUZ_OWNER       String?                              @db.VarChar(200)
+  SORT            Int?                                 @default(10)
+  CREATOR_NO      String?                              @db.VarChar(20)
+  CREATOR         String?                              @db.VarChar(36)
+  CREATE_TIME     DateTime?                            @default(now()) @db.DateTime(0)
+  MODIFIER_NO     String?                              @db.VarChar(20)
+  MODIFIER        String?                              @db.VarChar(36)
+  MODIFY_TIME     DateTime?                            @default(now()) @db.DateTime(0)
+  DEL_FLAG        Int?                                 @default(0)
+  VERSION         Int?                                 @default(1)
+  SL_INDICATOR    gfdc_service_list_indicator_define[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_indicator_library {
+  ID             String    @id @db.VarChar(36)
+  INDICATOR_CODE String    @db.VarChar(50)
+  INDICATOR_NAME String    @db.VarChar(50)
+  INDICATOR_TYPE String    @db.VarChar(50)
+  INDICATOR_DESC String?   @db.VarChar(500)
+  BUSINESS_LOGIC String?   @db.VarChar(500)
+  BUSINESS_OWNER String?   @db.VarChar(50)
+  CREATOR_NO     String?   @db.VarChar(20)
+  CREATOR        String?   @db.VarChar(20)
+  CREATE_TIME    DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO    String?   @db.VarChar(20)
+  MODIFIER       String?   @db.VarChar(20)
+  MODIFY_TIME    DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG       Int?      @default(0)
+  version        Int?      @default(1)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_insert_table_body {
+  pt_date      String?   @db.VarChar(20)
+  str          String?   @db.LongText
+  create_time  DateTime? @default(now()) @db.DateTime(0)
+  message_code String?   @db.VarChar(156)
+  param_name   String?   @db.VarChar(156)
+
+  @@ignore
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_message_data_warn_log {
+  ID              String    @id @db.VarChar(36)
+  MESSAGE_CODE    String    @db.VarChar(200)
+  WARN_SOURCE     String    @db.VarChar(200)
+  PARAMS          String?   @db.Text
+  RULE_EXPRESSION String?   @db.VarChar(500)
+  IF_SUCCESS      Int?      @default(0)
+  FAIL_REASON     String?   @db.VarChar(500)
+  EXECUTE_TIME    DateTime? @default(now()) @db.DateTime(0)
+  CREATOR_NO      String?   @db.VarChar(20)
+  CREATOR         String?   @db.VarChar(20)
+  CREATE_TIME     DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO     String?   @db.VarChar(20)
+  MODIFIER        String?   @db.VarChar(20)
+  MODIFY_TIME     DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG        Int?      @default(0)
+  VERSION         Int?      @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_message_insert {
+  ID           Int       @id @default(autoincrement())
+  message_code String?   @db.VarChar(128)
+  type         String?   @db.VarChar(128)
+  body         String?   @db.LongText
+  CREATOR_NO   String?   @db.VarChar(20)
+  CREATOR      String?   @db.VarChar(36)
+  CREATE_TIME  DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO  String?   @db.VarChar(20)
+  MODIFIER     String?   @db.VarChar(36)
+  MODIFY_TIME  DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG     Int?      @default(0)
+  VERSION      Int?      @default(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_message_mq_send_info {
+  ID           String    @id @db.VarChar(100)
+  MESSAGE_CODE String?   @db.VarChar(100)
+  OPERATE_TYPE String?   @db.VarChar(100)
+  PARAMETER    String?   @db.LongText
+  SEND_STATUS  Int?      @default(0)
+  FAIL_REASON  String?   @db.VarChar(100)
+  CREATE_TIME  DateTime? @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_message_object {
+  ID           String    @id @db.VarChar(100)
+  MESSAGE_NAME String    @db.VarChar(100)
+  MESSAGE_CODE String    @db.VarChar(100)
+  TYPE         String    @db.VarChar(100)
+  TITLE        String    @db.VarChar(256)
+  MESSAGE      String    @db.LongText
+  CREATOR_NO   String?   @db.VarChar(20)
+  CREATOR      String?   @db.VarChar(36)
+  CREATE_TIME  DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO  String?   @db.VarChar(20)
+  MODIFIER     String?   @db.VarChar(36)
+  MODIFY_TIME  DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG     Int?      @default(0)
+  VERSION      Int?      @default(1)
+  start_time   DateTime? @db.DateTime(0)
+  end_time     DateTime? @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_message_object_config {
+  ID           String    @id @db.VarChar(100)
+  MESSAGE_CODE String    @db.VarChar(100)
+  TYPE         String    @db.VarChar(100)
+  CODE         String    @db.VarChar(256)
+  NAME         String?   @db.VarChar(256)
+  CREATOR_NO   String?   @db.VarChar(20)
+  CREATOR      String?   @db.VarChar(36)
+  CREATE_TIME  DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO  String?   @db.VarChar(20)
+  MODIFIER     String?   @db.VarChar(36)
+  MODIFY_TIME  DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG     Int?      @default(0)
+  VERSION      Int?      @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_message_pool {
+  ID               String    @id @db.VarChar(100)
+  MESSAGE_NAME     String?   @db.VarChar(100)
+  MESSAGE_CODE     String?   @db.VarChar(100)
+  TYPE             String    @db.VarChar(100)
+  TITLE            String    @db.VarChar(256)
+  MESSAGE          String    @db.LongText
+  readed           Boolean?
+  user_code_from   String?   @db.VarChar(256)
+  user_code_to     String?   @db.VarChar(256)
+  JUMP_PATH        String?   @db.VarChar(100)
+  RESOURCE_ID      String?   @db.VarChar(100)
+  IF_EMAIL         Int?
+  TABLE_NAME       String?   @db.VarChar(100)
+  IMAGE_ID         String?   @db.VarChar(256)
+  CREATOR_NO       String?   @db.VarChar(20)
+  CREATOR          String?   @db.VarChar(36)
+  CREATE_TIME      DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO      String?   @db.VarChar(20)
+  MODIFIER         String?   @db.VarChar(36)
+  MODIFY_TIME      DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG         Int?      @default(0)
+  VERSION          Int?      @default(1)
+  DELETE_FROM_PAGE Int?      @default(0)
+  DELETE_FROM_SEND Int?      @default(0)
+  start_time       DateTime? @db.DateTime(0)
+  end_time         DateTime? @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_message_rule_config {
+  ID              String    @id @db.VarChar(36)
+  MESSAGE_CODE    String    @db.VarChar(200)
+  RULE_EXPRESSION String?   @db.VarChar(500)
+  CREATOR_NO      String?   @db.VarChar(20)
+  CREATOR         String?   @db.VarChar(20)
+  CREATE_TIME     DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO     String?   @db.VarChar(20)
+  MODIFIER        String?   @db.VarChar(20)
+  MODIFY_TIME     DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG        Int?      @default(0)
+  VERSION         Int?      @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_message_send_history {
+  ID          String    @id @default(cuid()) @db.VarChar(32)
+  MESSAGE_ID  String    @db.VarChar(32)
+  SEND_TYPE   String    @db.VarChar(50)
+  TITLE       String    @db.VarChar(200)
+  CONTENT     String?   @db.Text
+  IF_ALL      Int?      @default(0)
+  SENDER      String?   @db.VarChar(50)
+  RECEIVER    String?   @db.Text
+  CREATOR_NO  String?   @db.VarChar(20)
+  CREATOR     String?   @db.VarChar(36)
+  CREATE_TIME DateTime? @default(now()) @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_message_task {
+  ID              String    @id @default(cuid()) @db.VarChar(32)
+  JOB_NAME        String?   @db.VarChar(156)
+  DESCRIPTION     String?   @db.VarChar(128)
+  CRON_EXPRESSION String?   @db.VarChar(32)
+  BEAN_CLASS      String?   @db.VarChar(64)
+  METHOD_NAME     String?   @db.VarChar(64)
+  JOB_STATUS      Int?      @default(0)
+  PARAMS          String?   @db.Text
+  CREATOR_NO      String?   @db.VarChar(20)
+  CREATOR         String?   @db.VarChar(36)
+  CREATE_TIME     DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO     String?   @db.VarChar(20)
+  MODIFIER        String?   @db.VarChar(36)
+  MODIFY_TIME     DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG        Int?      @default(0)
+  VERSION         Int?      @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_message_wechat_his {
+  id                String    @id @default(cuid()) @db.VarChar(32)
+  message           String?   @db.LongText
+  wechat_message_id String?   @db.VarChar(100)
+  active            String?   @db.VarChar(100)
+  CREATOR_NO        String?   @db.VarChar(20)
+  CREATOR           String?   @db.VarChar(20)
+  CREATE_TIME       DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO       String?   @db.VarChar(20)
+  MODIFIER          String?   @db.VarChar(20)
+  MODIFY_TIME       DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG          Int?      @default(0)
+  VERSION           Int?      @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_message_wechat_html {
+  id           String    @id @default(cuid()) @db.VarChar(32)
+  message_code String?   @db.VarChar(100)
+  html         String?   @db.LongText
+  CREATOR_NO   String?   @db.VarChar(20)
+  CREATOR      String?   @db.VarChar(20)
+  CREATE_TIME  DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO  String?   @db.VarChar(20)
+  MODIFIER     String?   @db.VarChar(20)
+  MODIFY_TIME  DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG     Int?      @default(0)
+  VERSION      Int?      @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_report_dataset {
+  ID           String          @id @db.VarChar(36)
+  DATASET_TYPE String?         @default("sql") @db.VarChar(36)
+  DATASET_NAME String          @unique(map: "DATASET_NAME") @db.VarChar(100)
+  DATASET_SQL  String?         @db.Text
+  PARAMETERS   String?         @db.Text
+  DS           gfdc_report_ds? @relation(fields: [DS_ID], references: [ID])
+  DS_ID        String          @db.VarChar(36)
+  VALID        Int             @default(1)
+  CREATOR_NO   String?         @db.VarChar(20)
+  CREATOR      String?         @db.VarChar(20)
+  CREATE_TIME  DateTime?       @default(now()) @db.DateTime(0)
+  MODIFIER_NO  String?         @db.VarChar(20)
+  MODIFIER     String?         @db.VarChar(20)
+  MODIFY_TIME  DateTime?       @default(now()) @db.DateTime(0)
+  DEL_FLAG     Int?            @default(0)
+  version      Int?            @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_report_ds {
+  ID          String                @id @db.VarChar(36)
+  DS_NAME     String                @db.VarChar(36)
+  DS_TYPE     String?               @db.VarChar(100)
+  DS_DRIVER   String?               @db.VarChar(100)
+  DS_HOST     String?               @db.VarChar(100)
+  DS_PORT     String?               @db.VarChar(100)
+  DS_URL      String?               @db.VarChar(200)
+  USERNAME    String?               @db.VarChar(100)
+  PASSWORD    String?               @db.VarChar(100)
+  VALID       Int                   @default(1)
+  CREATOR_NO  String?               @db.VarChar(20)
+  CREATOR     String?               @db.VarChar(20)
+  CREATE_TIME DateTime?             @default(now()) @db.DateTime(0)
+  MODIFIER_NO String?               @db.VarChar(20)
+  MODIFIER    String?               @db.VarChar(20)
+  MODIFY_TIME DateTime?             @default(now()) @db.DateTime(0)
+  DEL_FLAG    Int?                  @default(0)
+  version     Int?                  @default(1)
+  DATASET     gfdc_report_dataset[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_search_log {
+  ID          String    @id @default(cuid()) @db.VarChar(32)
+  REFERER     String    @db.VarChar(200)
+  KEYWORD     String    @db.VarChar(200)
+  CREATOR_NO  String?   @db.VarChar(20)
+  CREATOR     String?   @db.VarChar(36)
+  CREATE_TIME DateTime? @default(now()) @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_service_list {
+  ID              String                               @id @default(cuid()) @db.VarChar(32)
+  MODULE          String?                              @db.VarChar(50)
+  RESOURCE        gfdc_auth_resource?                  @relation(fields: [RESOURCE_ID], references: [ID])
+  RESOURCE_ID     String?                              @db.VarChar(32)
+  RESOURCE_DEFINE String?                              @db.LongText
+  AGEING          String?                              @db.VarChar(500)
+  SORT            Int?                                 @default(10)
+  CREATOR_NO      String?                              @db.VarChar(20)
+  CREATOR         String?                              @db.VarChar(36)
+  CREATE_TIME     DateTime?                            @default(now()) @db.DateTime(0)
+  MODIFIER_NO     String?                              @db.VarChar(20)
+  MODIFIER        String?                              @db.VarChar(36)
+  MODIFY_TIME     DateTime?                            @default(now()) @db.DateTime(0)
+  DEL_FLAG        Int?                                 @default(0)
+  VERSION         Int?                                 @default(1)
+  SL_INDICATOR    gfdc_service_list_indicator_define[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_service_list_indicator_define {
+  ID                  String                 @id @default(cuid()) @db.VarChar(32)
+  SERVICE_LIST        gfdc_service_list?     @relation(fields: [SERVICE_LIST_ID], references: [ID])
+  SERVICE_LIST_ID     String?                @db.VarChar(32)
+  INDICATOR_DEFINE    gfdc_indicator_define? @relation(fields: [INDICATOR_DEFINE_ID], references: [ID])
+  INDICATOR_DEFINE_ID String?                @db.VarChar(32)
+  CREATOR_NO          String?                @db.VarChar(20)
+  CREATOR             String?                @db.VarChar(36)
+  CREATE_TIME         DateTime?              @default(now()) @db.DateTime(0)
+  MODIFIER_NO         String?                @db.VarChar(20)
+  MODIFIER            String?                @db.VarChar(36)
+  MODIFY_TIME         DateTime?              @default(now()) @db.DateTime(0)
+  DEL_FLAG            Int?                   @default(0)
+  VERSION             Int?                   @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_sjkd_data_model {
+  ID                  String                          @id @default(cuid()) @db.VarChar(32)
+  MODEL_CODE          String                          @db.VarChar(50)
+  MODEL_NAME          String                          @db.VarChar(50)
+  DATA_FORM_JSON      String?                         @db.Text
+  CREATOR_NO          String?                         @db.VarChar(20)
+  CREATOR             String?                         @db.VarChar(36)
+  CREATE_TIME         DateTime?                       @default(now()) @db.DateTime(0)
+  MODIFIER_NO         String?                         @db.VarChar(20)
+  MODIFIER            String?                         @db.VarChar(36)
+  MODIFY_TIME         DateTime?                       @default(now()) @db.DateTime(0)
+  DEL_FLAG            Int?                            @default(0)
+  VERSION             Int?                            @default(1)
+  DATA_MODEL_RESOURCE gfdc_sjkd_data_model_resource[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_sjkd_data_model_fields {
+  ID                  String    @id @default(cuid()) @db.VarChar(32)
+  DATA_MODEL_ID       String    @db.VarChar(32)
+  FIELD_CODE          String    @db.VarChar(50)
+  FIELD_NAME          String    @db.VarChar(50)
+  FIELD_TYPE          String    @db.VarChar(50)
+  FIELD_SIZE          String?   @db.VarChar(50)
+  IF_REQUIRED         Int?      @default(0)
+  IF_COMPOSITE_UNIQUE Int?      @default(0)
+  IF_ENABLED          Int?      @default(1)
+  CREATOR_NO          String?   @db.VarChar(20)
+  CREATOR             String?   @db.VarChar(36)
+  CREATE_TIME         DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO         String?   @db.VarChar(20)
+  MODIFIER            String?   @db.VarChar(36)
+  MODIFY_TIME         DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG            Int?      @default(0)
+  VERSION             Int?      @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_sjkd_data_model_resource {
+  ID            String                @id @default(cuid()) @db.VarChar(32)
+  DATA_MODEL    gfdc_sjkd_data_model? @relation(fields: [DATA_MODEL_ID], references: [ID])
+  DATA_MODEL_ID String                @db.VarChar(32)
+  RESOURCE      gfdc_auth_resource?   @relation(fields: [RESOURCE_ID], references: [ID])
+  RESOURCE_ID   String                @db.VarChar(32)
+  CREATOR_NO    String?               @db.VarChar(20)
+  CREATOR       String?               @db.VarChar(36)
+  CREATE_TIME   DateTime?             @default(now()) @db.DateTime(0)
+  MODIFIER_NO   String?               @db.VarChar(20)
+  MODIFIER      String?               @db.VarChar(36)
+  MODIFY_TIME   DateTime?             @default(now()) @db.DateTime(0)
+  DEL_FLAG      Int?                  @default(0)
+  VERSION       Int?                  @default(1)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_sjkd_menu_to_moudle_001 {
+  id          String?   @db.VarChar(32)
+  creator_no  String?   @db.VarChar(20)
+  creator     String?   @db.VarChar(36)
+  create_time DateTime? @default(now()) @db.DateTime(0)
+  modifier_no String?   @db.VarChar(20)
+  modifier    String?   @db.VarChar(36)
+  modify_time DateTime? @default(now()) @db.DateTime(0)
+  del_flag    Int?      @default(0)
+  test001     String?   @db.VarChar(200)
+  test002     String?   @db.VarChar(200)
+  test003     DateTime? @db.Date
+  test004     String?   @db.Text
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_sjkd_sort_test {
+  id          String?   @db.VarChar(32)
+  creator_no  String?   @db.VarChar(20)
+  creator     String?   @db.VarChar(36)
+  create_time DateTime? @default(now()) @db.DateTime(0)
+  modifier_no String?   @db.VarChar(20)
+  modifier    String?   @db.VarChar(36)
+  modify_time DateTime? @default(now()) @db.DateTime(0)
+  del_flag    Int?      @default(0)
+  year        String?   @db.VarChar(10)
+  month       String?   @db.VarChar(2)
+  remark      String?   @db.VarChar(200)
+  num         Decimal?  @db.Decimal(38, 10)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_sjkd_test001 {
+  id          String?   @db.VarChar(32)
+  creator_no  String?   @db.VarChar(20)
+  creator     String?   @db.VarChar(36)
+  create_time DateTime? @default(now()) @db.DateTime(0)
+  modifier_no String?   @db.VarChar(20)
+  modifier    String?   @db.VarChar(36)
+  modify_time DateTime? @default(now()) @db.DateTime(0)
+  del_flag    Int?      @default(0)
+  string      String?   @db.VarChar(200)
+  text        String?   @db.Text
+  number      Decimal?  @db.Decimal(38, 10)
+  number002   Decimal?  @db.Decimal(38, 10)
+  date        DateTime? @db.Date
+
+  @@ignore
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_storage_file {
+  ID           String    @id @db.VarChar(36)
+  STORAGE_TYPE String?   @db.VarChar(36)
+  FILE_URL     String?   @db.VarChar(200)
+  FILE_NAME    String?   @db.VarChar(200)
+  FILE_SIZE    BigInt?
+  FILE_TYPE    String?   @db.VarChar(36)
+  CREATOR_NO   String?   @db.VarChar(20)
+  CREATOR      String?   @db.VarChar(20)
+  CREATE_TIME  DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO  String?   @db.VarChar(20)
+  MODIFIER     String?   @db.VarChar(20)
+  MODIFY_TIME  DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG     Int?      @default(0)
+  version      Int?      @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_target_config {
+  ID                      String                    @id @db.VarChar(36)
+  FIELD_CODE              String                    @db.VarChar(50)
+  FIELD_NAME              String                    @db.VarChar(50)
+  FIELD_TYPE              String                    @db.VarChar(50)
+  REQUIRED                Int?                      @default(1)
+  RELATION_TARGET_HEAD    gfdc_target_head?         @relation("gfdc_target_config_RELATION_TARGET_HEAD", fields: [RELATION_TARGET_HEAD_ID], references: [ID])
+  RELATION_TARGET_HEAD_ID String?                   @db.VarChar(36)
+  REMARK                  String?                   @db.VarChar(200)
+  TARGET_HEAD             gfdc_target_head?         @relation("gfdc_target_config_TARGET_HEAD", fields: [TARGET_HEAD_ID], references: [ID])
+  TARGET_HEAD_ID          String                    @db.VarChar(36)
+  CREATOR_NO              String?                   @db.VarChar(20)
+  CREATOR                 String?                   @db.VarChar(20)
+  CREATE_TIME             DateTime?                 @default(now()) @db.DateTime(0)
+  MODIFIER_NO             String?                   @db.VarChar(20)
+  MODIFIER                String?                   @db.VarChar(20)
+  MODIFY_TIME             DateTime?                 @default(now()) @db.DateTime(0)
+  DEL_FLAG                Int?                      @default(0)
+  version                 Int?                      @default(1)
+  ITEMS                   gfdc_target_config_item[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_target_config_item {
+  ID               String              @id @db.VarChar(36)
+  TARGET_HEAD      gfdc_target_head?   @relation(fields: [TARGET_HEAD_ID], references: [ID])
+  TARGET_HEAD_ID   String              @db.VarChar(36)
+  TARGET_CONFIG    gfdc_target_config? @relation(fields: [TARGET_CONFIG_ID], references: [ID])
+  TARGET_CONFIG_ID String              @db.VarChar(36)
+  TARGET_ITEM_ID   String              @db.VarChar(36)
+  FIELD_VALUE      String?             @db.VarChar(200)
+  CREATOR_NO       String?             @db.VarChar(20)
+  CREATOR          String?             @db.VarChar(20)
+  CREATE_TIME      DateTime?           @default(now()) @db.DateTime(0)
+  MODIFIER_NO      String?             @db.VarChar(20)
+  MODIFIER         String?             @db.VarChar(20)
+  MODIFY_TIME      DateTime?           @default(now()) @db.DateTime(0)
+  DEL_FLAG         Int?                @default(0)
+  version          Int?                @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_target_head {
+  ID              String                    @id @db.VarChar(36)
+  TARGET_CODE     String                    @db.VarChar(50)
+  TARGET_NAME     String                    @db.VarChar(50)
+  TARGET_ENABLE   Int?                      @default(1)
+  CREATOR_NO      String?                   @db.VarChar(20)
+  CREATOR         String?                   @db.VarChar(20)
+  CREATE_TIME     DateTime?                 @default(now()) @db.DateTime(0)
+  MODIFIER_NO     String?                   @db.VarChar(20)
+  MODIFIER        String?                   @db.VarChar(20)
+  MODIFY_TIME     DateTime?                 @default(now()) @db.DateTime(0)
+  DEL_FLAG        Int?                      @default(0)
+  version         Int?                      @default(1)
+  FIELDS          gfdc_target_config[]      @relation("gfdc_target_config_TARGET_HEAD")
+  RELATION_FIELDS gfdc_target_config[]      @relation("gfdc_target_config_RELATION_TARGET_HEAD")
+  ITEMS           gfdc_target_config_item[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_target_item {
+  ID             String    @id @db.VarChar(36)
+  TARGET_HEAD_ID String    @db.VarChar(36)
+  CREATOR_NO     String?   @db.VarChar(20)
+  CREATOR        String?   @db.VarChar(20)
+  CREATE_TIME    DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO    String?   @db.VarChar(20)
+  MODIFIER       String?   @db.VarChar(20)
+  MODIFY_TIME    DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG       Int?      @default(0)
+  version        Int?      @default(1)
+  COLUMN_JSON    String?   @db.Text
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_three_major_report {
+  ID             String  @id @default(cuid()) @db.VarChar(32)
+  API_CODE       String? @db.VarChar(50)
+  API_NAME       String? @db.VarChar(50)
+  STOCK_TYPE     String? @db.VarChar(50)
+  REPORT_TYPE    String? @db.VarChar(50)
+  STOCK_CODE     String? @db.VarChar(50)
+  STOCK_NAME     String? @db.VarChar(50)
+  REPORT_DATE    String? @db.VarChar(50)
+  CYCLE          String? @db.VarChar(50)
+  INDICATOR_CODE String? @db.VarChar(50)
+  INDICATOR_NAME String? @db.VarChar(50)
+  AMOUNT         String? @db.VarChar(50)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model gfdc_user_collect_info {
+  ID          String    @id @db.VarChar(36)
+  EMP_NO      String    @db.VarChar(36)
+  MENU_CODE   String    @db.VarChar(100)
+  ORDER_NUM   Int?      @default(1)
+  CREATOR_NO  String?   @db.VarChar(20)
+  CREATOR     String?   @db.VarChar(20)
+  CREATE_TIME DateTime? @default(now()) @db.DateTime(0)
+  MODIFIER_NO String?   @db.VarChar(20)
+  MODIFIER    String?   @db.VarChar(20)
+  MODIFY_TIME DateTime? @default(now()) @db.DateTime(0)
+  DEL_FLAG    Int?      @default(0)
+  version     Int?      @default(1)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model zbpc_fw_exp_001 {
+  ID            String  @id @default(cuid()) @db.VarChar(32)
+  ENTITY_CODE   String? @db.VarChar(100)
+  ENTITY_NAME   String? @db.VarChar(100)
+  TIME          String? @db.VarChar(100)
+  CATEGORY_CODE String? @db.VarChar(100)
+  CATEGORY_NAME String? @db.VarChar(100)
+  COL001        String? @db.VarChar(50)
+  COL002        String? @db.VarChar(50)
+  COL003        String? @db.VarChar(50)
+  COL004        String? @db.VarChar(50)
+  COL005        String? @db.VarChar(50)
+  COL006        String? @db.VarChar(50)
+  COL007        String? @db.VarChar(50)
+  COL008        String? @db.VarChar(50)
+  COL009        String? @db.VarChar(50)
+  COL010        String? @db.VarChar(50)
+  COL011        String? @db.VarChar(50)
+  COL012        String? @db.VarChar(50)
+  COL013        String? @db.VarChar(50)
+  COL014        String? @db.VarChar(50)
+  COL015        String? @db.VarChar(50)
+  COL016        String? @db.VarChar(50)
+  COL017        String? @db.VarChar(50)
+  COL018        String? @db.VarChar(50)
+  COL019        String? @db.VarChar(50)
+  COL020        String? @db.VarChar(50)
+  COL021        String? @db.VarChar(50)
+  COL022        String? @db.VarChar(50)
+  COL023        String? @db.VarChar(50)
+  COL024        String? @db.VarChar(50)
+  COL025        String? @db.VarChar(50)
+  COL026        String? @db.VarChar(50)
+  COL027        String? @db.VarChar(50)
+  COL028        String? @db.VarChar(50)
+  COL029        String? @db.VarChar(50)
+  COL030        String? @db.VarChar(50)
+  COL031        String? @db.VarChar(50)
+  COL032        String? @db.VarChar(50)
+  COL033        String? @db.VarChar(50)
+  COL034        String? @db.VarChar(50)
+  COL035        String? @db.VarChar(50)
+  COL036        String? @db.VarChar(50)
+  COL037        String? @db.VarChar(50)
+  COL038        String? @db.VarChar(50)
+  COL039        String? @db.VarChar(50)
+  COL040        String? @db.VarChar(50)
+  COL041        String? @db.VarChar(50)
+  COL042        String? @db.VarChar(50)
+  COL043        String? @db.VarChar(50)
+  COL044        String? @db.VarChar(50)
+}
+
+model field_rw {
+  ID          String          @id @default(cuid()) @db.VarChar(32)
   // user   User   @relation(fields: [userId], references: [id])
   // userId Int    @unique
-  permis String
+  PERMIS      String          @db.Text
+  CREATE_TIME DateTime?       @default(now()) @db.DateTime(0)
+  ROLE        gfdc_auth_role? @relation(fields: [ROLE_ID], references: [ID])
+  ROLE_ID     String?         @unique
 }
